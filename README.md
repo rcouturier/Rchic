@@ -1,0 +1,4 @@
+Rchic
+=====
+
+CHIC for R
