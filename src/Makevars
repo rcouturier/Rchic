@@ -1,0 +1,2 @@
+PKG_CXXFLAGS  = -DNDEBUG -DNIMAPFN -std=c++0x
+

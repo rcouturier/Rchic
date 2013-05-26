@@ -1,0 +1,4 @@
+useDynLib(rchic)
+#exportPattern("^[[:alpha:]]+")
+
+#export("asirules")
