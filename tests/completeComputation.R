@@ -2,7 +2,9 @@
 #############    TO BE CHANGED    ############
 ##############################################
 library(rchic)
-workingDirectory='/home/couturie/Rchic/R'
+#workingDirectory='/home/couturie/Rchic/R'
+workingDirectory='C:\\Documents and Settings\\coutu\\Mes documents\\Rchic\\R'
+
 
 setwd(workingDirectory)
 
