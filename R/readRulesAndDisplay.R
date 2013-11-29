@@ -76,14 +76,17 @@ readRulesAndDisplay <-function() {
         g1 <- addEdge(from,to,g1,1)
       }
     }
-    plot(g1)
+    
+    #no need to plot thegraph
+  #  plot(g1)
     
     
     
     graph1 <- agopen(g1,"foo")
     
-    workingHeight=slot(slot(boundBox(graph1),'upRight'),'y')/2+50
-    workingWidth=slot(slot(boundBox(graph1),'upRight'),'x')/2+50
+    
+    workingHeight=slot(slot(boundBox(graph1),'upRight'),'y')+100
+    workingWidth=slot(slot(boundBox(graph1),'upRight'),'x')+100
     
     tkconfigure(canvas, scrollregion=c(0,0,workingWidth,workingHeight))
     
@@ -92,13 +95,18 @@ readRulesAndDisplay <-function() {
     
     nodes = AgNode(graph1)
     
+    
+    offsetX=40
+    
+    scalingFactor=0.8
+    
     for (i in 1:length(nodes)) {
       node=nodes[[i]]
       coord=getNodeXY(node)
       name=name(node)
-      tkcreate(canvas, "text", coord$x/2, workingHeight+25-coord$y/2, text=name,font=plotFont, fill="brown",tags="draw")
+      tkcreate(canvas, "text", offsetX+coord$x*scalingFactor, workingHeight+0-coord$y*scalingFactor, text=name,font=plotFont, fill="brown",tags="draw")
     }
-    
+    #print (graph1$size)
     edges = AgEdge(graph1)
     for (i in 1:length(edges)) {
       edge=edges[[i]]
@@ -112,8 +120,8 @@ readRulesAndDisplay <-function() {
         }
         lCoord=numeric(8)
         for(k in 1:4) {
-          lCoord[2*k-1]=slot(cPoints(coord)[[k]],'x')/2
-          lCoord[2*k]=workingHeight+25-slot(cPoints(coord)[[k]],'y')/2
+          lCoord[2*k-1]=offsetX+slot(cPoints(coord)[[k]],'x')*scalingFactor
+          lCoord[2*k]=workingHeight+0-slot(cPoints(coord)[[k]],'y')*scalingFactor
         }
         tkcreate(canvas, "line", lCoord,width=2,arrow=arrow,smooth='bezier',splinesteps=10,tags="draw")
       }
