@@ -526,6 +526,8 @@ int asirules (int *argc2, char *argv[])
   double  supp     = 10.0;      /* minimal support    (in percent) */
   double  conf     = 80.0;      /* minimal confidence (in percent) */
 	double  impli    = 0.;
+	double normal_simi=0;
+	double entro_simi=0;
 	double  phi=0.;
 	double occhyp,occcon;
   int     rsdef    = IST_BODY;  /* rule support definition */
@@ -941,9 +943,9 @@ int asirules (int *argc2, char *argv[])
     char buf[size];
     char b[100][size];
     double v[100],originality;
-		fprintf(out, "hyp -> con,       occurrence(hyp),     occurrence(con),      support(rule),       confidence,     classical index,     entropic index\n");
+		fprintf(out, "hyp -> con,       occurrence(hyp),     occurrence(con),      support(rule),       confidence,      classical index,         entropic index,     classical simi,       entropic simi\n");
     while (1) {                 /* extract rules from tree */
-      cis->cnt = ist_rule(istree, cis->iids, &occhyp, &occcon, &supp, &conf, &minval,&phi, &impli,maxlen,simple_impli,Binomial_law);
+      cis->cnt = ist_rule(istree, cis->iids, &occhyp, &occcon, &supp, &conf, &minval,&phi, &impli,&normal_simi,&entro_simi,maxlen,simple_impli,Binomial_law);
       if (cis->cnt <= 0) break; /* get next rule and print its head */
       buf[0]='\0';
       for (i = 1; i < cis->cnt; i++) {  /* traverse the rule body */
@@ -1031,6 +1033,8 @@ int asirules (int *argc2, char *argv[])
 					fputs(", ", out); fprintf(out, fmt, conf *100);
 					fputs(", ", out);fprintf(out, fmt, phi*100);
 					fputs(", ", out);fprintf(out, fmt, impli*100);
+					fputs(", ", out);fprintf(out, fmt, normal_simi*100);
+					fputs(", ", out);fprintf(out, fmt, entro_simi*100);
 					fputs(", ", out);fprintf(out, fmt, originality*100);
 					fputs("\n", out);
 					reccnt++;
@@ -1048,6 +1052,8 @@ int asirules (int *argc2, char *argv[])
 					fputs(", ", out); fprintf(out, fmt, conf *100);
 					fputs(", ", out);fprintf(out, fmt, phi*100);
 					fputs(", ", out);fprintf(out, fmt, impli*100);
+					fputs(", ", out);fprintf(out, fmt, normal_simi*100);
+					fputs(", ", out);fprintf(out, fmt, entro_simi*100);
 					fputs("\n", out);
 					reccnt++;
 				}

@@ -629,7 +629,7 @@ double Poisson(double para,int cumul)
 
 int ist_rule (ISTREE *ist, int *rule,
               double* occhyp, double* occcon, double *supp, double *conf, double *aval, double *phi,
-							double *impli, int maxlen, int simple_impli, int Binomial_law)
+							double *impli, double* normal_simi,double *entro_simi, int maxlen, int simple_impli, int Binomial_law)
 {                               /* --- extract next rule */
   int      i;                   /* loop variable */
   int      item;                /* buffer for an item identifier */
@@ -792,6 +792,10 @@ int ist_rule (ISTREE *ist, int *rule,
 		else h2=1.;
 		ii = sqrt((1.-h1)*(1.-h2));
 		*impli=(1.-1./(2.*sqrt(occ_n)))*ii;
+
+
+		double c=(occ_a*occ_b)/occ_n;
+		*normal_simi=Normal((occ_ab-c)/sqrt(c));
 
 
 

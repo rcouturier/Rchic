@@ -105,7 +105,7 @@ extern void    ist_init   (ISTREE *ist, int minlen,
                            int arem, double minval);
 extern int     ist_rule   (ISTREE *ist, int *rule,
                            double *occhyp, double *occcon, double *supp, double *conf, double *aval, double *phi,
-													 double *impli, int maxlen, int simple_impli, int Binomial_law);
+													 double *impli,  double* normal_simi,double *entro_simi, int maxlen, int simple_impli, int Binomial_law);
 extern int     ist_hedge  (ISTREE *ist, int *hedge,
                            double *supp, double *conf);
 
