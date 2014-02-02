@@ -374,6 +374,8 @@ SEXP similarity(SEXP similarity_matrix) {
 				}
 				tabo[f]=(int)taby[x][1];
 				tabz[f]=(int)taby[x][tabe[x]];
+        
+        Rprintf("Level %d tabo %d tabz %d\n",f,tabo[f],tabz[f]);
 				tabee[f]=tabe[x];			
 				
         char *new_s=new char[strlen(cc[x])+3];  //3 a cause des ()
@@ -392,6 +394,8 @@ SEXP similarity(SEXP similarity_matrix) {
 				delete []cl[x];
 				cl[x]=new_s2;
         Rprintf("Classification %d : %s similarity %f\n",f+1,cl[x],max);
+        
+        
 				//os<<Classification<<(f+1)<<" : "<<cl[x]<<Similarity<<max<<"\r\n\r\n";
 				f++;
 	
@@ -409,18 +413,57 @@ SEXP similarity(SEXP similarity_matrix) {
   }while(r>1 && max>1e-12);    
     
         
-        
-        
-  //} while a faire
-
-
+  j=0;
+  k=0;
+  for(i=0;i<nb_col;i++)
+	{
+		if(cc[i]) j+=strlen(cc[i])+1;
+	}
+	for(i=0;i<nb_col;i++)
+	{
+		if(cc[i]) k+=strlen(cl[i])+1;
+	}
+	
+	char *chc=new char[j+1];
+	chc[0]='\0';
+	char *chl=new char[k+1];
+	chl[0]='\0';
+	for(i=0;i<nb_col;i++)
+	{
+		if(tabe[i])
+		{
+			strcat(chc,cc[i]);
+			strcat(chc," ");
+			strcat(chl,cl[i]);
+			strcat(chl," ");
+			
+		}
+	}
 
 
   
-  SEXP dimnames = PROTECT(allocVector(VECSXP, 2));
-  SET_VECTOR_ELT(dimnames, 0, getAttrib(similarity_matrix, R_DimNamesSymbol));
-  SET_VECTOR_ELT(dimnames, 1, getAttrib(similarity_matrix, R_DimSymbol));
-  UNPROTECT(1); 
+  SEXP results = PROTECT(allocVector(VECSXP, 4));
+  SEXP listClasses = PROTECT(allocVector(VECSXP, 2));
+  SET_VECTOR_ELT(listClasses, 0, mkString(chc));
+  SET_VECTOR_ELT(listClasses, 1, mkString(chl));
+  SET_VECTOR_ELT(results, 0, listClasses);
+  
+  SEXP Rtabo = PROTECT(allocVector(INTSXP, f));
+  for(i=0;i<f;i++)
+    INTEGER(Rtabo)[i]=tabo[i]+1;  //+1 because in R indexes start at 1
+  SET_VECTOR_ELT(results, 1, Rtabo);
+  
+  SEXP Rtabz = PROTECT(allocVector(INTSXP, f));
+  for(i=0;i<f;i++)
+    INTEGER(Rtabz)[i]=tabz[i]+1;  //idem
+  SET_VECTOR_ELT(results, 2, Rtabz);
+  
+  
+  SEXP RnbLevel=PROTECT(allocVector(INTSXP, 1));
+  INTEGER(RnbLevel)[0] = f;
+  SET_VECTOR_ELT(results, 3, RnbLevel);
+  
+  UNPROTECT(5); 
   
   for(i;i<nb_col;i++)
     delete []Index[i];
@@ -450,268 +493,9 @@ SEXP similarity(SEXP similarity_matrix) {
   delete []tabo;
   delete []Item;
   delete []level;
-  return dimnames;
+  return results;
   
-	//int similarity (SEXP nb_col) {
 
-/*
-		long x,y,j,k;
-		int i;
-		double max;
-		long u,v;
-		int max_found;
-
-		char * str=new char[nb_col>20?20000:int(nb_col)*1000]; //1000 est la taille d'un chaine
-		if(level) delete []level;
-		level= new int[nb_col];
-		CString Classification;
-		CString Similarity;
-		Similarity.LoadString(IDS_SIMILARITY);
-		Classification.LoadString(IDS_CLASSIFICATION);
-		ostrstream os(str,nb_col>20?20000:int(nb_col)*1000);
-
-		r=0;
-		for(i=0;i<nb_col;i++) r+=Item[i];
-		f=0;
-		for(i=0;i<nb_col;i++)
-			for(j=0;j<nb_col;j++) taby[i][j]=0;
-		for (i=0;i<nb_col;i++)
-			{
-				if(Item[i]) taby[i][1]=(float)i;
-				tabe[i]=1;
-				cc[i]=new char[VarLength];	//4 permet d'avoir des nombres composés de 3 chiffres
-				cl[i]=new char[VarLength];
-				wsprintf(cc[i],"%i",i+1);
-				wsprintf(cl[i],"%s",Variable[i]);
-			}
-
-		if(Node) delete []Node;
-		Node=new int[r];
-		for(i=0;i<r;i++) Node[i]=0;
-		if(AlreadyInClasse) delete []AlreadyInClasse;
-		AlreadyInClasse = new int[nb_col];
-		for(i=0;i<nb_col;i++) AlreadyInClasse[i]=-999999;
-		if(Terminal) delete []Terminal;
-		Terminal = new int[nb_col];
-		for(i=0;i<nb_col;i++) Terminal[i]=1;
-		if(LevelX) delete []LevelX;
-		LevelX=new int[r];
-		for(i=0;i<r;i++) LevelX[i]=-1;
-		if(LevelY) delete []LevelY;
-		LevelY=new int[r];
-		for(i=0;i<r;i++) LevelY[i]=-1;
-
-
-		do
-			{
-				for (u=0;u<nb_col-1;u++)
-					for (v=u+1;v<nb_col;v++)
-						{
-							if(Item[u] && Item[v])
-								{
-									if ( tabe[u]==1 && tabe[v]==1)	CurIndex[u][v]=Index[u][v];
-									else if (tabe[u]==0 || tabe[v]==0) CurIndex[u][v]=0;
-									else
-										{
-											x=(long)taby[u][1];
-											y=(long)taby[v][1];
-											max=Index[x][y];
-											for (j=1;j<=tabe[u];j++)
-												for (k=1;k<=tabe[v];k++)
-													{
-														double t=Index[(int)taby[u][j]][(int)taby[v][k]];
-														if (max<t) max=t;
-														t=pow(max,tabe[u]);
-														CurIndex[u][v]=pow(t,tabe[v]);
-													}
-										}
-								}
-						}
-				max=1e-12;
-				max_found=0;
-				x=0;
-				y=0;
-				for (u=0;u<nb_col-1;u++)         //voir u=0 u<nb_col-1
-					for (v=u+1;v<nb_col;v++)            //v=u+1;<nb_col
-						{
-							if(Item[u] && Item[v])
-								{	
-									if (tabe[u]==1 && tabe[v]==1) CurIndex[u][v]=Index[u][v];
-									if (max<CurIndex[u][v])
-										{
-											max=CurIndex[u][v];
-											x=u;
-											y=v;
-										}
-								}
-						}
-
-				for (u=0;u<nb_col;u++) tabb[u]=-1;
-
-				for (u=x;u<nb_col-1;u++)
-					for (v=u+1;v<nb_col;v++)
-						if (tabe[u]!=0 && tabe[v]!=0)
-							if (CurIndex[u][v]==max)
-								{
-									tabb[u]=u;
-									tabb[v]=v;
-								}
-
-
-				j=tabe[x];
-				if(max>1e-12)
-					{
-						level[x]=f;
-			
-						for (u=x+1;u<nb_col;u++)
-							{
-								if(Item[u])
-									{                                             
-										if (tabb[u]!=-1 && CurIndex[x][u]==max && !max_found)
-											{
-												max_found=1;
-												if(AlreadyInClasse[x]==-999999 && AlreadyInClasse[y]==-999999)
-													{
-														AlreadyInClasse[x]=f;
-														AlreadyInClasse[y]=f;
-														LevelX[f]=-x-1;
-														LevelY[f]=-y-1;
-													}
-												else
-													if(AlreadyInClasse[x]==-999999) 
-														{
-															LevelX[f]=-x-1;
-															LevelY[f]=AlreadyInClasse[y];
-															AlreadyInClasse[x]=f;
-															AlreadyInClasse[y]=f;
-														}
-													else
-														if(AlreadyInClasse[y]==-999999)
-															{
-																LevelX[f]=AlreadyInClasse[x];
-																LevelY[f]=-y-1;
-																AlreadyInClasse[x]=f;
-																AlreadyInClasse[y]=f;
-															}
-														else
-															{
-																LevelX[f]=AlreadyInClasse[x];
-																LevelY[f]=AlreadyInClasse[y];
-																AlreadyInClasse[x]=f;
-																AlreadyInClasse[y]=f;
-															}
-												Terminal[y]=0;
-												GenericPair(x,y,tabe[x],tabe[y],GenPairX[f],GenPairY[f]);
-
-
-												level[u]=f;
-												tabe[x]=tabe[x]+tabe[u];
-												char * new_s = new char[lstrlen(cc[x])+2+lstrlen(cc[u])];
-												lstrcpy(new_s,cc[x]);
-												lstrcat(new_s," ");    //espace entre les 2 chaines
-												lstrcat(new_s,cc[u]);
-												delete []cc[u];
-												cc[u]=0;
-												delete []cc[x];
-												cc[x]=new_s;
-												char * new_s2 = new char[lstrlen(cl[x])+2+lstrlen(cl[u])];
-												lstrcpy(new_s2,cl[x]);
-												lstrcat(new_s2," ");    //espace entre les 2 chaines
-												lstrcat(new_s2,cl[u]);
-												delete []cl[u];
-												cl[u]=NULL;
-												delete []cl[x];
-												cl[x]=new_s2;
-
-												r--;
-												for (k=j+1;k<=j+tabe[u];k++)
-													taby[x][k]=taby[u][k-j];
-												j=j+tabe[u];
-												tabe[u]=0;
-											}
-									}
-							}
-						tabo[f]=(int)taby[x][1];
-						tabz[f]=(int)taby[x][tabe[x]];
-						tabee[f]=tabe[x];			
-						char *new_s=new char[lstrlen(cc[x])+3];  //3 a cause des ()
-						char *new_s2=new char[lstrlen(cl[x])+3];
-						//wsprintf(new_s,"(%s)",cc[x]);         //on met la classe formée entre ()
-						//attention wsprintf est limite a 1024 caractere
-						lstrcpy(new_s,"(");
-						lstrcat(new_s,cc[x]);    //espace entre les 2 chaines
-						lstrcat(new_s,")");
-						delete []cc[x];
-						cc[x]=new_s;
-						lstrcpy(new_s2,"(");
-						lstrcat(new_s2,cl[x]);    //espace entre les 2 chaines
-						lstrcat(new_s2,")");
-						delete []cl[x];
-						cl[x]=new_s2;
-						os<<Classification<<(f+1)<<" : "<<cl[x]<<Similarity<<max<<"\r\n\r\n";
-						f++;
-			
-						if(f%10==9)
-							{
-								os<<'\0';
-								if(DisplayResult && !TextDesactivated) PView->GetEditCtrl().ReplaceSel(str);
-								os.seekp(0);
-							}
-					}
-		
-				TRY
-					{
-						StopTest();
-					}
-				CATCH( CUserException, e )
-					{
-						delete  []str;
-						AfxThrowUserException( );
-					} 
-				END_CATCH
-					}while(r>1 && max>1e-12);
-		os<<'\0';
-		i=0;
-		
-		j=0;
-		k=0;
-		for(i=0;i<nb_col;i++)
-			{
-				if(cc[i]) j+=lstrlen(cc[i])+1;
-			}
-		for(i=0;i<nb_col;i++)
-			{
-				if(cc[i]) k+=lstrlen(cl[i])+1;
-			}
-		if(chc) delete chc;
-		if(chl) delete chl;
-		chc=new char[j+1];
-		chc[0]='\0';
-		chl=new char[k+1];
-		chl[0]='\0';
-		for(i=0;i<nb_col;i++)
-			{
-				if(tabe[i])
-					{
-						lstrcat(chc,cc[i]);
-						lstrcat(chc," ");
-						lstrcat(chl,cl[i]);
-						lstrcat(chl," ");
-						delete []cc[i];
-						cc[i]=NULL;
-						delete []cl[i];
-						cl[i]=NULL;
-					}
-			}
-
-		if(DisplayResult && !TextDesactivated) PView->GetEditCtrl().ReplaceSel(str);
-		delete []str;
-		int nb=0;
-		for(i=0;i<nb_col;i++) nb+=Item[i];
-		//		if(SigniNode && nb) SignificantLevel();
-
-	}
-*/
 }
 
 
