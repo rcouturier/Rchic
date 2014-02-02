@@ -53,7 +53,8 @@ list.simi.variables=res[[1]][[2]]
 tabo=res[[2]]
 tabz=res[[3]]
 
-nb.levels=res[[4]]+1
+#+1 because index starts with 1 in R and +1 because there is one element more than the nb of levels
+nb.levels=res[[4]]+2 
 
 list.simi.indexes.variable=str_replace_all(list.simi.indexes.variable,"[[:punct:]]","")
 list.simi.indexes.variable=strsplit(list.simi.indexes.variable,' ')
