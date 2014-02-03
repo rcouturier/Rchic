@@ -8,9 +8,9 @@ callAsirules <- function() {
 
 
 
-callSimilarityComputation <- function(similarity_matrix)  {
+callSimilarityComputation <- function(similarity_matrix,list.selected.item,list.occurrences.variables)  {
     
-    .Call("similarity", similarity_matrix)  
+    .Call("similarity", similarity_matrix,list.selected.item,list.occurrences.variables)  
 }
 
 

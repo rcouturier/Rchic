@@ -13,120 +13,177 @@
 #include <R.h>
 #include <Rinternals.h>
 
+
+
+// list::sort
+#include <vector>
+#include <list>
+#include <string>
+#include <cctype>
+#include <algorithm> 
+#include <array> 
+
+
+
+struct Local {
+    Local(double *Occurrences) { this->Occurrences = Occurrences; }
+    bool operator () (const std::tuple<double,int,int>& a, const std::tuple<double,int,int>& b) {
+      double cohe_a=std::get<0>(a);
+      double cohe_b=std::get<0>(b);
+      int x_a=std::get<1>(a);
+      int x_b=std::get<1>(b);
+      int y_a=std::get<2>(a);
+      int y_b=std::get<2>(b);
+  
+      
+      return (cohe_a>cohe_b || 
+          (cohe_a==cohe_b && (Occurrences[x_a]<Occurrences[x_b] ||
+          (Occurrences[x_a]==Occurrences[x_b] && 
+          Occurrences[y_a]<Occurrences[y_b]))));
+    }
+
+    double *Occurrences;
+};
+
+
+
+
+template <class T>
+int
+insertNoDuplicate( std::vector<T>& references, T const& newValue )
+{
+    int results = std::find( references.begin(), references.end(), newValue )
+                                    - references.begin();
+    if ( results == references.size() ) {
+        references.push_back( newValue );
+    }
+    return results;
+}
+
 extern "C"{
 
-void convolve(double *a, int *na, double *b, int *nb, double *ab)
-{
-    int nab = *na + *nb - 1;
-
-    for(int i = 0; i < nab; i++)
-        ab[i] = 0.0;
-    for(int i = 0; i < *na; i++)
-        for(int j = 0; j < *nb; j++)
-            ab[i + j] += a[i] * b[j];
-}
-
-
-/* second version */
-SEXP myout(SEXP x, SEXP y)
-{
-    int nx = length(x), ny = length(y);
-    SEXP ans = PROTECT(allocMatrix(REALSXP, nx, ny));
-    double *rx = REAL(x), *ry = REAL(y), *rans = REAL(ans);
-
-    for(int i = 0; i < nx; i++) {
-  double tmp = rx[i];
-	for(int j = 0; j < ny; j++)
-	    rans[i + nx*j] = tmp * ry[j];
-    }
-
-    SEXP dimnames = PROTECT(allocVector(VECSXP, 2));
-    SET_VECTOR_ELT(dimnames, 0, getAttrib(x, R_NamesSymbol));
-    SET_VECTOR_ELT(dimnames, 1, getAttrib(y, R_NamesSymbol));
-    setAttrib(ans, R_DimNamesSymbol, dimnames);
-    UNPROTECT(2);
-    return ans;
-}
-
-/* second version */
-SEXP myout2(SEXP x, SEXP y)
-{
-    int nx = length(x), ny = length(y);
-    SEXP ans = PROTECT(allocMatrix(REALSXP, nx, ny));
-    double *rx = REAL(x), *ry = REAL(y), *rans = REAL(ans);
-
-Rprintf("%d %d \n",nx,ny);
-
-    for(int i = 0; i < nx; i++) {
-  double tmp = rx[i];
-  for(int j = 0; j < ny; j++)
-	    rans[i + nx*j] = tmp * ry[j];
-    }
-
-    SEXP dimnames = PROTECT(allocVector(VECSXP, 2));
-    SET_VECTOR_ELT(dimnames, 0, getAttrib(x, R_NamesSymbol));
-    SET_VECTOR_ELT(dimnames, 1, getAttrib(y, R_NamesSymbol));
-    setAttrib(ans, R_DimNamesSymbol, dimnames);
-    UNPROTECT(2);
-    
-    
-    char buffer[100];
-  
-    /*SEXP e = allocVector(STRSXP, nx);
-    for (int i = 0;i<nx;i++){
-      sprintf(buffer, "val %d", i);
-      SEXP s = mkChar(buffer);
-      SET_STRING_ELT(e, i, s);
-    }
-    
-    return e;   
-    */
-    
-     SEXP alist = R_NilValue;
-    for (int i = 0;i<nx;i++){
-  PROTECT(alist);
-        sprintf(buffer, "val %d", i);
-	alist = CONS(mkString(buffer), alist);
-	UNPROTECT(1);
-    }
-    
-    return alist;
-    
-}
 
 
 
-SEXP myout3(SEXP x)
-{
-  
-  if(!isReal(x))
-    error("name is not a single string");
-  Rprintf("value is %f\n", REAL(x)[0]);
-  
-  return R_NilValue;  
-    
-}
 
-SEXP myout4(SEXP mat)
-{
-  
-  if(!isMatrix(mat))
-    error("matrix needed");
-  
-  SEXP names=getAttrib(mat, R_DimNamesSymbol);
-  SEXP v1= VECTOR_ELT(names, 0);
-  Rprintf("is string %d %d\n",isString(v1),isNewList(v1));
-  
-  //char *s=(CHAR(STRING_ELT(names, 0)));
-  Rprintf("name %s\n",CHAR(STRING_ELT(v1, 1)));
-    
-  SEXP dimnames = PROTECT(allocVector(VECSXP, 2));
-  SET_VECTOR_ELT(dimnames, 0, getAttrib(mat, R_DimNamesSymbol));
-  SET_VECTOR_ELT(dimnames, 1, getAttrib(mat, R_DimSymbol));
-  UNPROTECT(1);  
-  return dimnames;  
-    
-}
+
+
+
+
+
+
+//void convolve(double *a, int *na, double *b, int *nb, double *ab)
+//{
+//    int nab = *na + *nb - 1;
+//
+//    for(int i = 0; i < nab; i++)
+//        ab[i] = 0.0;
+//    for(int i = 0; i < *na; i++)
+//        for(int j = 0; j < *nb; j++)
+//            ab[i + j] += a[i] * b[j];
+//}
+//
+//
+///* second version */
+//SEXP myout(SEXP x, SEXP y)
+//{
+//    int nx = length(x), ny = length(y);
+//    SEXP ans = PROTECT(allocMatrix(REALSXP, nx, ny));
+//    double *rx = REAL(x), *ry = REAL(y), *rans = REAL(ans);
+//
+//    for(int i = 0; i < nx; i++) {
+//  double tmp = rx[i];
+//	for(int j = 0; j < ny; j++)
+//	    rans[i + nx*j] = tmp * ry[j];
+//    }
+//
+//    SEXP dimnames = PROTECT(allocVector(VECSXP, 2));
+//    SET_VECTOR_ELT(dimnames, 0, getAttrib(x, R_NamesSymbol));
+//    SET_VECTOR_ELT(dimnames, 1, getAttrib(y, R_NamesSymbol));
+//    setAttrib(ans, R_DimNamesSymbol, dimnames);
+//    UNPROTECT(2);
+//    return ans;
+//}
+//
+///* second version */
+//SEXP myout2(SEXP x, SEXP y)
+//{
+//    int nx = length(x), ny = length(y);
+//    SEXP ans = PROTECT(allocMatrix(REALSXP, nx, ny));
+//    double *rx = REAL(x), *ry = REAL(y), *rans = REAL(ans);
+//
+//Rprintf("%d %d \n",nx,ny);
+//
+//    for(int i = 0; i < nx; i++) {
+//  double tmp = rx[i];
+//  for(int j = 0; j < ny; j++)
+//	    rans[i + nx*j] = tmp * ry[j];
+//    }
+//
+//    SEXP dimnames = PROTECT(allocVector(VECSXP, 2));
+//    SET_VECTOR_ELT(dimnames, 0, getAttrib(x, R_NamesSymbol));
+//    SET_VECTOR_ELT(dimnames, 1, getAttrib(y, R_NamesSymbol));
+//    setAttrib(ans, R_DimNamesSymbol, dimnames);
+//    UNPROTECT(2);
+//    
+//    
+//    char buffer[100];
+//  
+//    /*SEXP e = allocVector(STRSXP, nx);
+//    for (int i = 0;i<nx;i++){
+//      sprintf(buffer, "val %d", i);
+//      SEXP s = mkChar(buffer);
+//      SET_STRING_ELT(e, i, s);
+//    }
+//    
+//    return e;   
+//    */
+//    
+//     SEXP alist = R_NilValue;
+//    for (int i = 0;i<nx;i++){
+//  PROTECT(alist);
+//        sprintf(buffer, "val %d", i);
+//	alist = CONS(mkString(buffer), alist);
+//	UNPROTECT(1);
+//    }
+//    
+//    return alist;
+//    
+//}
+//
+//
+//
+//SEXP myout3(SEXP x)
+//{
+//  
+//  if(!isReal(x))
+//    error("name is not a single string");
+//  Rprintf("value is %f\n", REAL(x)[0]);
+//  
+//  return R_NilValue;  
+//    
+//}
+//
+//SEXP myout4(SEXP mat)
+//{
+//  
+//  if(!isMatrix(mat))
+//    error("matrix needed");
+//  
+//  SEXP names=getAttrib(mat, R_DimNamesSymbol);
+//  SEXP v1= VECTOR_ELT(names, 0);
+//  Rprintf("is string %d %d\n",isString(v1),isNewList(v1));
+//  
+//  //char *s=(CHAR(STRING_ELT(names, 0)));
+//  Rprintf("name %s\n",CHAR(STRING_ELT(v1, 1)));
+//    
+//  SEXP dimnames = PROTECT(allocVector(VECSXP, 2));
+//  SET_VECTOR_ELT(dimnames, 0, getAttrib(mat, R_DimNamesSymbol));
+//  SET_VECTOR_ELT(dimnames, 1, getAttrib(mat, R_DimSymbol));
+//  UNPROTECT(1);  
+//  return dimnames;  
+//    
+//}
 
 void GenericPair(int u,int v,int p,int q,int &maxx, int& maxy, double **Index, int **taby)
 {
@@ -148,8 +205,232 @@ void GenericPair(int u,int v,int p,int q,int &maxx, int& maxy, double **Index, i
 
 
 
+void SignificantLevel(double **indexes_values,int nb_col, double* occurrences_variables, int nb_levels, 
+int *variable_left,int *variable_right, int *size_class, int** classes_associated_with, int*  significant_nodes)
+{
+  //double* cohe;
+  //int *order;
+  int *x,*y;
+  long ll=nb_col*(nb_col-1);
+  double old_signi=0;
+  //cohe = new double[ll];
+  
+  std::vector <std::tuple<double,int,int>> list_pairs;
+  //list of pairs of pairs (all pairs possible at a given level)
+  std::vector <std::tuple<double,int,int>> list_pairs_pairs;   
+  std::vector <std::tuple<double,int,int>>::iterator it;
+  
+  
+  long i,j,k,l=0,m;
+  
+  
+  for(i=0;i<nb_col;i++)
+    for(j=0;j<nb_col;j++)
+    {  
+      if(i!=j)
+      {
+        list_pairs.push_back(std::make_tuple(indexes_values[i][j],i,j));
+//        cohe[l]=Index[i][j];
+//        x[l]=i;
+//        y[l]=j;
+        
+      }
+    }
+  
+  std::sort (list_pairs.begin(), list_pairs.end(), Local(occurrences_variables)); 
+  
+  std::cout << "list contains:"<<std::endl;
+  for (it=list_pairs.begin(); it!=list_pairs.end(); ++it) {
+    std::cout << std::get<0>(*it) << ' '<<std::get<1>(*it) << ' '<<std::get<2>(*it) << ' '<<std::endl;
+  }
+  
+  
+//  char * str=new char[ll*50+20000]; 
+//  ostrstream os(str,ll*50+20000);
+//  os.precision(3);
+//  
+//  
+//  CString Text;
+  double *signi=new double[nb_levels];
+  double *localmax=new double[nb_levels];
+  
+  for(i=0;i<nb_levels;i++)
+  {
+//    if(LongCalculation)
+//    {
+//      CString level;
+//      level.LoadString(IDS_LEVEL);
+      std::cout<<std::endl<<" Level "<<i+1<<" : ";
+//    }
+    for(j=0;j<=i;j++)
+    {
+      int t;
+      int u=variable_left[j];
+      int v=variable_right[j];
+      int p=size_class[j];
+//      int u=tabo[j];
+//      int v=tabz[j];
+//      int p=tabee[j];
+      if(p>=1)
+        for (l=1;l<=p-1;l++)
+          for (t=l+1;t<=p;t++)  																								  
+          {
+            int i=classes_associated_with[u][l];
+            int j=classes_associated_with[u][t];
+            insertNoDuplicate(list_pairs_pairs,std::make_tuple(indexes_values[i][j],i,j));
+            
+            //list.Insert((int)taby[u][l],(int)taby[u][t]); 
+            
+            //add it for double arrows in hierarchy
+            //value>=10 means equivalent nodes
+            if(significant_nodes[j]>=10) 
+              insertNoDuplicate(list_pairs_pairs,std::make_tuple(indexes_values[j][i],j,i));
+            
+          }
+      if(p==0)
+      {
+        //list.Insert(u,v); 
+        insertNoDuplicate(list_pairs_pairs,std::make_tuple(indexes_values[u][v],u,v));
+      }
+    }
+//    int nb_ele_niv=list.GetCount();
+//    int *uni_x=new int[nb_ele_niv];
+//    int *uni_y=new int[nb_ele_niv];
+//    double *uni_cohe = new double[nb_ele_niv];
+//    
+//    l=0;
+//    POSITION pos=list.GetHeadPosition();
+//    while(list.GetCount()>l)
+//    {
+//      int*mm = list.GetNext(pos);
+//      
+//      uni_x[l]=mm[0];
+//      uni_y[l]=mm[1];
+//      uni_cohe[l]=Index[mm[0]][mm[1]];
+//      l++;
+//      delete []mm; //indispensable pour recuperer la mem
+//    }
+//    list.RemoveAll();
+    
+    
+    
+    //qs(uni_cohe,uni_x,uni_y,nb_ele_niv);
+    std::sort (list_pairs_pairs.begin(), list_pairs_pairs.end(), Local(occurrences_variables));   
+//    
+//    
+//    if(LongCalculation)
+//    {
+//        for(l=0;l<nb_ele_niv;l++)
+//        {
+//          if(l%11==10) std::cout<<endl
+//          std::cout<<"c("<<(uni_x[l]+1)<<","<<(uni_y[l]+1)<<")="<<uni_cohe[l]<<" ";
+//        }
+//    }
+    int *mark=new int[ll];
+    for(l=0;l<ll;l++) mark[l]=0;
+    int last=ll-1;
+    int out;
+    int nb=0;
+    int nb_elements_level=list_pairs_pairs.size();
+    int val=nb_elements_level;
+    
+    for(l=nb_elements_level-1;l>=0;l--)
+    {
+      last=ll-1;//cette instruction n'est pas indispensable en theorie
+      //mais si on l'enleve il y a des pb a cause des quicksorts qui peuvent
+      //trier des valeurs egales dans des ordes diff 
+      out=0;
+      while(last>=0 && !out)
+      {
+        // get<1> means element x
+        // get<2> means element y
+        if(std::get<1>(list_pairs_pairs[l])==std::get<1>(list_pairs[last]) && std::get<2>(list_pairs_pairs[l])==std::get<2>(list_pairs[last]))
+        {
+          mark[last]=val--;
+          out=1;
+        }
+        last--;
+      }
+    }
+//    //if(val!=0) MessageBeep(0);
+    for(l=nb_elements_level-1;l>=0;l--)
+    {
+      k=ll-1;
+      out=0;
+      while(k>=0 && !out) {out=(mark[k--]==l+1);}
+      int ind=k+1;
+      
+      // get<0> means current index value
+      while(k>=0 && std::get<0>(list_pairs[ind])==std::get<0>(list_pairs[k]) 
+              && occurrences_variables[std::get<1>(list_pairs[ind])]==occurrences_variables[std::get<1>(list_pairs[k])] 
+              && occurrences_variables[std::get<2>(list_pairs[ind])]==occurrences_variables[std::get<2>(list_pairs[k])]) 
+      {
+        k--; 
+        //os<<"ah "; //message pour vérifier ou interviennent les cas ou les cohe sont =
+      }
+      for(m=k;m>=0;m--)
+      {
+        if(!mark[m]) nb++;
+      }
+    }
+    double sr=nb_elements_level*(ll-nb_elements_level);
+    
+    signi[i]=(nb-0.5*sr)/(sqrt(sr*(ll+1)/12.));
+    if(i!=0) localmax[i]=signi[i]-signi[i-1];
+    else localmax[i]=signi[0];
+//    if(LongCalculation)
+//      os<<"    G-SR="<<nb<<"  S="<<signi[i]<<"  V="<<localmax[i];
 
-SEXP similarity(SEXP similarity_matrix) {
+    std::cout<<"    G-SR="<<nb<<"  S="<<signi[i]<<"  V="<<localmax[i];
+    delete []mark;
+//    delete []uni_x;
+//    delete []uni_y;
+//    delete []uni_cohe;
+  }
+  double max=0;
+  int index=0;
+  for(i=0;i<nb_levels;i++)
+  {
+    if(max<localmax[i]) 
+    {
+      max=localmax[i];
+      index=i;
+    }
+  }
+//  Text.LoadString(IDS_MOSTSIGNIFICANT);
+  std::cout<<"Most significant level "<<index+1<<std::endl;
+//  
+//  Text.LoadString(IDS_SIGNIFICANTNODES);
+//  os<<"\r\n\r\n"<<Text<<"\r\n";
+//  Text.LoadString(IDS_ATLEVEL);
+  for(i=0;i<nb_levels;i++)
+  {
+    int node=0;
+    if(i==0 && nb_levels>0 && localmax[i]>localmax[i+1]) node=1;
+    if(i>0 && i<nb_levels-1 && localmax[i]>=localmax[i-1] && localmax[i]>=localmax[i+1]) node=1;
+    if(i==nb_levels-1 && i>0 && localmax[i]>localmax[i-1]) node=1;
+    if(node) 
+    {
+      std::cout<<"Significant level "<<i+1<<std::endl; 
+      significant_nodes[i]+=1;
+    }
+  }
+//  os<<"\r\n"<<'\0';
+//  if(DisplayResult && !TextDesactivated) PView->GetEditCtrl().ReplaceSel(str);
+//  delete []x;
+//  delete []y;
+//  delete []str;
+//  delete []cohe;
+//  delete []signi;
+//  delete []localmax;
+//  //	delete []order;
+  
+  
+}
+
+
+
+SEXP similarity(SEXP similarity_matrix,SEXP list_selected_items, SEXP list_occurrences_variables) {
   if(!isMatrix(similarity_matrix))
     error("matrix needed");
   
@@ -157,9 +438,13 @@ SEXP similarity(SEXP similarity_matrix) {
   SEXP list_names=getAttrib(similarity_matrix, R_DimNamesSymbol);
   SEXP variables= VECTOR_ELT(list_names, 0);
   
-  
-  
+  if(!isVector(list_selected_items))
+    error("vector needed");
+  //if(INTEGER(getAttrib(list_selected_items, R_DimSymbol))[0]!=nb_col)  
+  //  error("list of selected items should be the same size than the number of elements");
   Rprintf("Nb col %d\n",nb_col);
+  
+  
   
   int i,j,k,u,v;
   int x,y;
@@ -167,9 +452,13 @@ SEXP similarity(SEXP similarity_matrix) {
   bool max_found;
   
   int *level= new int[nb_col];
-  int *Item=new int[nb_col];
-  for(i=0;i<nb_col;i++)
-    Item[i]=1;
+  //int *Item=new int[nb_col];
+  int *Item = INTEGER(list_selected_items);
+  double *Occurrences_variables = REAL(list_occurrences_variables);
+  /*for(i=0;i<nb_col;i++) {
+    Rprintf("%d\n",Item[i]);
+  }*/
+  
   int *tabe=new int[nb_col];
   int *tabo=new int[nb_col];
   int *tabb=new int[nb_col];
@@ -183,10 +472,12 @@ SEXP similarity(SEXP similarity_matrix) {
     
   char **cc=new char*[nb_col];
 	char **cl=new char*[nb_col];
+  int *equivalent_nodes=new int[nb_col];
 	for(i=0;i<nb_col;i++) 
 	{
 		cc[i]=0;
 		cl[i]=0;
+    equivalent_nodes[i]=0;
 	}
   
   for (i=0;i<nb_col;i++)
@@ -441,6 +732,13 @@ SEXP similarity(SEXP similarity_matrix) {
 	}
 
 
+//tabo=variable_left
+//tabz=variable_right
+//tabee=size_class
+//taby=classes_associated_with
+  SignificantLevel(Index, nb_col, Occurrences_variables,f,tabo,tabz,tabee,taby,equivalent_nodes);
+
+
   
   SEXP results = PROTECT(allocVector(VECSXP, 4));
   SEXP listClasses = PROTECT(allocVector(VECSXP, 2));
@@ -491,12 +789,18 @@ SEXP similarity(SEXP similarity_matrix) {
   delete []tabb;
   delete []tabz;
   delete []tabo;
-  delete []Item;
+  delete []equivalent_nodes;
+  //delete []Item;
   delete []level;
   return results;
   
 
 }
+
+
+
+
+
 
 
 

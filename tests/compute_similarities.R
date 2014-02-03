@@ -10,6 +10,7 @@ n=dim(rules)[1]
 
 tempListVariables=strsplit(row.names(rules),split=' -> ')
 list.variables=character(0)
+
 for(i in 1:n) {
   
   
@@ -21,7 +22,11 @@ for(i in 1:n) {
 list.variables=sort(unique(list.variables))
 max.length.variables=max(str_length(list.variables))
 
+#data frame containing all the similarities
 similarity_df=data.frame()
+
+#list of the occurrences of the variables
+list.occurrences.variables=vector()
 
 for(i in 1:n) {
   rule=strsplit(row.names(rules)[i],split=' -> ')
@@ -29,6 +34,8 @@ for(i in 1:n) {
   to=rule[[1]][2]
   val=rules[i,7]
   similarity_df[from,to]=val
+  
+  list.occurrences.variables[from]=rules[i,1]
 }
 
 similarity_df[is.na(similarity_df)]=0 
@@ -44,24 +51,32 @@ similarity_matrix=data.matrix(similarity_df/100)  #we need to use values between
 
 
 
+#currently we consider that all items are selected
+list.selected.item=rep_len(T,length(list.variables))
 
 
-res=callSimilarityComputation(similarity_matrix)
+
+
+#call the similarity computation written in C
+res=callSimilarityComputation(similarity_matrix,list.selected.item,list.occurrences.variables)
 
 list.simi.indexes.variable=res[[1]][[1]]
 list.simi.variables=res[[1]][[2]]
-tabo=res[[2]]
-tabz=res[[3]]
 
-#+1 because index starts with 1 in R and +1 because there is one element more than the nb of levels
-nb.levels=res[[4]]+2 
+#name of variables to create the classes
+variable.left=res[[2]]    #variable.left=tabo
+variable.right=res[[3]]   #variable.right=tabz
 
-list.simi.indexes.variable=str_replace_all(list.simi.indexes.variable,"[[:punct:]]","")
+#+1 because index starts with 1 in R 
+nb.levels=res[[4]]+1
+
+#remove the () in the classes and convert the indexes from char to integer
+list.simi.indexes.variable=str_replace_all(list.simi.indexes.variable,"([())])","")
 list.simi.indexes.variable=strsplit(list.simi.indexes.variable,' ')
 list.simi.indexes.variable=as.integer(list.simi.indexes.variable[[1]])
 
-
-list.simi.variables=str_replace_all(list.simi.variables,"[[:punct:]]","")
+#remove the () and create a list of the variable in the order that they need to be displayed
+list.simi.variables=str_replace_all(list.simi.variables,"([())])","")
 list.simi.variables=strsplit(list.simi.variables,' ')
 list.simi.variables=list.simi.variables[[1]]
 
@@ -70,14 +85,14 @@ list.simi.variables=list.simi.variables[[1]]
 
 offsetX=10
 offsetY=30
-space.item=20
+
 dx=20
 dy=10
 
 visibleWidth=1200
 visibleHeight=800
 
-workingWidth=nb.levels*space.item+50
+workingWidth=nb.levels*dx+50
 workingHeight=offsetY+10*(max.length.variables)+nb.levels*dy+50
 
 offset.variable.x=0
@@ -131,13 +146,13 @@ myreplot <- function(...) {
   
   level=0
   
-  for (i in 1:nb.levels) {
+  for (i in 1:length(list.simi.variables)) {
     #lengtt of current variable
     length.variable=str_length(list.simi.variables[i])
     #offset compared to the lenghtest variable
     offset.length.variable=max.length.variables-length.variable
     for (j in 1:str_length(list.simi.variables[i])) {
-      tkcreate(canvas, "text", offsetX+i*space.item, offsetY+10*(offset.length.variable+j), text=substr(list.simi.variables[i],j,j),font=plotFont, fill="brown",tags="draw")
+      tkcreate(canvas, "text", offsetX+i*dx, offsetY+10*(offset.length.variable+j), text=substr(list.simi.variables[i],j,j),font=plotFont, fill="brown",tags="draw")
     }
   }
   
@@ -148,45 +163,43 @@ myreplot <- function(...) {
   #for (j in 1:12) {  
   
     y2=dy*j+offsetY;
-    line.coord[1]=offset.variable.x[tabo[j]]   #tabh = offset.variable.x
-    line.coord[2]=offset.variable.y[tabo[j]]   #tabh = offset.variable.y
-    line.coord[3]=offset.variable.x[tabo[j]]
+    line.coord[1]=offset.variable.x[variable.left[j]]   #tabz = offset.variable.x
+    line.coord[2]=offset.variable.y[variable.left[j]]   #tabh = offset.variable.y
+    line.coord[3]=offset.variable.x[variable.left[j]]
     line.coord[4]=y2
-    
+    #draw the left horizontal line
     tkcreate(canvas, "line", line.coord,width=2,tags="draw")
     
-    line.coord[1]=offset.variable.x[tabo[j]]
+    line.coord[1]=offset.variable.x[variable.left[j]]
     line.coord[2]=y2
-    line.coord[3]=offset.variable.x[tabz[j]]
+    line.coord[3]=offset.variable.x[variable.right[j]]
     line.coord[4]=y2
-    
+    #draw the vertical line
     tkcreate(canvas, "line", line.coord,width=2,tags="draw")
     
     
-    line.coord[1]=offset.variable.x[tabz[j]]
+    line.coord[1]=offset.variable.x[variable.right[j]]
     line.coord[2]=y2
-    line.coord[3]=offset.variable.x[tabz[j]]
-    line.coord[4]=offset.variable.y[tabz[j]]
-    
+    line.coord[3]=offset.variable.x[variable.right[j]]
+    line.coord[4]=offset.variable.y[variable.right[j]]
+    #draw the right line
     tkcreate(canvas, "line", line.coord,width=2,tags="draw")
     
     
-#     dc->LineTo((int)taby[tabz[j-1]][0],tabh[tabz[j-1]]);
+    offset.variable.x[variable.left[j]]=(offset.variable.x[variable.left[j]]+offset.variable.x[variable.right[j]])/2
+
+    offset.variable.x[variable.right[j]]=offset.variable.x[variable.left[j]]
+
+    offset.variable.y[variable.left[j]]=y2
     
-    offset.variable.x[tabo[j]]=(offset.variable.x[tabo[j]]+offset.variable.x[tabz[j]])/2
-#     taby[tabo[j-1]][0]=(taby[tabo[j-1]][0]+taby[tabz[j-1]][0])/2;
-    offset.variable.x[tabz[j]]=offset.variable.x[tabo[j]]
-#     taby[tabz[j-1]][0]=taby[tabo[j-1]][0];
-    offset.variable.y[tabo[j]]=y2
+
     
-#     tabh[tabo[j-1]]=y2;
-    
-    offset.variable.y[tabz[j]]=y2
-#     tabh[tabz[j-1]]=y2;
+    offset.variable.y[variable.right[j]]=y2
+
     
     
-     level[tabo[j]]=-1;
-     level[tabz[j]]=-1;
+     level[variable.left[j]]=-1;
+     level[variable.right[j]]=-1;
 #     i=2;
 #     for (u=0;u<nb_col;u++)
 #     {
@@ -264,3 +277,4 @@ myreplot()
 # 
 # 
 # 
+
