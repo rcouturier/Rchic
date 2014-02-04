@@ -36,10 +36,10 @@ struct Local {
       int y_b=std::get<2>(b);
   
       
-      return (cohe_a>cohe_b || 
-          (cohe_a==cohe_b && (Occurrences[x_a]<Occurrences[x_b] ||
+      return (cohe_a<cohe_b || 
+          (cohe_a==cohe_b && (Occurrences[x_a]>Occurrences[x_b] ||
           (Occurrences[x_a]==Occurrences[x_b] && 
-          Occurrences[y_a]<Occurrences[y_b]))));
+          Occurrences[y_a]>Occurrences[y_b]))));
     }
 
     double *Occurrences;
@@ -316,22 +316,24 @@ int *variable_left,int *variable_right, int *size_class, int** classes_associate
     
     //qs(uni_cohe,uni_x,uni_y,nb_ele_niv);
     std::sort (list_pairs_pairs.begin(), list_pairs_pairs.end(), Local(occurrences_variables));   
+    int nb_elements_level=list_pairs_pairs.size();
 //    
 //    
 //    if(LongCalculation)
 //    {
-//        for(l=0;l<nb_ele_niv;l++)
-//        {
-//          if(l%11==10) std::cout<<endl
-//          std::cout<<"c("<<(uni_x[l]+1)<<","<<(uni_y[l]+1)<<")="<<uni_cohe[l]<<" ";
-//        }
+        std::cout<<"size list pairs "<<list_pairs.size()<<std::endl;
+        for(l=0;l<nb_elements_level;l++)
+        {
+          if(l%11==10) std::cout<<std::endl;
+          std::cout<<"c("<<(std::get<1>(list_pairs_pairs[l])+1)<<","<<(std::get<2>(list_pairs_pairs[l])+1)<<")="<<(std::get<0>(list_pairs_pairs[l]))<<" ";
+        }
 //    }
     int *mark=new int[ll];
     for(l=0;l<ll;l++) mark[l]=0;
     int last=ll-1;
     int out;
     int nb=0;
-    int nb_elements_level=list_pairs_pairs.size();
+    
     int val=nb_elements_level;
     
     for(l=nb_elements_level-1;l>=0;l--)
