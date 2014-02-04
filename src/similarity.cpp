@@ -70,121 +70,6 @@ extern "C"{
 
 
 
-
-
-//void convolve(double *a, int *na, double *b, int *nb, double *ab)
-//{
-//    int nab = *na + *nb - 1;
-//
-//    for(int i = 0; i < nab; i++)
-//        ab[i] = 0.0;
-//    for(int i = 0; i < *na; i++)
-//        for(int j = 0; j < *nb; j++)
-//            ab[i + j] += a[i] * b[j];
-//}
-//
-//
-///* second version */
-//SEXP myout(SEXP x, SEXP y)
-//{
-//    int nx = length(x), ny = length(y);
-//    SEXP ans = PROTECT(allocMatrix(REALSXP, nx, ny));
-//    double *rx = REAL(x), *ry = REAL(y), *rans = REAL(ans);
-//
-//    for(int i = 0; i < nx; i++) {
-//  double tmp = rx[i];
-//	for(int j = 0; j < ny; j++)
-//	    rans[i + nx*j] = tmp * ry[j];
-//    }
-//
-//    SEXP dimnames = PROTECT(allocVector(VECSXP, 2));
-//    SET_VECTOR_ELT(dimnames, 0, getAttrib(x, R_NamesSymbol));
-//    SET_VECTOR_ELT(dimnames, 1, getAttrib(y, R_NamesSymbol));
-//    setAttrib(ans, R_DimNamesSymbol, dimnames);
-//    UNPROTECT(2);
-//    return ans;
-//}
-//
-///* second version */
-//SEXP myout2(SEXP x, SEXP y)
-//{
-//    int nx = length(x), ny = length(y);
-//    SEXP ans = PROTECT(allocMatrix(REALSXP, nx, ny));
-//    double *rx = REAL(x), *ry = REAL(y), *rans = REAL(ans);
-//
-//Rprintf("%d %d \n",nx,ny);
-//
-//    for(int i = 0; i < nx; i++) {
-//  double tmp = rx[i];
-//  for(int j = 0; j < ny; j++)
-//	    rans[i + nx*j] = tmp * ry[j];
-//    }
-//
-//    SEXP dimnames = PROTECT(allocVector(VECSXP, 2));
-//    SET_VECTOR_ELT(dimnames, 0, getAttrib(x, R_NamesSymbol));
-//    SET_VECTOR_ELT(dimnames, 1, getAttrib(y, R_NamesSymbol));
-//    setAttrib(ans, R_DimNamesSymbol, dimnames);
-//    UNPROTECT(2);
-//    
-//    
-//    char buffer[100];
-//  
-//    /*SEXP e = allocVector(STRSXP, nx);
-//    for (int i = 0;i<nx;i++){
-//      sprintf(buffer, "val %d", i);
-//      SEXP s = mkChar(buffer);
-//      SET_STRING_ELT(e, i, s);
-//    }
-//    
-//    return e;   
-//    */
-//    
-//     SEXP alist = R_NilValue;
-//    for (int i = 0;i<nx;i++){
-//  PROTECT(alist);
-//        sprintf(buffer, "val %d", i);
-//	alist = CONS(mkString(buffer), alist);
-//	UNPROTECT(1);
-//    }
-//    
-//    return alist;
-//    
-//}
-//
-//
-//
-//SEXP myout3(SEXP x)
-//{
-//  
-//  if(!isReal(x))
-//    error("name is not a single string");
-//  Rprintf("value is %f\n", REAL(x)[0]);
-//  
-//  return R_NilValue;  
-//    
-//}
-//
-//SEXP myout4(SEXP mat)
-//{
-//  
-//  if(!isMatrix(mat))
-//    error("matrix needed");
-//  
-//  SEXP names=getAttrib(mat, R_DimNamesSymbol);
-//  SEXP v1= VECTOR_ELT(names, 0);
-//  Rprintf("is string %d %d\n",isString(v1),isNewList(v1));
-//  
-//  //char *s=(CHAR(STRING_ELT(names, 0)));
-//  Rprintf("name %s\n",CHAR(STRING_ELT(v1, 1)));
-//    
-//  SEXP dimnames = PROTECT(allocVector(VECSXP, 2));
-//  SET_VECTOR_ELT(dimnames, 0, getAttrib(mat, R_DimNamesSymbol));
-//  SET_VECTOR_ELT(dimnames, 1, getAttrib(mat, R_DimSymbol));
-//  UNPROTECT(1);  
-//  return dimnames;  
-//    
-//}
-
 void GenericPair(int u,int v,int p,int q,int &maxx, int& maxy, double **Index, int **taby)
 {
   int l,t;
@@ -474,12 +359,12 @@ SEXP similarity(SEXP similarity_matrix,SEXP list_selected_items, SEXP list_occur
     
   char **cc=new char*[nb_col];
 	char **cl=new char*[nb_col];
-  int *equivalent_nodes=new int[nb_col];
+  int *significant_nodes=new int[nb_col];
 	for(i=0;i<nb_col;i++) 
 	{
 		cc[i]=0;
 		cl[i]=0;
-    equivalent_nodes[i]=0;
+    significant_nodes[i]=0;
 	}
   
   for (i=0;i<nb_col;i++)
@@ -738,11 +623,11 @@ SEXP similarity(SEXP similarity_matrix,SEXP list_selected_items, SEXP list_occur
 //tabz=variable_right
 //tabee=size_class
 //taby=classes_associated_with
-  SignificantLevel(Index, nb_col, Occurrences_variables,f,tabo,tabz,tabee,taby,equivalent_nodes);
+  SignificantLevel(Index, nb_col, Occurrences_variables,f,tabo,tabz,tabee,taby,significant_nodes);
 
 
   
-  SEXP results = PROTECT(allocVector(VECSXP, 4));
+  SEXP results = PROTECT(allocVector(VECSXP, 5));
   SEXP listClasses = PROTECT(allocVector(VECSXP, 2));
   SET_VECTOR_ELT(listClasses, 0, mkString(chc));
   SET_VECTOR_ELT(listClasses, 1, mkString(chl));
@@ -763,7 +648,14 @@ SEXP similarity(SEXP similarity_matrix,SEXP list_selected_items, SEXP list_occur
   INTEGER(RnbLevel)[0] = f;
   SET_VECTOR_ELT(results, 3, RnbLevel);
   
-  UNPROTECT(5); 
+  SEXP Rsignificant_nodes=PROTECT(allocVector(INTSXP, nb_col));
+  for(i=0;i<nb_col;i++)
+    INTEGER(Rsignificant_nodes)[i]=significant_nodes[i];
+  
+  SET_VECTOR_ELT(results, 4, Rsignificant_nodes);
+  
+  
+  UNPROTECT(6); 
   
   for(i;i<nb_col;i++)
     delete []Index[i];
@@ -791,7 +683,7 @@ SEXP similarity(SEXP similarity_matrix,SEXP list_selected_items, SEXP list_occur
   delete []tabb;
   delete []tabz;
   delete []tabo;
-  delete []equivalent_nodes;
+  delete []significant_nodes;
   //delete []Item;
   delete []level;
   return results;

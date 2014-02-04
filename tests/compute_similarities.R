@@ -70,6 +70,8 @@ variable.right=res[[3]]   #variable.right=tabz
 #+1 because index starts with 1 in R 
 nb.levels=res[[4]]+1
 
+list.significant.nodes=res[[5]]
+
 #remove the () in the classes and convert the indexes from char to integer
 list.simi.indexes.variable=str_replace_all(list.simi.indexes.variable,"([())])","")
 list.simi.indexes.variable=strsplit(list.simi.indexes.variable,' ')
@@ -175,13 +177,14 @@ myreplot <- function(...) {
     line.coord[3]=offset.variable.x[variable.right[j]]
     line.coord[4]=y2
     #draw the vertical line
-    tkcreate(canvas, "line", line.coord,width=2,tags="draw")
+    tkcreate(canvas, "line", line.coord,width=2,tags="draw",fill="red")
     
     
     line.coord[1]=offset.variable.x[variable.right[j]]
     line.coord[2]=y2
     line.coord[3]=offset.variable.x[variable.right[j]]
     line.coord[4]=offset.variable.y[variable.right[j]]
+    
     #draw the right line
     tkcreate(canvas, "line", line.coord,width=2,tags="draw")
     
