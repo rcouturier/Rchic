@@ -176,8 +176,12 @@ myreplot <- function(...) {
     line.coord[2]=y2
     line.coord[3]=offset.variable.x[variable.right[j]]
     line.coord[4]=y2
+    
     #draw the vertical line
-    tkcreate(canvas, "line", line.coord,width=2,tags="draw",fill="red")
+    if(list.significant.nodes[j])    
+      tkcreate(canvas, "line", line.coord,width=2,tags="draw",fill="red")
+    else
+      tkcreate(canvas, "line", line.coord,width=2,tags="draw")
     
     
     line.coord[1]=offset.variable.x[variable.right[j]]
