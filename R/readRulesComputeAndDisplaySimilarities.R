@@ -202,18 +202,6 @@ readRulesComputeAndDisplaySimilarities <-function() {
       
       
       
-      level[variable.left[j]]=-1;
-      level[variable.right[j]]=-1;
-      #     i=2;
-      #     for (u=0;u<nb_col;u++)
-      #     {
-      #       if(Item[u] && level[u]==j-1)
-      #       {
-      #         dc->MoveTo((int)taby[u][0],tabh[u]);
-      #         dc->LineTo((int)taby[u][0],dy*f+deby);	
-      #       }
-      #     }
-      
     }
     
     

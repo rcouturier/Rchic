@@ -1070,10 +1070,11 @@ SEXP hierarchy(SEXP similarity_matrix,SEXP list_selected_items, SEXP list_occurr
 //tabz=variable_right
 //tabee=size_class
 //taby=classes_associated_with
+//tabe=list_finel_nodes
   SignificantLevel(Index, nb_col, Occurrences_variables,f,tabo,tabz,tabee,taby,significant_nodes);
 
   
-  SEXP results = PROTECT(allocVector(VECSXP, 5));
+  SEXP results = PROTECT(allocVector(VECSXP, 6));
   SEXP listClasses = PROTECT(allocVector(VECSXP, 2));
   SET_VECTOR_ELT(listClasses, 0, mkString(chc));
   SET_VECTOR_ELT(listClasses, 1, mkString(chl));
@@ -1097,11 +1098,15 @@ SEXP hierarchy(SEXP similarity_matrix,SEXP list_selected_items, SEXP list_occurr
   SEXP Rsignificant_nodes=PROTECT(allocVector(INTSXP, nb_col));
   for(i=0;i<nb_col;i++)
     INTEGER(Rsignificant_nodes)[i]=significant_nodes[i];
-  
   SET_VECTOR_ELT(results, 4, Rsignificant_nodes);
   
-  
-  UNPROTECT(6); 
+  SEXP Rfinal_nodes=PROTECT(allocVector(INTSXP, nb_col));
+  for(i=0;i<nb_col;i++)
+    INTEGER(Rfinal_nodes)[i]=tabe[i];
+  SET_VECTOR_ELT(results, 5, Rfinal_nodes);
+
+
+  UNPROTECT(7); 
   
   for(i;i<nb_col;i++)
     delete []Index[i];
