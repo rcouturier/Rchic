@@ -1,24 +1,17 @@
 Package: rchic
 Type: Package
 Title: What the package does (short line)
-Version: 1.0
+Version: 0.1
 Date: 2014
-Author: Who wrote it
-Maintainer: Who to complain to <yourfault@somewhere.net>
-Description: This package is intented to implement all the features of Statistical Implicative Analysis. This theory aims 
-at building association rules of the form : if an object has the property A it also tends to have the property B.
-The SIA builds confidence of rules by computing the number of counter examples of such an rule and then by measuring
-the surprise  (or the probability) to have so few counter examples compared to the number of counter examples we woulc 
-have with two random variables have the same sizes (than A and B).
-With Rchic you can build a similirity tree (using similarity analysis), an implicative graph and a hierarchical tree.
-
+Author: Raphaël Couturier
+Maintainer: Raphäel Couturier <raphael.couturier@univ-fcomte.fr>
+Description: This package is intented to implement all the features of 
+    Statistical Implicative Analysis. This theory aims at building association 
+    rules of the form : if an object has the property A it also tends to have 
+    the property B. The SIA builds confidence of rules by computing the number 
+    of counter examples of such an rule and then by measuring the surprise 
+    (or the probability) to have so few counter examples compared to the number 
+    of counter examples we would have with two random variables have the same 
+    sizes (than A and B). With Rchic you can build a similirity tree (using 
+    similarity analysis), an implicative graph and a hierarchical tree.
 License: FREE
-
-
-Currently I put some news.
-
-A first version of the implicative graph is working.
-To use it, you need to go in the directory tests and run the file ImplicativeGraph.R
-
-A first version of the similarity tree is also working with the computation of the significant levels
-To use it, you need to go in the directory tests and run the file SimilarityTree.R
