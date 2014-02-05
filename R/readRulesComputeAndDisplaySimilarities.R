@@ -64,8 +64,7 @@ readRulesComputeAndDisplaySimilarities <-function() {
   variable.left=res[[2]]    #variable.left=tabo
   variable.right=res[[3]]   #variable.right=tabz
   
-  #+1 because index starts with 1 in R 
-  nb.levels=res[[4]]+1
+  nb.levels=res[[4]]
   
   list.significant.nodes=res[[5]]
   
