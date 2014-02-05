@@ -90,7 +90,7 @@ readRulesComputeAndDisplaySimilarities <-function() {
   visibleWidth=1200
   visibleHeight=800
   
-  workingWidth=nb.levels*dx+50
+  workingWidth=length(list.simi.variables)*dx+50
   workingHeight=offsetY+10*(max.length.variables)+nb.levels*dy+50
   
   offset.variable.x=0
