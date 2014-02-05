@@ -24,7 +24,8 @@
 #include <array> 
 
 
-
+//This structure is used to sort the tuples used in the similarity and the hierarchy to compute the significant nodes
+//Tuple are sorted by cohesion (or similarity), if both values are equal we compare the occurrences of x and then y
 struct Local {
     Local(double *Occurrences) { this->Occurrences = Occurrences; }
     bool operator () (const std::tuple<double,int,int>& a, const std::tuple<double,int,int>& b) {
@@ -47,7 +48,8 @@ struct Local {
 
 
 
-
+//This routines is used to create a vector without doublons
+//If the element does not exist we add it into the vector
 template <class T>
 int
 insertNoDuplicate( std::vector<T>& references, T const& newValue )
@@ -60,16 +62,15 @@ insertNoDuplicate( std::vector<T>& references, T const& newValue )
     return results;
 }
 
+
+
+
+//functions from R should be in this part
 extern "C"{
 
 
-
-
-
-
-
-
-
+//define a generic pair as page 31 in the book: Statistical implicative analysis theory and applications
+//a generic pair has the greater index among all the possible pairs in a class
 void GenericPair(int u,int v,int p,int q,int &maxx, int& maxy, double **Index, int **taby)
 {
   int l,t;
@@ -89,73 +90,63 @@ void GenericPair(int u,int v,int p,int q,int &maxx, int& maxy, double **Index, i
 }
 
 
-
+//this function computes significant levels for the hierarchy or similarity tree
 void SignificantLevel(double **indexes_values,int nb_col, double* occurrences_variables, int nb_levels, 
 int *variable_left,int *variable_right, int *size_class, int** classes_associated_with, int*  significant_nodes)
 {
-  //double* cohe;
-  //int *order;
-  int *x,*y;
+  
   long ll=nb_col*(nb_col-1);
   double old_signi=0;
-  //cohe = new double[ll];
-  
+
+  //list of pairs of variables
   std::vector <std::tuple<double,int,int>> list_pairs;
+  
   //list of pairs of pairs (all pairs possible at a given level)
+  //in thie list we remove all the doublons
   std::vector <std::tuple<double,int,int>> list_pairs_pairs;   
   std::vector <std::tuple<double,int,int>>::iterator it;
   
   
   long i,j,k,l=0,m;
   
-  
+  //create all the possible pairs between all the variables
+  //a tuple contains the value of the similarity or cohesion for 2 variables
   for(i=0;i<nb_col;i++)
     for(j=0;j<nb_col;j++)
     {  
       if(i!=j)
       {
         list_pairs.push_back(std::make_tuple(indexes_values[i][j],i,j));
-//        cohe[l]=Index[i][j];
-//        x[l]=i;
-//        y[l]=j;
-        
       }
     }
   
+  //pairs are sorted according the the index and the occurrences of variables in case of equality
   std::sort (list_pairs.begin(), list_pairs.end(), Local(occurrences_variables)); 
   
-  std::cout << "list contains:"<<std::endl;
-  for (it=list_pairs.begin(); it!=list_pairs.end(); ++it) {
-    std::cout << std::get<0>(*it) << ' '<<std::get<1>(*it) << ' '<<std::get<2>(*it) << ' '<<std::endl;
-  }
   
+  //only to check the content of the list
+  //std::cout << "list contains:"<<std::endl;
+  //for (it=list_pairs.begin(); it!=list_pairs.end(); ++it) {
+  //  std::cout << std::get<0>(*it) << ' '<<std::get<1>(*it) << ' '<<std::get<2>(*it) << ' '<<std::endl;
+  //}
   
-//  char * str=new char[ll*50+20000]; 
-//  ostrstream os(str,ll*50+20000);
-//  os.precision(3);
-//  
-//  
-//  CString Text;
   double *signi=new double[nb_levels];
   double *localmax=new double[nb_levels];
   
+  //for each level we need to compute the significance of this level
   for(i=0;i<nb_levels;i++)
   {
-//    if(LongCalculation)
-//    {
-//      CString level;
-//      level.LoadString(IDS_LEVEL);
-      std::cout<<std::endl<<" Level "<<i+1<<" : ";
-//    }
+    //for debuging
+    std::cout<<std::endl<<" Level "<<i+1<<" : ";
+
     for(j=0;j<=i;j++)
     {
       int t;
       int u=variable_left[j];
       int v=variable_right[j];
       int p=size_class[j];
-//      int u=tabo[j];
-//      int v=tabz[j];
-//      int p=tabee[j];
+      //if the class has more than 2 elements
+      //for all possible pairs in the class we add the pair (without doublons)
       if(p>=1)
         for (l=1;l<=p-1;l++)
           for (t=l+1;t<=p;t++)  																								  
@@ -163,56 +154,36 @@ int *variable_left,int *variable_right, int *size_class, int** classes_associate
             int i=classes_associated_with[u][l];
             int j=classes_associated_with[u][t];
             insertNoDuplicate(list_pairs_pairs,std::make_tuple(indexes_values[i][j],i,j));
-            
-            //list.Insert((int)taby[u][l],(int)taby[u][t]); 
-            
+                      
             //add it for double arrows in hierarchy
             //value>=10 means equivalent nodes
             if(significant_nodes[j]>=10) 
               insertNoDuplicate(list_pairs_pairs,std::make_tuple(indexes_values[j][i],j,i));
             
           }
+      //if the class has only 2 elements
       if(p==0)
       {
-        //list.Insert(u,v); 
         insertNoDuplicate(list_pairs_pairs,std::make_tuple(indexes_values[u][v],u,v));
       }
     }
-//    int nb_ele_niv=list.GetCount();
-//    int *uni_x=new int[nb_ele_niv];
-//    int *uni_y=new int[nb_ele_niv];
-//    double *uni_cohe = new double[nb_ele_niv];
-//    
-//    l=0;
-//    POSITION pos=list.GetHeadPosition();
-//    while(list.GetCount()>l)
-//    {
-//      int*mm = list.GetNext(pos);
-//      
-//      uni_x[l]=mm[0];
-//      uni_y[l]=mm[1];
-//      uni_cohe[l]=Index[mm[0]][mm[1]];
-//      l++;
-//      delete []mm; //indispensable pour recuperer la mem
-//    }
-//    list.RemoveAll();
-    
-    
-    
-    //qs(uni_cohe,uni_x,uni_y,nb_ele_niv);
+
+
+    //the list is sorted by index
     std::sort (list_pairs_pairs.begin(), list_pairs_pairs.end(), Local(occurrences_variables));   
+    //number of disctinc elements between all the possible pairs at this level
     int nb_elements_level=list_pairs_pairs.size();
-//    
-//    
-//    if(LongCalculation)
-//    {
-        std::cout<<"size list pairs "<<list_pairs.size()<<std::endl;
-        for(l=0;l<nb_elements_level;l++)
-        {
-          if(l%11==10) std::cout<<std::endl;
-          std::cout<<"c("<<(std::get<1>(list_pairs_pairs[l])+1)<<","<<(std::get<2>(list_pairs_pairs[l])+1)<<")="<<(std::get<0>(list_pairs_pairs[l]))<<" ";
-        }
-//    }
+
+    //DEBUG
+    std::cout<<"size list pairs "<<list_pairs.size()<<std::endl;
+    for(l=0;l<nb_elements_level;l++)
+    {
+      if(l%11==10) std::cout<<std::endl;
+      std::cout<<"c("<<(std::get<1>(list_pairs_pairs[l])+1)<<","<<(std::get<2>(list_pairs_pairs[l])+1)<<")="<<(std::get<0>(list_pairs_pairs[l]))<<" ";
+    }
+
+
+
     int *mark=new int[ll];
     for(l=0;l<ll;l++) mark[l]=0;
     int last=ll-1;
@@ -221,16 +192,19 @@ int *variable_left,int *variable_right, int *size_class, int** classes_associate
     
     int val=nb_elements_level;
     
+    //we start by the end because elements are in increasing order
+    //l is used for the long list (with all possible pairs)
     for(l=nb_elements_level-1;l>=0;l--)
     {
-      last=ll-1;//cette instruction n'est pas indispensable en theorie
-      //mais si on l'enleve il y a des pb a cause des quicksorts qui peuvent
-      //trier des valeurs egales dans des ordes diff 
+      //last is used for the short list (only direct pairs)
+      last=ll;
+      
       out=0;
       while(last>=0 && !out)
       {
         // get<1> means element x
         // get<2> means element y
+        //we compare x and y in both lists
         if(std::get<1>(list_pairs_pairs[l])==std::get<1>(list_pairs[last]) && std::get<2>(list_pairs_pairs[l])==std::get<2>(list_pairs[last]))
         {
           mark[last]=val--;
@@ -239,7 +213,7 @@ int *variable_left,int *variable_right, int *size_class, int** classes_associate
         last--;
       }
     }
-//    //if(val!=0) MessageBeep(0);
+
     for(l=nb_elements_level-1;l>=0;l--)
     {
       k=ll-1;
@@ -253,7 +227,6 @@ int *variable_left,int *variable_right, int *size_class, int** classes_associate
               && occurrences_variables[std::get<2>(list_pairs[ind])]==occurrences_variables[std::get<2>(list_pairs[k])]) 
       {
         k--; 
-        //os<<"ah "; //message pour vérifier ou interviennent les cas ou les cohe sont =
       }
       for(m=k;m>=0;m--)
       {

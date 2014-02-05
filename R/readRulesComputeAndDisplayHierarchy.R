@@ -71,7 +71,7 @@ readRulesComputeAndDisplayHierarchy <-function() {
   
   
   
-  #call the similarity computation written in C
+  #call the hierarchy computation written in C
   res=callHierarchyComputation(cohesion_matrix,list.selected.item,list.occurrences.variables)
   
   
@@ -89,8 +89,8 @@ readRulesComputeAndDisplayHierarchy <-function() {
   
   
   
-  list.simi.indexes.variable=res[[1]][[1]]
-  list.simi.variables=res[[1]][[2]]
+  list.hier.indexes.variable=res[[1]][[1]]
+  list.hier.variables=res[[1]][[2]]
   
   #name of variables to create the classes
   variable.left=res[[2]]    #variable.left=tabo
@@ -106,14 +106,14 @@ readRulesComputeAndDisplayHierarchy <-function() {
   print(list.final.nodes)
   
   #remove the () in the classes and convert the indexes from char to integer
-  list.simi.indexes.variable=str_replace_all(list.simi.indexes.variable,"([())])","")
-  list.simi.indexes.variable=strsplit(list.simi.indexes.variable,' ')
-  list.simi.indexes.variable=as.integer(list.simi.indexes.variable[[1]])
+  list.hier.indexes.variable=str_replace_all(list.hier.indexes.variable,"([())])","")
+  list.hier.indexes.variable=strsplit(list.hier.indexes.variable,' ')
+  list.hier.indexes.variable=as.integer(list.hier.indexes.variable[[1]])
   
   #remove the () and create a list of the variable in the order that they need to be displayed
-  list.simi.variables=str_replace_all(list.simi.variables,"([())])","")
-  list.simi.variables=strsplit(list.simi.variables,' ')
-  list.simi.variables=list.simi.variables[[1]]
+  list.hier.variables=str_replace_all(list.hier.variables,"([())])","")
+  list.hier.variables=strsplit(list.hier.variables,' ')
+  list.hier.variables=list.hier.variables[[1]]
   
   
   
@@ -127,13 +127,13 @@ readRulesComputeAndDisplayHierarchy <-function() {
   visibleWidth=1200
   visibleHeight=800
   
-  workingWidth=length(list.simi.variables)*dx+50
+  workingWidth=length(list.hier.variables)*dx+50
   workingHeight=offsetY+10*(max.length.variables)+nb.levels*dy+50
   
   offset.variable.x=0
   offset.variable.y=0
-  for(i in 1:length(list.simi.indexes.variable)){
-    offset.variable.x[list.simi.indexes.variable[i]]=offsetX+dx*i
+  for(i in 1:length(list.hier.indexes.variable)){
+    offset.variable.x[list.hier.indexes.variable[i]]=offsetX+dx*i
     offset.variable.y[i]=offsetY+10*max.length.variables+10
   }
   
@@ -181,13 +181,13 @@ readRulesComputeAndDisplayHierarchy <-function() {
     
     level=0
     
-    for (i in 1:length(list.simi.variables)) {
+    for (i in 1:length(list.hier.variables)) {
       #lengtt of current variable
-      length.variable=str_length(list.simi.variables[i])
+      length.variable=str_length(list.hier.variables[i])
       #offset compared to the lenghtest variable
       offset.length.variable=max.length.variables-length.variable
-      for (j in 1:str_length(list.simi.variables[i])) {
-        tkcreate(canvas, "text", offsetX+i*dx, offsetY+10*(offset.length.variable+j), text=substr(list.simi.variables[i],j,j),font=plotFont, fill="brown",tags="draw")
+      for (j in 1:str_length(list.hier.variables[i])) {
+        tkcreate(canvas, "text", offsetX+i*dx, offsetY+10*(offset.length.variable+j), text=substr(list.hier.variables[i],j,j),font=plotFont, fill="brown",tags="draw")
       }
     }
     
@@ -258,19 +258,10 @@ readRulesComputeAndDisplayHierarchy <-function() {
       
       level[variable.left[j]]=-1;
       level[variable.right[j]]=-1;
-      #     i=2;
-      #     for (u=0;u<nb_col;u++)
-      #     {
-      #       if(Item[u] && level[u]==j-1)
-      #       {
-      #         dc->MoveTo((int)taby[u][0],tabh[u]);
-      #         dc->LineTo((int)taby[u][0],dy*f+deby);  
-      #       }
-      #     }
       
     }
     
-    for (u in 1:length(list.simi.variables))
+    for (u in 1:length(list.hier.variables))
     {
       if(list.final.nodes[u])
       {
