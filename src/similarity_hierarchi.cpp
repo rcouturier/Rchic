@@ -692,6 +692,457 @@ SEXP similarity(SEXP similarity_matrix,SEXP list_selected_items, SEXP list_occur
 }
 
 
+double Produce(int u,int v,int p,int q, double** Index, int** taby)
+{
+  double prod1=1,prod2=1,prod3=1;
+	long l,t,nq;
+	if(p>=1)
+	for (l=1;l<=p-1;l++)
+		for (t=l+1;t<=p;t++)																									  
+			prod1=prod1*Index[taby[u][l]][taby[u][t]];
+	if(q>=1)
+	for (l=1;l<=q-1;l++)
+		for (t=l+1;t<=q;t++)
+			prod2=prod2*Index[taby[v][l]][taby[v][t]];
+	for (l=1;l<=p;l++)
+		for (t=1;t<=q;t++)
+			prod3=prod3*Index[taby[u][l]][taby[v][t]];
+	if (prod1==0 || prod2==0 || prod3==0) return 0;
+	else
+	{
+		nq=p+q;
+		nq=nq*(nq-1);
+		return pow(prod1*prod2*prod3,2./nq);
+	}
+}
+
+
+
+double Cohesion_classX(int q,int p, double** Index, int** taby)
+{
+  int ordre;
+	long l,t;
+	double prod=1,d;
+	if (p==1) ordre=0;
+	else if (p==2) ordre=1;
+	else if (p>2) ordre=2;
+	switch (ordre)
+	{
+		case 0:d=1;break;
+		case 1:
+			d=Index[(int)taby[q][1]][(int)taby[q][p]];
+		break;
+		case 2:
+			for (l=1;l<p;l++)
+				for (t=l+1;t<=p;t++)
+					prod=prod*Index[(int)taby[q][l]][(int)taby[q][t]];
+			if (prod==0) d=0;
+			else
+			{
+				d=pow(prod,2./(p*(p-1)));
+			}
+			break;
+	}
+	return d;
+}
+
+double ClassImpli(int l,int n,int p,int q, double c1, double c2, double** Index, int **taby)
+{
+  int z;
+	long i,j;
+	double res=0,sup=0;
+	
+	z=p*q;
+	if ((p==0)||(q==0)) res=0;
+	else
+	{
+		for (i=1;i<=p;i++)
+			for (j=1;j<=q;j++)
+				if(sup<Index[(int)taby[l][i]][(int)taby[n][j]])
+					sup=Index[(int)taby[l][i]][(int)taby[n][j]];
+		res=pow(sup,p*q)*sqrt(c1*c2);
+	}
+	return res;
+}
+
+
+SEXP hierarchy(SEXP similarity_matrix,SEXP list_selected_items, SEXP list_occurrences_variables) {
+  if(!isMatrix(similarity_matrix))
+    error("matrix needed");
+  
+  int nb_col=INTEGER(getAttrib(similarity_matrix, R_DimSymbol))[0];
+  SEXP list_names=getAttrib(similarity_matrix, R_DimNamesSymbol);
+  SEXP variables= VECTOR_ELT(list_names, 0);
+  
+  if(!isVector(list_selected_items))
+    error("vector needed");
+  //if(INTEGER(getAttrib(list_selected_items, R_DimSymbol))[0]!=nb_col)  
+  //  error("list of selected items should be the same size than the number of elements");
+  Rprintf("Nb col %d\n",nb_col);
+  
+  
+  
+  int i,j,k,u,v;
+  int x,y;
+  double max=-1;
+  bool max_found;
+  
+  int *level= new int[nb_col];
+  //int *Item=new int[nb_col];
+  int *Item = INTEGER(list_selected_items);
+  double *Occurrences_variables = REAL(list_occurrences_variables);
+  /*for(i=0;i<nb_col;i++) {
+    Rprintf("%d\n",Item[i]);
+  }*/
+  
+  int *tabe=new int[nb_col];
+  int *tabo=new int[nb_col];
+  int *tabb=new int[nb_col];
+  int *tabz=new int[nb_col];
+  int *tabee=new int[nb_col];
+  int **taby=new int*[nb_col];
+  for(int i;i<nb_col;i++)
+    taby[i]=new int[nb_col];
+  for(i=0;i<nb_col;i++)
+    for(j=0;j<nb_col;j++) taby[i][j]=0;
+    
+  char **cc=new char*[nb_col];
+	char **cl=new char*[nb_col];
+  int *significant_nodes=new int[nb_col];
+	for(i=0;i<nb_col;i++) 
+	{
+		cc[i]=0;
+		cl[i]=0;
+    significant_nodes[i]=0;
+	}
+  
+  for (i=0;i<nb_col;i++)
+	{
+		if(Item[i]) taby[i][1]=i;
+		tabe[i]=1;
+    int length=strlen(CHAR(STRING_ELT(variables, i)));
+		cc[i]=new char[10];	//it is only to have the number of the variable
+		cl[i]=new char[length+1];
+		sprintf(cc[i],"%i",i+1);
+		sprintf(cl[i],"%s",CHAR(STRING_ELT(variables, i)));
+	}
+  
+  int r=0;
+  for(i=0;i<nb_col;i++) 
+    r+=Item[i];
+	int f=0;
+	
+    
+
+  int *AlreadyInClasse = new int[nb_col];
+	for(i=0;i<nb_col;i++) AlreadyInClasse[i]=-999999;
+	
+  int  *GenPairX = new int[nb_col];
+  int  *GenPairY = new int[nb_col];
+  
+	int	*Terminal = new int[nb_col];
+	for(i=0;i<nb_col;i++) Terminal[i]=1;
+	
+  
+	int *LevelX=new int[r];
+	for(i=0;i<r;i++) LevelX[i]=-1;
+		
+	int *LevelY=new int[r];
+	for(i=0;i<r;i++) LevelY[i]=-1;
+
+  double **CurIndex = new double*[nb_col];
+  for(i=0;i<nb_col;i++)
+    CurIndex[i] = new double[nb_col];
+
+  double *val_mat=REAL(similarity_matrix);
+  double **Index= new double*[nb_col];
+  for(i=0;i<nb_col;i++)
+    Index[i] = new double[nb_col];
+
+
+  //to test how to get data for the matrix and put data into Index
+  for(i=0;i<nb_col;i++) {
+    for(j=0;j<nb_col;j++) {
+      Index[i][j]=val_mat[j*nb_col+i];  //element in the matrix seems to be transposed
+      Rprintf("%f ",Index[i][j]);   
+    }
+    Rprintf("\n");
+  }
+
+
+  while(r>1 && max!=0)
+  {
+		for (u=0;u<nb_col;u++)
+			for (v=0;v<nb_col;v++)
+				{
+					if(Item[u] && Item[v])
+						{
+							if ( tabe[u]==1 && tabe[v]==1)	CurIndex[u][v]=Index[u][v];
+							else if (tabe[u]==0 || tabe[v]==0 || u==v) CurIndex[u][v]=0;
+							else
+								CurIndex[u][v]=Produce(u,v,tabe[u],tabe[v], Index, taby);
+								
+						}
+				}
+		max=-1;
+		
+		x=0;
+		y=0;
+		for (u=0;u<nb_col;u++)        
+			for (v=0;v<nb_col;v++)      
+				{
+					if(Item[u] && Item[v])
+    			{
+  					if (u!=v && max<=CurIndex[u][v])
+  					{
+  						if (max>0 && max==CurIndex[u][v])//ordre de pref cohe de la nouvelle class,
+  						{												//impli de la nouvelle classe, cohe interne
+  							//calcul de phi(A,B) et phi(B,A)
+  							double c1=Cohesion_classX(x,tabe[x],Index,taby);
+  							double c2=Cohesion_classX(u,tabe[u],Index,taby);
+  							double impl1=ClassImpli(x,y,u,v,c1,c2,Index,taby); //impl de la class max
+  							double impl2=ClassImpli(u,v,x,y,c2,c1,Index,taby);
+  							if(impl1==impl2)
+  							{
+  								if(c1<c2)
+  								{
+  									x=u;	//on garde la classe qui a la plus forte cohe interne
+  									y=v;
+  								}
+  								else
+  									if(c1==c2)
+  									{
+  										//signale le pb a regis (avec exemple 41)
+  										if(x==v && y==u)
+  										significant_nodes[f]=10;
+  									}
+  							}
+  							else
+  								if(impl1<impl2)
+  								{
+  									x=u;	//on garde la classe qui a le plus fort phi
+  									y=v;
+  								}
+  	
+  						}
+  						else
+  						{
+  							max=CurIndex[u][v];
+  							x=u;
+  							y=v;
+  							significant_nodes[f]=0;
+  						}
+  					}
+  				}
+				}
+    
+		for (u=0;u<nb_col;u++) tabb[u]=-1;
+    tabb[x]=x;tabb[y]=y;
+    
+    j=tabe[x];
+
+  	u=y;
+		if(Item[u])
+		{                                             //a regarder bizare
+			if ((tabb[u]!=-1)&&(CurIndex[x][u]==max)&&(CurIndex[x][u]!=0))
+			{
+				
+				if(AlreadyInClasse[x]==-999999 && AlreadyInClasse[y]==-999999)
+				{
+					AlreadyInClasse[x]=f;
+					AlreadyInClasse[y]=f;
+					LevelX[f]=-x-1;
+					LevelY[f]=-y-1;
+				}
+				else
+					if(AlreadyInClasse[x]==-999999) 
+					{
+						LevelX[f]=-x-1;
+						LevelY[f]=AlreadyInClasse[y];
+						AlreadyInClasse[x]=f;
+						AlreadyInClasse[y]=f;
+					}
+					else
+						if(AlreadyInClasse[y]==-999999)
+						{
+							LevelX[f]=AlreadyInClasse[x];
+							LevelY[f]=-y-1;
+							AlreadyInClasse[x]=f;
+							AlreadyInClasse[y]=f;
+						}
+						else
+						{
+							LevelX[f]=AlreadyInClasse[x];
+							LevelY[f]=AlreadyInClasse[y];
+							AlreadyInClasse[x]=f;
+							AlreadyInClasse[y]=f;
+						}
+				Terminal[y]=0;
+				GenericPair(x,y,tabe[x],tabe[y],GenPairX[f],GenPairY[f],Index,taby);
+				tabe[x]=tabe[x]+tabe[u];
+				char * new_s = new char[strlen(cc[x])+2+strlen(cc[u])];
+				strcpy(new_s,cc[x]);
+				strcat(new_s," ");    //espace entre les 2 chaines
+				strcat(new_s,cc[u]);
+				delete []cc[u];
+				cc[u]=NULL;
+				delete []cc[x];
+				cc[x]=new_s;
+				char * new_s2 = new char[strlen(cl[x])+2+strlen(cl[u])];
+				strcpy(new_s2,cl[x]);
+				strcat(new_s2," ");    //espace entre les 2 chaines
+				strcat(new_s2,cl[u]);
+				delete []cl[u];
+				cl[u]=NULL;
+				delete []cl[x];
+				cl[x]=new_s2;
+
+				r=r-1;
+				for (k=j+1;k<=j+tabe[u];k++)
+					taby[x][k]=taby[u][k-j];
+				j=j+tabe[u];
+				tabe[u]=0;
+			}
+		}
+    if (max!=0)
+  	{
+			tabo[f]=taby[x][1];
+			tabz[f]=taby[x][tabe[x]];
+			tabee[f]=tabe[x];
+			char *new_s=new char[strlen(cc[x])+3];  //3 a cause des ()
+			char *new_s2=new char[strlen(cl[x])+3];
+			//wsprintf(new_s,"(%s)",cc[x]);         //on met la classe formée entre ()
+			strcpy(new_s,"(");
+			strcat(new_s,cc[x]);    //espace entre les 2 chaines
+			strcat(new_s,")");
+			delete []cc[x];
+			cc[x]=new_s;
+			strcpy(new_s2,"(");
+			strcat(new_s2,cl[x]);    //espace entre les 2 chaines
+			strcat(new_s2,")");
+			delete []cl[x];
+			cl[x]=new_s2;
+			double a=Cohesion_classX(x,tabe[x],Index,taby);
+			Rprintf("Classification %d : %s  Cohesion %f\n",(f+1),cl[x],a);
+			//tab_cohe[f]=a;
+			if (max) f++;
+			
+		}
+	
+  
+		
+
+	
+  }
+    
+        
+  j=0;
+  k=0;
+  for(i=0;i<nb_col;i++)
+	{
+		if(cc[i]) j+=strlen(cc[i])+1;
+	}
+	for(i=0;i<nb_col;i++)
+	{
+		if(cc[i]) k+=strlen(cl[i])+1;
+	}
+	
+	char *chc=new char[j+1];
+	chc[0]='\0';
+	char *chl=new char[k+1];
+	chl[0]='\0';
+	for(i=0;i<nb_col;i++)
+	{
+		if(tabe[i])
+		{
+			strcat(chc,cc[i]);
+			strcat(chc," ");
+			strcat(chl,cl[i]);
+			strcat(chl," ");
+			
+		}
+	}
+
+
+
+
+//tabo=variable_left
+//tabz=variable_right
+//tabee=size_class
+//taby=classes_associated_with
+//tabe=list_finel_nodes
+  SignificantLevel(Index, nb_col, Occurrences_variables,f,tabo,tabz,tabee,taby,significant_nodes);
+
+  
+  SEXP results = PROTECT(allocVector(VECSXP, 6));
+  SEXP listClasses = PROTECT(allocVector(VECSXP, 2));
+  SET_VECTOR_ELT(listClasses, 0, mkString(chc));
+  SET_VECTOR_ELT(listClasses, 1, mkString(chl));
+  SET_VECTOR_ELT(results, 0, listClasses);
+  
+  SEXP Rtabo = PROTECT(allocVector(INTSXP, f));
+  for(i=0;i<f;i++)
+    INTEGER(Rtabo)[i]=tabo[i]+1;  //+1 because in R indexes start at 1
+  SET_VECTOR_ELT(results, 1, Rtabo);
+  
+  SEXP Rtabz = PROTECT(allocVector(INTSXP, f));
+  for(i=0;i<f;i++)
+    INTEGER(Rtabz)[i]=tabz[i]+1;  //idem
+  SET_VECTOR_ELT(results, 2, Rtabz);
+  
+  
+  SEXP RnbLevel=PROTECT(allocVector(INTSXP, 1));
+  INTEGER(RnbLevel)[0] = f;
+  SET_VECTOR_ELT(results, 3, RnbLevel);
+  
+  SEXP Rsignificant_nodes=PROTECT(allocVector(INTSXP, nb_col));
+  for(i=0;i<nb_col;i++)
+    INTEGER(Rsignificant_nodes)[i]=significant_nodes[i];
+  SET_VECTOR_ELT(results, 4, Rsignificant_nodes);
+  
+  SEXP Rfinal_nodes=PROTECT(allocVector(INTSXP, nb_col));
+  for(i=0;i<nb_col;i++)
+    INTEGER(Rfinal_nodes)[i]=tabe[i];
+  SET_VECTOR_ELT(results, 5, Rfinal_nodes);
+
+
+  UNPROTECT(7); 
+  
+  for(i;i<nb_col;i++)
+    delete []Index[i];
+  delete []Index;
+  for(i;i<nb_col;i++)
+    delete []CurIndex[i];
+  delete []CurIndex;
+
+  delete []AlreadyInClasse;
+
+  delete []Terminal;
+  delete []LevelX;
+  delete []LevelY;
+  for(i;i<nb_col;i++)
+    delete []taby[i];
+  for(i;i<nb_col;i++)
+    if(cl[i]) delete []cl[i];
+  delete []cl;
+  for(i;i<nb_col;i++)
+    if(cc[i]) delete []cc[i];
+  delete []cc;
+  delete []taby;
+  delete []tabe;
+  delete []GenPairX;
+  delete []GenPairY;
+  delete []tabee;
+  delete []tabb;
+  delete []tabz;
+  delete []tabo;
+  delete []significant_nodes;
+  //delete []Item;
+  delete []level;
+  return results;
+  
+
+}
 
 
 

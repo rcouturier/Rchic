@@ -1,5 +1,4 @@
-
-readRulesComputeAndDisplaySimilarities <-function() {
+readRulesComputeAndDisplayHierarchy <-function() {
   
   rules=read.table(file='transaction.out',header=TRUE,row.names=1,sep=',')
   n=dim(rules)[1]
@@ -19,8 +18,9 @@ readRulesComputeAndDisplaySimilarities <-function() {
   list.variables=sort(unique(list.variables))
   max.length.variables=max(str_length(list.variables))
   
-  #data frame containing all the similarities
-  similarity_df=data.frame()
+  #data frame containing all the cohesion
+  #in fact the computation of the cohesion is made just after...
+  cohesion_df=data.frame()
   
   #list of the occurrences of the variables
   list.occurrences.variables=vector()
@@ -29,22 +29,39 @@ readRulesComputeAndDisplaySimilarities <-function() {
     rule=strsplit(row.names(rules)[i],split=' -> ')
     from=rule[[1]][1]
     to=rule[[1]][2]
-    val=rules[i,7]
-    similarity_df[from,to]=val
+    val=rules[i,5]
+    cohesion_df[from,to]=val
     
     list.occurrences.variables[from]=rules[i,1]
   }
   
-  similarity_df[is.na(similarity_df)]=0 
+  cohesion_df[is.na(cohesion_df)]=0 
   
   #sort col names
-  similarity_df=similarity_df[order(names(similarity_df))]
+  cohesion_df=cohesion_df[order(names(cohesion_df))]
   #sort row names
-  similarity_df=similarity_df[order(row.names(similarity_df)),]
+  cohesion_df=cohesion_df[order(row.names(cohesion_df)),]
+  
+  
+  
+  #apply the cohesion formula
+  #first divide values by 100
+  cohesion_df=cohesion_df/100 
+  
+  #first remove elements < 0.5
+  cohesion_df[cohesion_df<0.5]=0 
+  
+  cohesion_df=sqrt(1-(-cohesion_df*log2(cohesion_df)-(1-cohesion_df)*log2(1-cohesion_df))^2)
+  
+  #replace NAN by 0  => NOT NICE...
+  cohesion_df[is.na(cohesion_df)]=0
+  
+  
+  
   
   
   #convert to matrix
-  similarity_matrix=data.matrix(similarity_df/100)  #we need to use values between 0 and 1
+  cohesion_matrix=data.matrix(cohesion_df)  
   
   
   
@@ -55,7 +72,22 @@ readRulesComputeAndDisplaySimilarities <-function() {
   
   
   #call the similarity computation written in C
-  res=callSimilarityComputation(similarity_matrix,list.selected.item,list.occurrences.variables)
+  res=callHierarchyComputation(cohesion_matrix,list.selected.item,list.occurrences.variables)
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   
   list.simi.indexes.variable=res[[1]][[1]]
   list.simi.variables=res[[1]][[2]]
@@ -64,9 +96,14 @@ readRulesComputeAndDisplaySimilarities <-function() {
   variable.left=res[[2]]    #variable.left=tabo
   variable.right=res[[3]]   #variable.right=tabz
   
+  
   nb.levels=res[[4]]
   
   list.significant.nodes=res[[5]]
+  
+  list.final.nodes=res[[6]]
+  
+  print(list.final.nodes)
   
   #remove the () in the classes and convert the indexes from char to integer
   list.simi.indexes.variable=str_replace_all(list.simi.indexes.variable,"([())])","")
@@ -173,11 +210,29 @@ readRulesComputeAndDisplaySimilarities <-function() {
       line.coord[3]=offset.variable.x[variable.right[j]]
       line.coord[4]=y2
       
+      
       #draw the vertical line
-      if(list.significant.nodes[j])    
-        tkcreate(canvas, "line", line.coord,width=2,tags="draw",fill="red")
-      else
-        tkcreate(canvas, "line", line.coord,width=2,tags="draw")
+      if(list.significant.nodes[j]) {   
+        color="red"
+      }
+      else {
+        color="black"
+      }
+      tkcreate(canvas, "line", line.coord,width=2,tags="draw",fill=color)
+      
+      #draw arrow
+      line.coord[1]=offset.variable.x[variable.right[j]]-5
+      line.coord[2]=y2-5
+      line.coord[3]=offset.variable.x[variable.right[j]]
+      line.coord[4]=y2
+      tkcreate(canvas, "line", line.coord,width=2,tags="draw",fill=color)
+      line.coord[1]=offset.variable.x[variable.right[j]]-5
+      line.coord[2]=y2+5
+      line.coord[3]=offset.variable.x[variable.right[j]]
+      line.coord[4]=y2
+      tkcreate(canvas, "line", line.coord,width=2,tags="draw",fill=color)
+      
+      
       
       
       line.coord[1]=offset.variable.x[variable.right[j]]
@@ -201,9 +256,31 @@ readRulesComputeAndDisplaySimilarities <-function() {
       
       
       
+      level[variable.left[j]]=-1;
+      level[variable.right[j]]=-1;
+      #     i=2;
+      #     for (u=0;u<nb_col;u++)
+      #     {
+      #       if(Item[u] && level[u]==j-1)
+      #       {
+      #         dc->MoveTo((int)taby[u][0],tabh[u]);
+      #         dc->LineTo((int)taby[u][0],dy*f+deby);  
+      #       }
+      #     }
+      
     }
     
-    
+    for (u in 1:length(list.simi.variables))
+    {
+      if(list.final.nodes[u])
+      {
+        line.coord[1]=offset.variable.x[u]
+        line.coord[2]=offset.variable.y[u]
+        line.coord[3]=offset.variable.x[u]
+        line.coord[4]=dy*nb.levels+offsetY
+        tkcreate(canvas, "line", line.coord,width=2,tags="draw")
+      }
+    }
     
     
   }
@@ -218,7 +295,4 @@ readRulesComputeAndDisplaySimilarities <-function() {
   
   
   myreplot()
-  
-  
 }
-
