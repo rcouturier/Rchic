@@ -197,7 +197,7 @@ int *variable_left,int *variable_right, int *size_class, int** classes_associate
     for(l=nb_elements_level-1;l>=0;l--)
     {
       //last is used for the short list (only direct pairs)
-      last=ll;
+      last=ll-1;
       
       out=0;
       while(last>=0 && !out)
@@ -212,6 +212,7 @@ int *variable_left,int *variable_right, int *size_class, int** classes_associate
         }
         last--;
       }
+      Rprintf("last %d\n",last);
     }
 
     for(l=nb_elements_level-1;l>=0;l--)
@@ -238,14 +239,9 @@ int *variable_left,int *variable_right, int *size_class, int** classes_associate
     signi[i]=(nb-0.5*sr)/(sqrt(sr*(ll+1)/12.));
     if(i!=0) localmax[i]=signi[i]-signi[i-1];
     else localmax[i]=signi[0];
-//    if(LongCalculation)
-//      os<<"    G-SR="<<nb<<"  S="<<signi[i]<<"  V="<<localmax[i];
-
+    //debug
     std::cout<<"    G-SR="<<nb<<"  S="<<signi[i]<<"  V="<<localmax[i];
     delete []mark;
-//    delete []uni_x;
-//    delete []uni_y;
-//    delete []uni_cohe;
   }
   double max=0;
   int index=0;
@@ -257,12 +253,9 @@ int *variable_left,int *variable_right, int *size_class, int** classes_associate
       index=i;
     }
   }
-//  Text.LoadString(IDS_MOSTSIGNIFICANT);
+  //Debug
   std::cout<<"Most significant level "<<index+1<<std::endl;
-//  
-//  Text.LoadString(IDS_SIGNIFICANTNODES);
-//  os<<"\r\n\r\n"<<Text<<"\r\n";
-//  Text.LoadString(IDS_ATLEVEL);
+
   for(i=0;i<nb_levels;i++)
   {
     int node=0;
@@ -275,17 +268,6 @@ int *variable_left,int *variable_right, int *size_class, int** classes_associate
       significant_nodes[i]+=1;
     }
   }
-//  os<<"\r\n"<<'\0';
-//  if(DisplayResult && !TextDesactivated) PView->GetEditCtrl().ReplaceSel(str);
-//  delete []x;
-//  delete []y;
-//  delete []str;
-//  delete []cohe;
-//  delete []signi;
-//  delete []localmax;
-//  //	delete []order;
-  
-  
 }
 
 
