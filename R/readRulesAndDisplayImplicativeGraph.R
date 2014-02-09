@@ -7,29 +7,47 @@ readRulesAndDisplayImplicativeGraph <-function() {
   require(tcltk) || stop("tcltk support is absent")
   require(graphics); require(stats)
   
-  rules=read.table(file='transaction.out',header=TRUE,row.names=1,sep=',')
-  visibleWidth=1200
-  visibleHeight=800
   
-  workingWidth=1200
-  workingHeight=800
   
-  tt <- tktoplevel()
-  xscr <- tkscrollbar(tt, orient="horizontal",
+  
+  
+  visibleWidth<<-1800
+  visibleHeight<<-1000
+  
+  workingWidth<<-1800
+  workingHeight<<-1000
+  
+  top <- tktoplevel()
+  
+  
+  
+  tt <- ttkframe ( top , padding = 0)
+  toolbar <- ttkframe ( top , padding = 0 )
+  tkgrid(toolbar,tt)
+  
+  
+  
+  canvas <<- tkcanvas(tt, relief="raised", width=visibleWidth, height=visibleHeight,
+                      xscrollcommand=function(...)tkset(xscr,...), 
+                      yscrollcommand=function(...)tkset(yscr,...), 
+                      scrollregion=c(0,0,workingWidth,workingHeight))
+  xscr <<- tkscrollbar(tt, orient="horizontal",
                       command=function(...)tkyview(canvas,...))
   
-  yscr <- tkscrollbar(tt, orient="vertical",
-                     command=function(...)tkyview(canvas,...))
+  yscr <<- tkscrollbar(tt, orient="vertical",
+                      command=function(...)tkyview(canvas,...))
+  
+  
+  value=list(tclVar(99),tclVar(95),tclVar(90),tclVar(85))
+  
+  cbvalue=list(tclVar(1),tclVar(0),tclVar(0),tclVar(0))
+  
+  color=list("#FF0000","#00FF00","#0000FF","#00FFFF")
+  
+  toolbarGraph(toolbar,value,cbvalue,color)
   
   
   
-  
-  
-  
-  canvas <- tkcanvas(tt, relief="raised", width=visibleWidth, height=visibleHeight,
-                     xscrollcommand=function(...)tkset(xscr,...), 
-                     yscrollcommand=function(...)tkset(yscr,...), 
-                     scrollregion=c(0,0,workingWidth,workingHeight))
   tkconfigure(xscr, command = function(...) tkxview(canvas, ...))
   tkconfigure(yscr, command = function(...) tkyview(canvas, ...))
   #tkconfigure(canvas, xscrollcommand = function(...) tkset(xscr, ...))
@@ -39,67 +57,231 @@ readRulesAndDisplayImplicativeGraph <-function() {
   tkpack(yscr, side = "right", fill = "y")
   tkpack(canvas, side = "left", fill="both", expand=1)
   
-  plotFont <- "Helvetica 8"
+  plotFont <<- "Helvetica 8"
   
   
   
   
-  myreplot <- function(...) {
-    
-    
-    
-    threshold=as.numeric(tclObj(thresholdDialog))
-    
-    
-        
-    n=dim(rules)[1]
-    listNodes=strsplit(row.names(rules),split=' -> ')
-    lNodes=character(0)
-    for(i in 1:n) {
- 
-      if(rules[i,5]>threshold) {
-        from=listNodes[[i]][1]
-        to=listNodes[[i]][2]
-        lNodes=c(lNodes,from,to)
-      }
+  
+  myreplot(99,sapply(value,tclvalue),sapply(cbvalue,tclvalue),color) 
+  
+  
+}
+
+
+
+
+
+
+
+toolbarGraph <- function (frame,value,cbvalue,color) {
+  
+  spin=list()
+  cb=list()
+  tmp.val=array(0,4)
+  
+  
+  color_well1 <- tkcanvas ( frame , width = 40 , height = 16 ,
+                            background = color[[1]] ,
+                            highlightbackground = color[[1]] )
+  tkgrid(color_well1)
+  spin1<-tkwidget(frame,"spinbox", from=50, to=100, increment=1, command=function() changeSpinBox(1),width=3, textvariable=value[[1]])
+  tkgrid(spin1)
+  cb1 <- tkcheckbutton(frame)
+  tkconfigure(cb1,variable=cbvalue[[1]])
+  tkgrid(cb1)
+  
+  
+  
+  
+  
+  
+  
+  color_well2 <- tkcanvas ( frame , width = 40 , height = 16 ,
+                            background = color[[2]] ,
+                            highlightbackground = color[[2]] )
+  tkgrid(color_well2)
+  spin2<-tkwidget(frame, "spinbox",from=50, to=100, increment=1, width=3,command=function() changeSpinBox(2), textvariable=value[[2]])
+  tkgrid(spin2)
+  cb2 <- tkcheckbutton(frame)
+  tkconfigure(cb2,variable=cbvalue[[2]])
+  tkgrid(cb2)
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  color_well3 <- tkcanvas ( frame , width = 40 , height = 16 ,
+                            background = color[[3]] ,
+                            highlightbackground = color[[3]] )
+  tkgrid(color_well3)
+  spin3<-tkwidget(frame, "spinbox",from=50, to=100, increment=1, width=3,command=function() changeSpinBox(3), textvariable=value[[3]])
+  tkgrid(spin3)
+  cb3 <- tkcheckbutton(frame)
+  tkconfigure(cb3,variable=cbvalue[[3]])
+  tkgrid(cb3)
+  
+  
+  
+  
+  
+  
+  
+  color_well4 <- tkcanvas ( frame , width = 40 , height = 16 ,
+                            background = color[[4]] ,
+                            highlightbackground = color[[4]] )
+  tkgrid(color_well4)
+  spin4<-tkwidget(frame, "spinbox",from=50, to=100, increment=1, width=3,command=function() changeSpinBox(4), textvariable=value[[4]])
+  tkgrid(spin4)
+  cb4 <- tkcheckbutton(frame)
+  tkconfigure(cb4,variable=cbvalue[[4]])
+  tkgrid(cb4)
+  
+  
+  
+  
+  
+  
+  tkbind ( color_well1 , "<Button -1>" , function (W) {changeColor(W,1)})
+  tkbind ( color_well2 , "<Button -1>" , function (W) {changeColor(W,2)})
+  tkbind ( color_well3 , "<Button -1>" , function (W) {changeColor(W,3)})
+  tkbind ( color_well4 , "<Button -1>" , function (W) {changeColor(W,4)})
+  # 
+  
+  
+  changeColor <- function(W,i) {
+    color <- tcl ( "tk_chooseColor" , parent = W ,
+                   title = "Set box color" )
+    color <- tclvalue ( color )
+    print ( color )
+    if ( nchar ( color ) )
+      tkconfigure ( W , background = color )
+  }
+  
+  
+  
+  
+  spin=list(spin1,spin2,spin3,spin4)
+  cb=list(cb1,cb2,cb3,cb4)
+  
+  OnOK <- function()
+  {
+    threshold=100
+    for(i in 1:4) {
+      check <- as.numeric(tclvalue(cbvalue[[i]]))
+      print(check)
+      val=as.numeric(tclvalue(value[[i]]))
+      print(val)
+      if(check)
+        threshold=val
     }
-    lNodes=unique(lNodes)
-    
-    g1 <- new("graphNEL", nodes = lNodes,edgemode = "directed")
-    
-    #for Pablo: try to use graphAM class
-    for(i in 1:n) {
-      rule=strsplit(row.names(rules)[i],split=' -> ')
-      from=rule[[1]][1]
-      to=rule[[1]][2]
-      if(rules[i,1]<rules[i,2] & rules[i,5]>threshold) {
-        g1 <- addEdge(from,to,g1,1)
-      }
+    print("threshold")
+    print(threshold)
+    myreplot(threshold,sapply(value,tclvalue),sapply(cbvalue,tclvalue),color)
+  }
+  OK.but <- tkbutton(frame,text="OK",command=OnOK)
+  tkgrid(OK.but)
+  tkfocus(frame)
+  
+  
+  
+  
+  
+  
+  
+  
+  changeSpinBox <- function(spin.nb)  {
+    #print(spin.nb)
+    for(i in 1:4) {
+      tmp.val[i]=as.numeric(tclvalue(value[[i]]))
+      #print(tmp.val[i])
     }
+    for(i in 1:4)
+      if(i>spin.nb)
+        if(tmp.val[spin.nb]<tmp.val[i]+i-spin.nb) {
+          tmp.val[i]=tmp.val[spin.nb]-(i-spin.nb)
+          if(tmp.val[i]<=50)
+            tmp.val[i]=50
+          tkset(spin[[i]],tmp.val[i])
+        }
+    for(i in 1:4)
+      if(i<spin.nb)
+        if(tmp.val[spin.nb]>tmp.val[i]+i-spin.nb) {
+          tmp.val[i]=tmp.val[spin.nb]+spin.nb-i
+          if(tmp.val[i]>=100)
+            tmp.val[i]=100
+          tkset(spin[[i]],tmp.val[i])
+        }
+  }
+  
+}
+
+
+
+
+
+
+myreplot <- function(threshold=99,value,cbvalue,color) {
+  
+  
+  
+  rules<-read.table(file='transaction.out',header=TRUE,row.names=1,sep=',')
+  n=dim(rules)[1]
+  
+  listNodes=strsplit(row.names(rules),split=' -> ')
+  
+  lNodes=character(0)
+  for(i in 1:n) {
     
-    #no need to plot thegraph
+    if(rules[i,5]>threshold) {
+      from=listNodes[[i]][1]
+      to=listNodes[[i]][2]
+      lNodes=c(lNodes,from,to)
+    }
+  }
+  lNodes=unique(lNodes)
+    
+  g1 <- new("graphNEL", nodes = lNodes,edgemode = "directed")
+  
+  #for Pablo: try to use graphAM class
+  for(i in 1:n) {
+    rule=strsplit(row.names(rules)[i],split=' -> ')
+    from=rule[[1]][1]
+    to=rule[[1]][2]
+    if(rules[i,1]<rules[i,2] & rules[i,5]>threshold) {
+      g1 <- addEdge(from,to,g1)
+    }
+  }
+  
+  #no need to plot thegraph
   #  plot(g1)
-    
-    
-    
-    graph1 <- agopen(g1,"foo")
-    
-    
-    workingHeight=slot(slot(boundBox(graph1),'upRight'),'y')+100
-    workingWidth=slot(slot(boundBox(graph1),'upRight'),'x')+100
-    
-    tkconfigure(canvas, scrollregion=c(0,0,workingWidth,workingHeight))
-    
-    tkdelete(canvas, "draw")
-    
-    
-    nodes = AgNode(graph1)
-    
-    
-    offsetX=40
-    
-    scalingFactor=0.8
-    
+  
+  
+  graph1 <- agopen(g1,"foo")
+  
+  
+  workingHeight=slot(slot(boundBox(graph1),'upRight'),'y')+100
+  workingWidth=slot(slot(boundBox(graph1),'upRight'),'x')+100
+  
+  tkconfigure(canvas, scrollregion=c(0,0,workingWidth,workingHeight))
+  
+  tkdelete(canvas, "draw")
+  
+  
+  nodes = AgNode(graph1)
+  
+  
+  offsetX=40
+  
+  scalingFactor=0.6
+  
+  
+  if(length(nodes)>0) {
     for (i in 1:length(nodes)) {
       node=nodes[[i]]
       coord=getNodeXY(node)
@@ -107,6 +289,8 @@ readRulesAndDisplayImplicativeGraph <-function() {
       tkcreate(canvas, "text", offsetX+coord$x*scalingFactor, workingHeight+0-coord$y*scalingFactor, text=name,font=plotFont, fill="brown",tags="draw")
     }
     #print (graph1$size)
+    
+    
     edges = AgEdge(graph1)
     for (i in 1:length(edges)) {
       edge=edges[[i]]
@@ -123,37 +307,23 @@ readRulesAndDisplayImplicativeGraph <-function() {
           lCoord[2*k-1]=offsetX+slot(cPoints(coord)[[k]],'x')*scalingFactor
           lCoord[2*k]=workingHeight+0-slot(cPoints(coord)[[k]],'y')*scalingFactor
         }
-        tkcreate(canvas, "line", lCoord,width=2,arrow=arrow,smooth='bezier',splinesteps=10,tags="draw")
+        val=rules[paste(tail(edge),"->",head(edge)),5]
+        print(val)
+        col="black"
+        if(cbvalue[[1]]==1 && value[[1]]<val)
+          col=color[[1]]
+        else
+          if(cbvalue[[2]]==1 && value[[2]]<val)
+            col=color[[2]]
+          else
+            if(cbvalue[[3]]==1 && value[[3]]<val)
+              col=color[[3]]
+            else
+              if(cbvalue[[4]]==1 && value[[4]]<val)
+                col=color[[4]]
+        tkcreate(canvas, "line", lCoord,width=2,arrow=arrow,smooth='bezier',splinesteps=10,tags="draw",fill=col)
       }
     }
   }
-  
-  have_ttk <- as.character(tcl("info", "tclversion")) >= "8.5"
-  if(have_ttk) {
-    tkbutton <- ttkbutton
-    tkframe <- ttkframe
-  }
-  
-  thresholdDialog  <- tclVar(99.99)
-  
-  
-  
-  grDevices::devAskNewPage(FALSE) # override setting in demo()
-  tclServiceMode(FALSE)
-  base <- tktoplevel()  
-  tkpack(tklabel(base, text="Threshold"))
-  for ( i in c(99.99,99.9,99,95,90,80) ) {
-    tmp <- tkradiobutton(base, command=myreplot,
-                         text=i,value=i,variable=thresholdDialog)
-    tkpack(tmp, anchor="w")
-    
-  }
-  
-  
-  tclServiceMode(TRUE)
-  
-  
-  myreplot()
-  
-  
 }
+

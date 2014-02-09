@@ -2,7 +2,7 @@
 #############    COMPUTE THE IMPLICATIVE GRAPH    ############
 ##############################################################
 library(rchic)
-require(tcltk)
+require(tcltk2)
 
 
 source('R/data2transac.R')

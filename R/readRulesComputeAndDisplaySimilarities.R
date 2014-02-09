@@ -101,6 +101,36 @@ readRulesComputeAndDisplaySimilarities <-function() {
   }
   
   
+
+  
+  
+#   #try to convert our tree to use it with the plot function of R
+#   merge=array(0,c(nb.levels,2))
+#   in.class=array(0,length(list.simi.indexes.variable))
+#   for(i in 1:nb.levels) {
+#     if (in.class[variable.left[i]]==0) {
+#       merge[i,1]=-variable.left[i]
+#     }
+#     else
+#       merge[i,1]=in.class[variable.left[i]]
+#     in.class[variable.left[i]]=i
+#     
+#     if (in.class[variable.right[i]]==0) {
+#       merge[i,2]=-variable.right[i]
+#     }
+#     else
+#       merge[i,2]=in.class[variable.right[i]]
+#     in.class[variable.right[i]]=i
+#   }
+#   order=list.simi.indexes.variable
+#   labels=list.simi.variables
+#   height=1:nb.levels
+#   tree=list(merge=merge,height=height,order=order,labels=labels,method='complete',call='test',dist.method='euclidian')
+#   attr(tree,'class')='hclust'
+#   plot(tree)
+  
+  
+  
   
   
   tt <- tktoplevel()

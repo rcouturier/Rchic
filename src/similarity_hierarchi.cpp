@@ -212,7 +212,7 @@ int *variable_left,int *variable_right, int *size_class, int** classes_associate
         }
         last--;
       }
-      Rprintf("last %d\n",last);
+      //Rprintf("last %d\n",last);
     }
 
     for(l=nb_elements_level-1;l>=0;l--)

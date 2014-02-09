@@ -140,6 +140,8 @@ readRulesComputeAndDisplayHierarchy <-function() {
   
   
   
+
+  
   tt <- tktoplevel()
   xscr <- tkscrollbar(tt, orient="horizontal",
                       command=function(...)tkyview(canvas,...))
