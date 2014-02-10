@@ -275,11 +275,10 @@ myreplot <- function(threshold=99,value,cbvalue,color) {
   offsetX=40
   
   scalingFactor=0.6
-  print((slot(slot(boundBox(graph1),'upRight'),'y')))
-  size.x=as.numeric(slot(slot(boundBox(graph1),'upRight'),'x'))
-  size.y=as.numeric(slot(slot(boundBox(graph1),'upRight'),'y'))
-  workingHeight=size.y*factor+10
-  workingWidth=size.x*factor+offsetX
+  size.x=slot(slot(boundBox(graph1),'upRight'),'x')
+  size.y=slot(slot(boundBox(graph1),'upRight'),'y')
+  workingHeight=size.y*scalingFactor+10
+  workingWidth=size.x*scalingFactor+offsetX
   
   tkconfigure(canvas, scrollregion=c(0,0,workingWidth,workingHeight))
   
