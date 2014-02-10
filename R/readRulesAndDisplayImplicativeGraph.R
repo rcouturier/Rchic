@@ -272,8 +272,14 @@ myreplot <- function(threshold=99,value,cbvalue,color) {
   graph1 <- agopen(g1,"foo")
   
   
-  workingHeight=slot(slot(boundBox(graph1),'upRight'),'y')+100
-  workingWidth=slot(slot(boundBox(graph1),'upRight'),'x')+100
+  offsetX=40
+  
+  scalingFactor=0.6
+  print((slot(slot(boundBox(graph1),'upRight'),'y')))
+  size.x=as.numeric(slot(slot(boundBox(graph1),'upRight'),'x'))
+  size.y=as.numeric(slot(slot(boundBox(graph1),'upRight'),'y'))
+  workingHeight=size.y*factor+10
+  workingWidth=size.x*factor+offsetX
   
   tkconfigure(canvas, scrollregion=c(0,0,workingWidth,workingHeight))
   
@@ -283,9 +289,7 @@ myreplot <- function(threshold=99,value,cbvalue,color) {
   nodes = AgNode(graph1)
   
   
-  offsetX=40
   
-  scalingFactor=0.6
   
   
   if(length(nodes)>0) {
