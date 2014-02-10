@@ -11,19 +11,24 @@ readRulesAndDisplayImplicativeGraph <-function() {
   
   
   
-  visibleWidth<<-1800
-  visibleHeight<<-1000
+  visibleWidth<<-1200
+  visibleHeight<<-800
   
-  workingWidth<<-1800
-  workingHeight<<-1000
+  workingWidth<<-1200
+  workingHeight<<-800
   
   top <- tktoplevel()
   
   
   
-  tt <- ttkframe ( top , padding = 0)
-  toolbar <- ttkframe ( top , padding = 0 )
-  tkgrid(toolbar,tt)
+  tt <- ttkframe ( top )#, padding = 0)
+  toolbar <- ttkframe ( top )#, padding = 0 )
+  
+  tkgrid(toolbar,row = 0 , column = 0, sticky = "news")
+  tkgrid(tt,row = 0 , column = 1 , sticky = "news")
+  
+  tkgrid.columnconfigure (top , 1 , weight = 1 )
+  tkgrid.rowconfigure (top , 0 , weight = 1 )
   
   
   
@@ -36,6 +41,8 @@ readRulesAndDisplayImplicativeGraph <-function() {
   
   yscr <<- tkscrollbar(tt, orient="vertical",
                       command=function(...)tkyview(canvas,...))
+  
+  
   
   
   value=list(tclVar(99),tclVar(95),tclVar(90),tclVar(85))
