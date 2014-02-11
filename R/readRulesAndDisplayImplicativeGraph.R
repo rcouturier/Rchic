@@ -335,5 +335,8 @@ myreplot <- function(threshold=99,value,cbvalue,color) {
       }
     }
   }
+  
+  #write the current postscript image in the current directory
+  tkpostscript(canvas, file="graph.ps",height=workingHeight,width=workingWidth)
 }
 
