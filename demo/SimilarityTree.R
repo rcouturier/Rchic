@@ -1,18 +1,12 @@
 ############################################################
-#############    COMPUTE THE HIERARCHY TREE    ############
+#############    COMPUTE THE SIMILARITY TREE    ############
 ############################################################
 
-HierarchyTree <- function() {
+SimilarityTree <- function() {
   
   library(rchic)
   library(stringr)
   require(tcltk) || stop("tcltk support is absent")
-  
-  source('R/data2transac.R')
-  source('R/callAsirules.R')
-  source('R/readRulesComputeAndDisplayHierarchy.R')
-  
-  
   
   #select file
   fileName <- tclvalue(tkgetOpenFile())
@@ -30,7 +24,7 @@ HierarchyTree <- function() {
     dataCSV<-read.csv(fileName,sep=";")
     data2transac(dataCSV)
     callAsirules()
-    readRulesComputeAndDisplayHierarchy()
+    readRulesComputeAndDisplaySimilarities()
     
   }
 }

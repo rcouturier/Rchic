@@ -1,4 +1,6 @@
-useDynLib(rchic)
-#exportPattern("^[[:alpha:]]+")
-
-#export("asirules")
+export(callAsirules)
+export(callHierarchyComputation)
+export(callSimilarityComputation)
+export(data2transac)
+export(hierarchyTree)
+export(similarityTree)
