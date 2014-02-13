@@ -22,6 +22,9 @@ if (!nchar(fileName)) {
   dataCSV<-read.csv(fileName, sep=";")
   data2transac(dataCSV)
   callAsirules()
-  readRulesComputeAndDisplayHierarchy()
+  list.variables=names(dataCSV)
+  list.variables=list.variables[-1]
+  #list of variables is needed to keep the same order in the variable when the cohesion matrix is built
+  hierarchyTree(list.variables)
   
 }

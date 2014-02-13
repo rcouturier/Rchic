@@ -26,7 +26,7 @@ SimilarityTree<- function() {
     callAsirules()
     list.variables=names(dataCSV)
     list.variables=list.variables[-1]
-    print(list.variables)
+    #list of variables is needed to keep the same order in the variable when the similarity matrix is built
     similarityTree(list.variables)
     
   }

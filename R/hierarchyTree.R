@@ -5,24 +5,13 @@
 #' @author Rapha\"{e}l Couturier \email{raphael.couturier@@univ-fcomte.fr}
 #' @export
 
-hierarchyTree <-function() {
+hierarchyTree <-function(list.variables) {
   
   rules = read.table(file='transaction.out',header=TRUE,row.names=1,sep=',')
   n = dim(rules)[1]
   
+  print(list.variables)
   
-  tempListVariables=strsplit(row.names(rules),split=' -> ')
-  list.variables=character(0)
-  
-  for(i in 1:n) {
-    
-    
-    from=tempListVariables[[i]][1]
-    to=tempListVariables[[i]][2]
-    list.variables=c(list.variables,from,to)
-    
-  }
-  list.variables=sort(unique(list.variables))
   max.length.variables=max(str_length(list.variables))
   
   #data frame containing all the cohesion
@@ -41,13 +30,12 @@ hierarchyTree <-function() {
     
     list.occurrences.variables[from]=rules[i,1]
   }
+  colnames(cohesion_df)=list.variables
+  rownames(cohesion_df)=list.variables
   
   cohesion_df[is.na(cohesion_df)]=0 
   
-  #sort col names
-  cohesion_df=cohesion_df[order(names(cohesion_df))]
-  #sort row names
-  cohesion_df=cohesion_df[order(row.names(cohesion_df)),]
+ 
   
   
   

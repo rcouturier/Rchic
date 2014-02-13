@@ -8,11 +8,7 @@ ImplicativeGraph <- function() {
   library(rchic)
   require(tcltk2)
   
-  
-  source('R/data2transac.R')
-  source('R/callAsirules.R')
-  source('R/readRulesAndDisplayImplicativeGraph.R')
-  
+ 
   
   
   #select file
@@ -31,7 +27,7 @@ ImplicativeGraph <- function() {
     dataCSV<-read.csv(fileName,sep=";")
     data2transac(dataCSV)
     callAsirules()
-    readRulesAndDisplayImplicativeGraph()
+    implicativeGraph()
     
   }
   
