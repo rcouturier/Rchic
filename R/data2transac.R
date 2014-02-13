@@ -2,8 +2,11 @@
 #'
 #' @description Saves the data to a transaction file.
 #' 
+#' @param 	data 	Matrix of data.
+#' 
 #' @author Rapha\"{e}l Couturier \email{raphael.couturier@@univ-fcomte.fr}
 #' @export
+
 data2transac <- function(data) {
   
   n = dim(data)[1]

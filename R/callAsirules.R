@@ -4,6 +4,7 @@
 #' 
 #' @author Rapha\"{e}l Couturier \email{raphael.couturier@@univ-fcomte.fr}
 #' @export
+#' @useDynLib
 
 callAsirules <- function(){
   b<-c("rchic","-l","-s0","-m1","-n2","-c2",'transaction.tab',"transaction.out")
@@ -16,6 +17,10 @@ callAsirules <- function(){
 #'
 #' @description Interface to call the the C++ similarity computation.
 #' 
+#' @param similarity_matrix 			matrix of similarities of the variables.
+#' @param list.selected.item 			subset of variables to apply the computation to.
+#' @param list.occurrences.variables 	list of the occurrences of the variables.
+#'
 #' @author Rapha\"{e}l Couturier \email{raphael.couturier@@univ-fcomte.fr}
 #' @export
 
@@ -28,6 +33,10 @@ callSimilarityComputation <- function(similarity_matrix,list.selected.item,list.
 #' @title Calls the C++ hierarchy computation.
 #'
 #' @description Interface to call the the C++ hierarchy computation.
+#'
+#' @param	cohesion_matrix				cohesion matrix of the variables
+#' @param	list.selected.item 			subset of variables to apply the computation to.
+#' @param	list.occurrences.variables  list of the occurrences of the variables.
 #' 
 #' @author Rapha\"{e}l Couturier \email{raphael.couturier@@univ-fcomte.fr}
 #' @export

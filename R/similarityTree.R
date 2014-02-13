@@ -2,7 +2,8 @@
 #'
 #' @description (Reads the ASI rules) Computes the similarities and displays the Similarity Tree.
 #' 
-#' @param rules   dataframe of ASI rules.
+#' @param   rules           dataframe of ASI rules.
+#' @param   list.variables  list of variables to compute the similarity tree from
 #'
 #' @author Rapha\"{e}l Couturier \email{raphael.couturier@@univ-fcomte.fr}
 #' @export

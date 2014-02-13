@@ -2,7 +2,11 @@
 \alias{hierarchyTree}
 \title{Computes and Displays the Hierarchy Tree.}
 \usage{
-hierarchyTree()
+hierarchyTree(list.variables)
+}
+\arguments{
+  \item{list.variables}{list of variables to compute the
+  hierarchy tree from.}
 }
 \description{
 Reads the ASI rules, computes the hierarchy tree and

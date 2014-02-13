@@ -14,4 +14,14 @@ Description: This package is intented to implement all the features of
     of counter examples we would have with two random variables have the same
     sizes (than A and B). With Rchic you can build a similirity tree (using
     similarity analysis), an implicative graph and a hierarchical tree.
+Depends:
+    R (>= 2.14.0),
+    tcltk,
+    Rgraphviz,
+    graphics,
+    stats
+Suggests:
+    stringr,
+    tcltk2
 License: GPL
+URL: https://github.com/rchic/Rchic/

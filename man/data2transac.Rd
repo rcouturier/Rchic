@@ -4,6 +4,9 @@
 \usage{
 data2transac(data)
 }
+\arguments{
+  \item{data}{Matrix of data.}
+}
 \description{
 Saves the data to a transaction file.
 }

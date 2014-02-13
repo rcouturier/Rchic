@@ -5,6 +5,16 @@
 callSimilarityComputation(similarity_matrix, list.selected.item,
   list.occurrences.variables)
 }
+\arguments{
+  \item{similarity_matrix}{matrix of similarities of the
+  variables.}
+
+  \item{list.selected.item}{subset of variables to apply
+  the computation to.}
+
+  \item{list.occurrences.variables}{list of the occurrences
+  of the variables.}
+}
 \description{
 Interface to call the the C++ similarity computation.
 }
