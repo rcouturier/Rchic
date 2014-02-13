@@ -1,12 +1,20 @@
+#' @title Computes and Displays the Similarity Tree.
+#'
+#' @description (Reads the ASI rules) Computes the similarities and displays the Similarity Tree.
+#' 
+#' @param rules   dataframe of ASI rules.
+#'
+#' @author Rapha\"{e}l Couturier \email{raphael.couturier@@univ-fcomte.fr}
+#' @export
 
-readRulesComputeAndDisplaySimilarities <-function(list.variables) {
+
+similarityTree <-function( list.variables, rules = NULL ) {
   
-  rules=read.table(file='transaction.out',header=TRUE,row.names=1,sep=',')
-  n=dim(rules)[1]
+  rules = read.table(file='transaction.out',header=TRUE,row.names=1,sep=',')
+  n     = dim(rules)[1]
   
-  
-  tempListVariables=strsplit(row.names(rules),split=' -> ')
-  #list.variables=character(0)
+  tempListVariables = strsplit(row.names(rules),split=' -> ')
+  #list.variables    = character(0)
   
   for(i in 1:n) {
     

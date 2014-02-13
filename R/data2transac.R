@@ -1,3 +1,9 @@
+#' @title Saves the data to a transaction file.
+#'
+#' @description Saves the data to a transaction file.
+#' 
+#' @author Rapha\"{e}l Couturier \email{raphael.couturier@@univ-fcomte.fr}
+#' @export
 data2transac <- function(data) {
   
   n = dim(data)[1]

@@ -1,7 +1,14 @@
-readRulesComputeAndDisplayHierarchy <-function() {
+#' @title Computes and Displays the Hierarchy Tree.
+#'
+#' @description Reads the ASI rules, computes the hierarchy tree and displays it.
+#' 
+#' @author Rapha\"{e}l Couturier \email{raphael.couturier@@univ-fcomte.fr}
+#' @export
+
+hierarchyTree <-function() {
   
-  rules=read.table(file='transaction.out',header=TRUE,row.names=1,sep=',')
-  n=dim(rules)[1]
+  rules = read.table(file='transaction.out',header=TRUE,row.names=1,sep=',')
+  n = dim(rules)[1]
   
   
   tempListVariables=strsplit(row.names(rules),split=' -> ')

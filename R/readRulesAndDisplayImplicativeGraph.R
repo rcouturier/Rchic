@@ -2,7 +2,6 @@ readRulesAndDisplayImplicativeGraph <-function() {
   
   #example of graph drawing for which the threshold can change
   
-  
   library(Rgraphviz)
   require(tcltk) || stop("tcltk support is absent")
   require(graphics); require(stats)
