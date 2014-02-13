@@ -272,7 +272,7 @@ int *variable_left,int *variable_right, int *size_class, int** classes_associate
 
 
 
-SEXP similarity(SEXP similarity_matrix,SEXP list_selected_items, SEXP list_occurrences_variables) {
+SEXP similarity(SEXP similarity_matrix,SEXP list_selected_items, SEXP list_occurrences_variables, SEXP debug) {
   if(!isMatrix(similarity_matrix))
     error("matrix needed");
   

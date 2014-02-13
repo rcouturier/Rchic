@@ -1,26 +1,27 @@
 
-readRulesComputeAndDisplaySimilarities <-function() {
+readRulesComputeAndDisplaySimilarities <-function(list.variables) {
   
   rules=read.table(file='transaction.out',header=TRUE,row.names=1,sep=',')
   n=dim(rules)[1]
   
   
   tempListVariables=strsplit(row.names(rules),split=' -> ')
-  list.variables=character(0)
+  #list.variables=character(0)
   
   for(i in 1:n) {
     
     
     from=tempListVariables[[i]][1]
     to=tempListVariables[[i]][2]
-    list.variables=c(list.variables,from,to)
+    #list.variables=c(list.variables,from,to)
     
   }
-  list.variables=sort(unique(list.variables))
+  #list.variables=sort(unique(list.variables))
+  
   max.length.variables=max(str_length(list.variables))
   
   #data frame containing all the similarities
-  similarity_df=data.frame()
+  similarity_df=data.frame(row.names=list.variables,col.names=list.variables)
   
   #list of the occurrences of the variables
   list.occurrences.variables=vector()

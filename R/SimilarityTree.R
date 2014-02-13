@@ -30,7 +30,10 @@ SimilarityTree <- function() {
     dataCSV<-read.csv(fileName,sep=";")
     data2transac(dataCSV)
     callAsirules()
-    readRulesComputeAndDisplaySimilarities()
+    list.variables=names(dataCSV)
+    list.variables=list.variables[-1]
+    print(list.variables)
+    readRulesComputeAndDisplaySimilarities(list.variables)
     
   }
 }
