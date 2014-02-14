@@ -1,7 +1,11 @@
+#' @title Displays the Implicative Graph.
+#'
+#' @description Reads the ASI rules, selects the rules according to the toolbar and calls rgraphviz before displaying the rules.
+#' 
+#' @author Rapha\"{e}l Couturier \email{raphael.couturier@@univ-fcomte.fr}
+#' @export
+
 implicativeGraph <-function() {
-  
-  #example of graph drawing for which the threshold can change
-  
   
 
 

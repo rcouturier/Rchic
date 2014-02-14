@@ -18,7 +18,9 @@ similarityTree <-function( list.variables, rules = NULL ) {
   max.length.variables=max(str_length(list.variables))
   
   #data frame containing all the similarities
-  similarity_df=data.frame(row.names=list.variables,col.names=list.variables)
+  similarity_matrix=matrix(nrow=length(list.variables),ncol=length(list.variables))
+  colnames(similarity_matrix)=list.variables
+  rownames(similarity_matrix)=list.variables
   
   #list of the occurrences of the variables
   list.occurrences.variables=vector()
@@ -28,17 +30,22 @@ similarityTree <-function( list.variables, rules = NULL ) {
     from=rule[[1]][1]
     to=rule[[1]][2]
     val=rules[i,7]
-    similarity_df[from,to]=val
+    similarity_matrix[from,to]=val
     
     list.occurrences.variables[from]=rules[i,1]
   }
   
-  similarity_df[is.na(similarity_df)]=0 
   
   
   
-  #convert to matrix
-  similarity_matrix=data.matrix(similarity_df/100)  #we need to use values between 0 and 1
+  
+  similarity_matrix[is.na(similarity_matrix)]=0 
+  
+  
+  
+  
+  #we need to use values between 0 and 1
+  similarity_matrix=similarity_matrix/100
   
   
   
@@ -168,6 +175,7 @@ similarityTree <-function( list.variables, rules = NULL ) {
     
     level=0
     
+    print(list.simi.variables)
     for (i in 1:length(list.simi.variables)) {
       #lengtt of current variable
       length.variable=str_length(list.simi.variables[i])

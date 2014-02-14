@@ -1,2 +1,2 @@
-PKG_CXXFLAGS  = -DNDEBUG -DNIMAPFN -std=c++0x -I /usr/lib/R/site-library/Rcpp/include
+PKG_CXXFLAGS  = -DNDEBUG -DNIMAPFN -std=c++0x 
 
