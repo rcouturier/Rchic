@@ -4,7 +4,7 @@
 #' 
 #' @author Rapha\"{e}l Couturier \email{raphael.couturier@@univ-fcomte.fr}
 #' @export
-#' @useDynLib
+#' @useDynLib rchic
 
 callAsirules <- function(){
   b<-c("rchic","-l","-s0","-m1","-n2","-c2",'transaction.tab',"transaction.out")
@@ -23,6 +23,7 @@ callAsirules <- function(){
 #'
 #' @author Rapha\"{e}l Couturier \email{raphael.couturier@@univ-fcomte.fr}
 #' @export
+#' @useDynLib rchic
 
 callSimilarityComputation <- function(similarity_matrix,list.selected.item,list.occurrences.variables)  {
     
@@ -40,6 +41,7 @@ callSimilarityComputation <- function(similarity_matrix,list.selected.item,list.
 #' 
 #' @author Rapha\"{e}l Couturier \email{raphael.couturier@@univ-fcomte.fr}
 #' @export
+#' @useDynLib rchic
 
 callHierarchyComputation <- function(cohesion_matrix,list.selected.item,list.occurrences.variables)  {
   
