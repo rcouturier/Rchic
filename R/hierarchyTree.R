@@ -18,7 +18,9 @@ hierarchyTree <-function(list.variables) {
   
   #data frame containing all the cohesion
   #in fact the computation of the cohesion is made just after...
-  cohesion_df=data.frame()
+  cohesion_matrix=matrix(nrow=length(list.variables),ncol=length(list.variables))
+  colnames(cohesion_matrix)=list.variables
+  rownames(cohesion_matrix)=list.variables
   
   #list of the occurrences of the variables
   list.occurrences.variables=vector()
@@ -28,14 +30,12 @@ hierarchyTree <-function(list.variables) {
     from=rule[[1]][1]
     to=rule[[1]][2]
     val=rules[i,5]
-    cohesion_df[from,to]=val
+    cohesion_matrix[from,to]=val
     
     list.occurrences.variables[from]=rules[i,1]
   }
-  colnames(cohesion_df)=list.variables
-  rownames(cohesion_df)=list.variables
   
-  cohesion_df[is.na(cohesion_df)]=0 
+  cohesion_matrix[is.na(cohesion_matrix)]=0 
   
  
   
@@ -43,22 +43,22 @@ hierarchyTree <-function(list.variables) {
   
   #apply the cohesion formula
   #first divide values by 100
-  cohesion_df=cohesion_df/100 
+  cohesion_matrix=cohesion_matrix/100 
   
   #first remove elements < 0.5
-  cohesion_df[cohesion_df<0.5]=0 
+  cohesion_matrix[cohesion_matrix<0.5]=0 
   
-  cohesion_df=sqrt(1-(-cohesion_df*log2(cohesion_df)-(1-cohesion_df)*log2(1-cohesion_df))^2)
+  cohesion_matrix=sqrt(1-(-cohesion_matrix*log2(cohesion_matrix)-(1-cohesion_matrix)*log2(1-cohesion_matrix))^2)
   
   #replace NAN by 0  => NOT NICE...
-  cohesion_df[is.na(cohesion_df)]=0
+  cohesion_matrix[is.na(cohesion_matrix)]=0
   
   
   
   
   
-  #convert to matrix
-  cohesion_matrix=data.matrix(cohesion_df)  
+  ##convert to matrix
+  #cohesion_matrix=data.matrix(cohesion_df)  
   
   
   
