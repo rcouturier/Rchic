@@ -7,7 +7,7 @@
 #' @author Rapha\"{e}l Couturier \email{raphael.couturier@@univ-fcomte.fr}
 #' @export
 
-hierarchyTree <-function(list.variables) {
+hierarchyTree <-function(list.variables, verbose=FALSE) {
   
   rules = read.table(file='transaction.out',header=TRUE,row.names=1,sep=',')
   n = dim(rules)[1]
@@ -69,18 +69,7 @@ hierarchyTree <-function(list.variables) {
   
   
   #call the hierarchy computation written in C
-  res=callHierarchyComputation(cohesion_matrix,list.selected.item,list.occurrences.variables)
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
+  res=callHierarchyComputation(cohesion_matrix,list.selected.item,list.occurrences.variables,verbose)
   
   
   
@@ -100,7 +89,7 @@ hierarchyTree <-function(list.variables) {
   
   list.final.nodes=res[[6]]
   
-  print(list.final.nodes)
+  #print(list.final.nodes)
   
   #remove the () in the classes and convert the indexes from char to integer
   list.hier.indexes.variable=str_replace_all(list.hier.indexes.variable,"([())])","")

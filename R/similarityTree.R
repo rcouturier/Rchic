@@ -4,12 +4,13 @@
 #' 
 #' @param   rules           dataframe of ASI rules.
 #' @param   list.variables  list of variables to compute the similarity tree from
+#' @param   verbose         give many details
 #'
 #' @author Rapha\"{e}l Couturier \email{raphael.couturier@@univ-fcomte.fr}
 #' @export
 
 
-similarityTree <-function( list.variables, rules = NULL ) {
+similarityTree <-function( list.variables, rules = NULL, verbose=FALSE ) {
   
   rules = read.table(file='transaction.out',header=TRUE,row.names=1,sep=',')
   n     = dim(rules)[1]
@@ -56,7 +57,7 @@ similarityTree <-function( list.variables, rules = NULL ) {
   
   
   #call the similarity computation written in C
-  res=callSimilarityComputation(similarity_matrix,list.selected.item,list.occurrences.variables)
+  res=callSimilarityComputation(similarity_matrix,list.selected.item,list.occurrences.variables,verbose)
   
   list.simi.indexes.variable=res[[1]][[1]]
   list.simi.variables=res[[1]][[2]]

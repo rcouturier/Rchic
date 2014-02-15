@@ -92,7 +92,7 @@ void GenericPair(int u,int v,int p,int q,int &maxx, int& maxy, double **Index, i
 
 //this function computes significant levels for the hierarchy or similarity tree
 void SignificantLevel(double **indexes_values,int nb_col, double* occurrences_variables, int nb_levels, 
-int *variable_left,int *variable_right, int *size_class, int** classes_associated_with, int*  significant_nodes)
+int *variable_left,int *variable_right, int *size_class, int** classes_associated_with, int*  significant_nodes, bool verbose)
 {
   
   long ll=nb_col*(nb_col-1);
@@ -136,8 +136,8 @@ int *variable_left,int *variable_right, int *size_class, int** classes_associate
   //for each level we need to compute the significance of this level
   for(i=0;i<nb_levels;i++)
   {
-    //for debuging
-    std::cout<<std::endl<<" Level "<<i+1<<" : ";
+    if(verbose)
+      std::cout<<std::endl<<" Level "<<i+1<<" : ";
 
     for(j=0;j<=i;j++)
     {
@@ -174,14 +174,14 @@ int *variable_left,int *variable_right, int *size_class, int** classes_associate
     //number of disctinc elements between all the possible pairs at this level
     int nb_elements_level=list_pairs_pairs.size();
 
-    //DEBUG
-    std::cout<<"size list pairs "<<list_pairs.size()<<std::endl;
-    for(l=0;l<nb_elements_level;l++)
-    {
-      if(l%11==10) std::cout<<std::endl;
-      std::cout<<"c("<<(std::get<1>(list_pairs_pairs[l])+1)<<","<<(std::get<2>(list_pairs_pairs[l])+1)<<")="<<(std::get<0>(list_pairs_pairs[l]))<<" ";
+    if(verbose) {
+      std::cout<<"size list pairs "<<list_pairs.size()<<std::endl;
+      for(l=0;l<nb_elements_level;l++)
+      {
+        if(l%11==10) std::cout<<std::endl;
+        std::cout<<"c("<<(std::get<1>(list_pairs_pairs[l])+1)<<","<<(std::get<2>(list_pairs_pairs[l])+1)<<")="<<(std::get<0>(list_pairs_pairs[l]))<<" ";
+      }
     }
-
 
 
     int *mark=new int[ll];
@@ -239,8 +239,8 @@ int *variable_left,int *variable_right, int *size_class, int** classes_associate
     signi[i]=(nb-0.5*sr)/(sqrt(sr*(ll+1)/12.));
     if(i!=0) localmax[i]=signi[i]-signi[i-1];
     else localmax[i]=signi[0];
-    //debug
-    std::cout<<"    G-SR="<<nb<<"  S="<<signi[i]<<"  V="<<localmax[i];
+    if(verbose)
+      std::cout<<"    G-SR="<<nb<<"  S="<<signi[i]<<"  V="<<localmax[i];
     delete []mark;
   }
   double max=0;
@@ -272,9 +272,13 @@ int *variable_left,int *variable_right, int *size_class, int** classes_associate
 
 
 
-SEXP similarity(SEXP similarity_matrix,SEXP list_selected_items, SEXP list_occurrences_variables, SEXP debug) {
+SEXP similarity(SEXP similarity_matrix,SEXP list_selected_items, SEXP list_occurrences_variables, SEXP Verbose) {
   if(!isMatrix(similarity_matrix))
     error("matrix needed");
+  if(!isLogical(Verbose))
+    error("verbose must be a boolean");
+  
+  bool verbose=LOGICAL(Verbose)[0];
   
   int nb_col=INTEGER(getAttrib(similarity_matrix, R_DimSymbol))[0];
   SEXP list_names=getAttrib(similarity_matrix, R_DimNamesSymbol);
@@ -284,7 +288,8 @@ SEXP similarity(SEXP similarity_matrix,SEXP list_selected_items, SEXP list_occur
     error("vector needed");
   //if(INTEGER(getAttrib(list_selected_items, R_DimSymbol))[0]!=nb_col)  
   //  error("list of selected items should be the same size than the number of elements");
-  Rprintf("Nb col %d\n",nb_col);
+  if(verbose)
+    Rprintf("Nb col %d\n",nb_col);
   
   
   
@@ -370,9 +375,9 @@ SEXP similarity(SEXP similarity_matrix,SEXP list_selected_items, SEXP list_occur
   for(i=0;i<nb_col;i++) {
     for(j=0;j<nb_col;j++) {
       Index[i][j]=val_mat[j*nb_col+i];  //element in the matrix seems to be transposed
-      Rprintf("%f ",Index[i][j]);   
+      //Rprintf("%f ",Index[i][j]);   
     }
-    Rprintf("\n");
+    //Rprintf("\n");
   }
 
 
@@ -507,8 +512,8 @@ SEXP similarity(SEXP similarity_matrix,SEXP list_selected_items, SEXP list_occur
 				}
 				tabo[f]=(int)taby[x][1];
 				tabz[f]=(int)taby[x][tabe[x]];
-        
-        Rprintf("Level %d tabo %d tabz %d\n",f,tabo[f],tabz[f]);
+        if(verbose)
+          Rprintf("Level %d tabo %d tabz %d\n",f,tabo[f],tabz[f]);
 				tabee[f]=tabe[x];			
 				
         char *new_s=new char[strlen(cc[x])+3];  //3 a cause des ()
@@ -578,7 +583,7 @@ SEXP similarity(SEXP similarity_matrix,SEXP list_selected_items, SEXP list_occur
 //tabz=variable_right
 //tabee=size_class
 //taby=classes_associated_with
-  SignificantLevel(Index, nb_col, Occurrences_variables,f,tabo,tabz,tabee,taby,significant_nodes);
+  SignificantLevel(Index, nb_col, Occurrences_variables,f,tabo,tabz,tabee,taby,significant_nodes,verbose);
 
 
   
@@ -721,7 +726,7 @@ double ClassImpli(int l,int n,int p,int q, double c1, double c2, double** Index,
 }
 
 
-SEXP hierarchy(SEXP similarity_matrix,SEXP list_selected_items, SEXP list_occurrences_variables) {
+SEXP hierarchy(SEXP similarity_matrix,SEXP list_selected_items, SEXP list_occurrences_variables, SEXP Verbose) {
   if(!isMatrix(similarity_matrix))
     error("matrix needed");
   
@@ -733,7 +738,13 @@ SEXP hierarchy(SEXP similarity_matrix,SEXP list_selected_items, SEXP list_occurr
     error("vector needed");
   //if(INTEGER(getAttrib(list_selected_items, R_DimSymbol))[0]!=nb_col)  
   //  error("list of selected items should be the same size than the number of elements");
-  Rprintf("Nb col %d\n",nb_col);
+  if(!isLogical(Verbose))
+    error("verbose must be a boolean");
+  
+  bool verbose=LOGICAL(Verbose)[0];
+  
+  if(verbose)
+    Rprintf("Nb col %d\n",nb_col);
   
   
   
@@ -819,9 +830,9 @@ SEXP hierarchy(SEXP similarity_matrix,SEXP list_selected_items, SEXP list_occurr
   for(i=0;i<nb_col;i++) {
     for(j=0;j<nb_col;j++) {
       Index[i][j]=val_mat[j*nb_col+i];  //element in the matrix seems to be transposed
-      Rprintf("%f ",Index[i][j]);   
+      //Rprintf("%f ",Index[i][j]);   
     }
-    Rprintf("\n");
+    //Rprintf("\n");
   }
 
 
@@ -1026,7 +1037,7 @@ SEXP hierarchy(SEXP similarity_matrix,SEXP list_selected_items, SEXP list_occurr
 //tabee=size_class
 //taby=classes_associated_with
 //tabe=list_finel_nodes
-  SignificantLevel(Index, nb_col, Occurrences_variables,f,tabo,tabz,tabee,taby,significant_nodes);
+  SignificantLevel(Index, nb_col, Occurrences_variables,f,tabo,tabz,tabee,taby,significant_nodes,verbose);
 
   
   SEXP results = PROTECT(allocVector(VECSXP, 6));

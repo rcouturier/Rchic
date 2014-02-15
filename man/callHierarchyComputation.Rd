@@ -3,7 +3,7 @@
 \title{Calls the C++ hierarchy computation.}
 \usage{
 callHierarchyComputation(cohesion_matrix, list.selected.item,
-  list.occurrences.variables)
+  list.occurrences.variables, verbose)
 }
 \arguments{
   \item{cohesion_matrix}{cohesion matrix of the variables}
@@ -13,6 +13,8 @@ callHierarchyComputation(cohesion_matrix, list.selected.item,
 
   \item{list.occurrences.variables}{list of the occurrences
   of the variables.}
+
+  \item{verbose}{gives more details}
 }
 \description{
 Interface to call the the C++ hierarchy computation.

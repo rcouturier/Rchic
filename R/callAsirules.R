@@ -20,14 +20,15 @@ callAsirules <- function(){
 #' @param similarity_matrix 			matrix of similarities of the variables.
 #' @param list.selected.item 			subset of variables to apply the computation to.
 #' @param list.occurrences.variables 	list of the occurrences of the variables.
+#' @param verbose                 gives more details
 #'
 #' @author Rapha\"{e}l Couturier \email{raphael.couturier@@univ-fcomte.fr}
 #' @export
 #' @useDynLib rchic
 
-callSimilarityComputation <- function(similarity_matrix,list.selected.item,list.occurrences.variables)  {
+callSimilarityComputation <- function(similarity_matrix,list.selected.item,list.occurrences.variables,verbose)  {
     
-    .Call("similarity", similarity_matrix,list.selected.item,list.occurrences.variables)  
+    .Call("similarity", similarity_matrix,list.selected.item,list.occurrences.variables,verbose)  
 }
 
 
@@ -38,13 +39,14 @@ callSimilarityComputation <- function(similarity_matrix,list.selected.item,list.
 #' @param	cohesion_matrix				cohesion matrix of the variables
 #' @param	list.selected.item 			subset of variables to apply the computation to.
 #' @param	list.occurrences.variables  list of the occurrences of the variables.
+#' @param verbose                 gives more details
 #' 
 #' @author Rapha\"{e}l Couturier \email{raphael.couturier@@univ-fcomte.fr}
 #' @export
 #' @useDynLib rchic
 
-callHierarchyComputation <- function(cohesion_matrix,list.selected.item,list.occurrences.variables)  {
+callHierarchyComputation <- function(cohesion_matrix,list.selected.item,list.occurrences.variables,verbose)  {
   
-  .Call("hierarchy", cohesion_matrix,list.selected.item,list.occurrences.variables)  
+  .Call("hierarchy", cohesion_matrix,list.selected.item,list.occurrences.variables,verbose)  
 }
 
