@@ -5,10 +5,10 @@
 similarityTree(list.variables, rules = NULL, verbose = FALSE)
 }
 \arguments{
-  \item{rules}{dataframe of ASI rules.}
-
   \item{list.variables}{list of variables to compute the
   similarity tree from}
+
+  \item{rules}{dataframe of ASI rules.}
 
   \item{verbose}{give many details}
 }

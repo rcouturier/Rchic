@@ -1,8 +1,9 @@
 ##############################################################
 #############    COMPUTE THE IMPLICATIVE GRAPH    ############
 ##############################################################
-  
-require(tcltk2)
+
+library(stringr)
+require(tcltk2) || stop("tcltk support is absent")
 
 #select file
 fileName <- tclvalue(tkgetOpenFile())
@@ -20,6 +21,9 @@ if (!nchar(fileName)) {
   dataCSV<-read.csv(fileName,sep=";")
   data2transac(dataCSV)
   callAsirules()
-  implicativeGraph()
+  list.variables=names(dataCSV)
+  list.variables=list.variables[-1]
+  #list of variables is needed to keep the same order in the variable when the cohesion matrix is built
+  implicativeGraph(list.variables)
   
 }

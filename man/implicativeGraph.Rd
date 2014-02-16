@@ -2,7 +2,10 @@
 \alias{implicativeGraph}
 \title{Displays the Implicative Graph.}
 \usage{
-implicativeGraph()
+implicativeGraph(list.variables)
+}
+\arguments{
+  \item{rules}{dataframe of ASI rules.}
 }
 \description{
 Reads the ASI rules, selects the rules according to the
