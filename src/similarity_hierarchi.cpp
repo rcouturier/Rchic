@@ -568,7 +568,8 @@ SEXP similarity(SEXP similarity_matrix,SEXP list_selected_items, SEXP list_occur
 	chl[0]='\0';
 	for(i=0;i<nb_col;i++)
 	{
-		if(tabe[i])
+	  //classes not selected are suppressed
+    if(tabe[i] && AlreadyInClasse[i]>=0)
 		{
 			strcat(chc,cc[i]);
 			strcat(chc," ");
@@ -578,7 +579,7 @@ SEXP similarity(SEXP similarity_matrix,SEXP list_selected_items, SEXP list_occur
 		}
 	}
 
-
+  
 //tabo=variable_left
 //tabz=variable_right
 //tabee=size_class

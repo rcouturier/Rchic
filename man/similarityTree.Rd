@@ -2,7 +2,7 @@
 \alias{similarityTree}
 \title{Computes and Displays the Similarity Tree.}
 \usage{
-similarityTree(list.variables, rules = NULL, verbose = FALSE)
+similarityTree(list.variables, rules = NULL, Verbose = FALSE)
 }
 \arguments{
   \item{list.variables}{list of variables to compute the

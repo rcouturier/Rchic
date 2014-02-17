@@ -1,6 +1,16 @@
+#' @title Displays the toolbar for the implicative graph
+#'
+#' @description Display the current parameters for the graph: thresholds, checkboxes, colors. 
+#' @description When the user press OK, the routine mycallPlot is called to update the graph
+#' 
+#' @param   frame           frame to display the toolbar, the frame is created first
+#' @param   mycallPlot      routine to call to update the graph
+#' 
+#' @author Rapha\"{e}l Couturier \email{raphael.couturier@@univ-fcomte.fr}
 #' @export
 
-#shared variables
+
+#WARNING  shared variables
 #myvalue
 #mycbvalue
 #mycolor

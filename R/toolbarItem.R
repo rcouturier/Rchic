@@ -1,4 +1,18 @@
-toolbarItem <- function(list.variables,list.ctcl,mycallPlot) {
+#' @title Displays the toolbar so select the items to display
+#'
+#' @description Display the current list of selected items. F7 and F8 can be used to select or deselect all the items respectively
+#' @description When the user press OK, the routine mycallPlot is called to update the graph or the tree
+#' @description The toolbar is created inside another frame
+#' 
+#' @param   list.variables     list of the name of the variables
+#' @param   list.tcl           list of the selected items in the tcl format
+#' @param   mycallPlot         routine to call to update the graph or the tree
+#' 
+#' @author Rapha\"{e}l Couturier \email{raphael.couturier@@univ-fcomte.fr}
+#' @export
+
+
+toolbarItem <- function(list.variables,list.tcl,mycallPlot) {
   
   
   

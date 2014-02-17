@@ -25,6 +25,6 @@ if (!nchar(fileName)) {
   list.variables=list.variables[-1]
   #list of variables is needed to keep the same order in the variable when the similarity matrix is built
   verbose=FALSE
-  similarityTree(list.variables,verbose=verbose)
+  similarityTree(list.variables,Verbose=verbose)
   
 }

@@ -56,7 +56,7 @@ implicativeGraph <-function(list.variables) {
   list.selected.item=rep_len(T,length(list.variables))
   list.tcl<<-lapply(list.selected.item,function(i) tclVar(i))
   
-  toolbarGraph(toolbar,callPlot)
+  toolbarGraph(toolbar,callPlotImplicativeGraph)
   
   
   
@@ -75,14 +75,14 @@ implicativeGraph <-function(list.variables) {
   
   
   
-  toolbarItem(list.variables,list.tcl,callPlot)  
+  toolbarItem(list.variables,list.tcl,callPlotImplicativeGraph)  
   
   
-  callPlot()
+  callPlotImplicativeGraph()
 }
 
 
-callPlot <- function() {
+callPlotImplicativeGraph <- function() {
   print("ICI")
   #currently we consider that all items are selected
   #list.selected.item=rep_len(T,length(list.variables))
@@ -106,7 +106,7 @@ callPlot <- function() {
   
   list.selected.item=lapply(list.tcl,function(i) tclvalue(i))
   print(list.selected.item)
-  myreplot(thres,sapply(myvalue,tclvalue),sapply(mycbvalue,tclvalue),mycolor,list.selected.item) 
+  plotImplicativeGraph(thres,sapply(myvalue,tclvalue),sapply(mycbvalue,tclvalue),mycolor,list.selected.item) 
 }
 
 
@@ -115,7 +115,7 @@ callPlot <- function() {
 
 
 
-myreplot <- function(threshold=99,value,cbvalue,color,list.selected.item) {
+plotImplicativeGraph <- function(threshold=99,value,cbvalue,color,list.selected.item) {
   
   
   
