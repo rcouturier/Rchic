@@ -2,8 +2,8 @@
 \alias{callSimilarityComputation}
 \title{Calls the C++ similarity computation.}
 \usage{
-callSimilarityComputation(similarity_matrix, list.selected.item,
-  list.occurrences.variables, verbose)
+callSimilarityComputation(similarity_matrix, list.occurrences.variables,
+  verbose)
 }
 \arguments{
   \item{similarity_matrix}{matrix of similarities of the

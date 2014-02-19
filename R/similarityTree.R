@@ -86,11 +86,11 @@ similarityTree <-function( list.variables, rules = NULL, Verbose=FALSE ) {
   
   
   
-  visibleWidth<<-1200
-  visibleHeight<<-800
+  visibleWidth=1200
+  visibleHeight=800
   
-  workingWidth<<-1200
-  workingHeight<<-800
+  workingWidth=1200
+  workingHeight=800
   
   
   
@@ -119,7 +119,7 @@ similarityTree <-function( list.variables, rules = NULL, Verbose=FALSE ) {
   tkpack(yscr, side = "right", fill = "y")
   tkpack(canvas, side = "left", fill="both", expand=1)
   
-  plotFont <<- "Helvetica 8"
+  
   
   callPlotSimilarityTree()
   
@@ -134,9 +134,7 @@ callPlotSimilarityTree <- function() {
   list.selected.item=unlist(lapply(list.tcl,function(i) as.logical(as.numeric(tclvalue(i)))))
   
   
-  #currently we consider that all items are selected
-  #list.selected.item=rep_len(T,length(list.variables))
-  
+    
   max.length.variables=max(str_length(list.variables))
   
   #extract sub matrix and sub list according to selected items
@@ -146,7 +144,7 @@ callPlotSimilarityTree <- function() {
   
   
   #call the similarity computation written in C
-  res=callSimilarityComputation(sub_matrix,sub.list.item,sub.list.occ,verbose)
+  res=callSimilarityComputation(sub_matrix,sub.list.occ,verbose)
   
   list.simi.indexes.variable=res[[1]][[1]]
   list.simi.variables=res[[1]][[2]]
@@ -178,11 +176,11 @@ callPlotSimilarityTree <- function() {
   dx=20
   dy=10
   
-  visibleWidth<<-1200
-  visibleHeight<<-800
+  visibleWidth=1200
+  visibleHeight=800
   
-  workingWidth<<-length(list.simi.variables)*dx+50
-  workingHeight<<-offsetY+10*(max.length.variables)+nb.levels*dy+50
+  workingWidth=length(list.simi.variables)*dx+50
+  workingHeight=offsetY+10*(max.length.variables)+nb.levels*dy+50
   
   offset.variable.x=0
   offset.variable.y=0
@@ -217,6 +215,8 @@ callPlotSimilarityTree <- function() {
   }
   
   offsetY=offsetY+10*max.length.variables+10
+  plotFont= "Helvetica 8"
+  
   
   line.coord=numeric(4)
   for (j in 1:nb.levels) {

@@ -272,7 +272,7 @@ int *variable_left,int *variable_right, int *size_class, int** classes_associate
 
 
 
-SEXP similarity(SEXP similarity_matrix,SEXP list_selected_items, SEXP list_occurrences_variables, SEXP Verbose) {
+SEXP similarity(SEXP similarity_matrix, SEXP list_occurrences_variables, SEXP Verbose) {
   if(!isMatrix(similarity_matrix))
     error("matrix needed");
   if(!isLogical(Verbose))
@@ -284,10 +284,6 @@ SEXP similarity(SEXP similarity_matrix,SEXP list_selected_items, SEXP list_occur
   SEXP list_names=getAttrib(similarity_matrix, R_DimNamesSymbol);
   SEXP variables= VECTOR_ELT(list_names, 0);
   
-  if(!isVector(list_selected_items))
-    error("vector needed");
-  //if(INTEGER(getAttrib(list_selected_items, R_DimSymbol))[0]!=nb_col)  
-  //  error("list of selected items should be the same size than the number of elements");
   if(verbose)
     Rprintf("Nb col %d\n",nb_col);
   
@@ -299,12 +295,8 @@ SEXP similarity(SEXP similarity_matrix,SEXP list_selected_items, SEXP list_occur
   bool max_found;
   
   int *level= new int[nb_col];
-  //int *Item=new int[nb_col];
-  int *Item = INTEGER(list_selected_items);
+  
   double *Occurrences_variables = REAL(list_occurrences_variables);
-  /*for(i=0;i<nb_col;i++) {
-    Rprintf("%d\n",Item[i]);
-  }*/
   
   int *tabe=new int[nb_col];
   int *tabo=new int[nb_col];
@@ -329,7 +321,7 @@ SEXP similarity(SEXP similarity_matrix,SEXP list_selected_items, SEXP list_occur
   
   for (i=0;i<nb_col;i++)
 	{
-		if(Item[i]) taby[i][1]=i;
+	  taby[i][1]=i;
 		tabe[i]=1;
     int length=strlen(CHAR(STRING_ELT(variables, i)));
 		cc[i]=new char[10];	//it is only to have the number of the variable
@@ -338,9 +330,8 @@ SEXP similarity(SEXP similarity_matrix,SEXP list_selected_items, SEXP list_occur
 		sprintf(cl[i],"%s",CHAR(STRING_ELT(variables, i)));
 	}
   
-  int r=0;
-  for(i=0;i<nb_col;i++) 
-    r+=Item[i];
+  int r=nb_col;
+  
 	int f=0;
 	
     
@@ -384,28 +375,24 @@ SEXP similarity(SEXP similarity_matrix,SEXP list_selected_items, SEXP list_occur
   do
   {
 		for (u=0;u<nb_col-1;u++)
-			for (v=u+1;v<nb_col;v++)
-				{
-					if(Item[u] && Item[v])
-						{
-							if ( tabe[u]==1 && tabe[v]==1)	CurIndex[u][v]=Index[u][v];
-							else if (tabe[u]==0 || tabe[v]==0) CurIndex[u][v]=0;
-							else
+			for (v=u+1;v<nb_col;v++) {
+				if ( tabe[u]==1 && tabe[v]==1)	CurIndex[u][v]=Index[u][v];
+				else if (tabe[u]==0 || tabe[v]==0) CurIndex[u][v]=0;
+				else {
+						x=taby[u][1];
+						y=taby[v][1];
+						max=Index[x][y];
+						for (j=1;j<=tabe[u];j++)
+							for (k=1;k<=tabe[v];k++)
 								{
-									x=taby[u][1];
-									y=taby[v][1];
-									max=Index[x][y];
-									for (j=1;j<=tabe[u];j++)
-										for (k=1;k<=tabe[v];k++)
-											{
-												double t=Index[taby[u][j]][taby[v][k]];  
-												if (max<t) max=t;
-												t=pow(max,tabe[u]);
-												CurIndex[u][v]=pow(t,tabe[v]);
-											}
+									double t=Index[taby[u][j]][taby[v][k]];  
+									if (max<t) max=t;
+									t=pow(max,tabe[u]);
+									CurIndex[u][v]=pow(t,tabe[v]);
 								}
-						}
 				}
+						
+		}
 		max=1e-12;
 		max_found=false;
 		x=0;
@@ -413,17 +400,16 @@ SEXP similarity(SEXP similarity_matrix,SEXP list_selected_items, SEXP list_occur
 		for (u=0;u<nb_col-1;u++)         //voir u=0 u<nb_col-1
 			for (v=u+1;v<nb_col;v++)            //v=u+1;<nb_col
 				{
-					if(Item[u] && Item[v])
-						{	
-							if (tabe[u]==1 && tabe[v]==1) CurIndex[u][v]=Index[u][v];
-							if (max<CurIndex[u][v])
-								{
-									max=CurIndex[u][v];
-									x=u;
-									y=v;
-								}
-						}
-				}
+						
+  				if (tabe[u]==1 && tabe[v]==1) CurIndex[u][v]=Index[u][v];
+  				if (max<CurIndex[u][v])
+  					{
+  						max=CurIndex[u][v];
+  						x=u;
+  						y=v;
+  					}
+  			}
+				
     
 		for (u=0;u<nb_col;u++) tabb[u]=-1;
 
@@ -444,70 +430,67 @@ SEXP similarity(SEXP similarity_matrix,SEXP list_selected_items, SEXP list_occur
 
 			for (u=x+1;u<nb_col;u++)
 				{
-					if(Item[u])
-						{                                             
-							if (tabb[u]!=-1 && CurIndex[x][u]==max && !max_found)
+					if (tabb[u]!=-1 && CurIndex[x][u]==max && !max_found)
+						{
+							max_found=true;
+							if(AlreadyInClasse[x]==-999999 && AlreadyInClasse[y]==-999999)
 								{
-									max_found=true;
-									if(AlreadyInClasse[x]==-999999 && AlreadyInClasse[y]==-999999)
+									AlreadyInClasse[x]=f;
+									AlreadyInClasse[y]=f;
+									LevelX[f]=-x-1;
+									LevelY[f]=-y-1;
+								}
+							else
+								if(AlreadyInClasse[x]==-999999) 
+									{
+										LevelX[f]=-x-1;
+										LevelY[f]=AlreadyInClasse[y];
+										AlreadyInClasse[x]=f;
+										AlreadyInClasse[y]=f;
+									}
+								else
+									if(AlreadyInClasse[y]==-999999)
 										{
+											LevelX[f]=AlreadyInClasse[x];
+											LevelY[f]=-y-1;
 											AlreadyInClasse[x]=f;
 											AlreadyInClasse[y]=f;
-											LevelX[f]=-x-1;
-											LevelY[f]=-y-1;
 										}
 									else
-										if(AlreadyInClasse[x]==-999999) 
-											{
-												LevelX[f]=-x-1;
-												LevelY[f]=AlreadyInClasse[y];
-												AlreadyInClasse[x]=f;
-												AlreadyInClasse[y]=f;
-											}
-										else
-											if(AlreadyInClasse[y]==-999999)
-												{
-													LevelX[f]=AlreadyInClasse[x];
-													LevelY[f]=-y-1;
-													AlreadyInClasse[x]=f;
-													AlreadyInClasse[y]=f;
-												}
-											else
-												{
-													LevelX[f]=AlreadyInClasse[x];
-													LevelY[f]=AlreadyInClasse[y];
-													AlreadyInClasse[x]=f;
-													AlreadyInClasse[y]=f;
-												}
-									Terminal[y]=0;
-									GenericPair(x,y,tabe[x],tabe[y],GenPairX[f],GenPairY[f], Index, taby);
+										{
+											LevelX[f]=AlreadyInClasse[x];
+											LevelY[f]=AlreadyInClasse[y];
+											AlreadyInClasse[x]=f;
+											AlreadyInClasse[y]=f;
+										}
+							Terminal[y]=0;
+							GenericPair(x,y,tabe[x],tabe[y],GenPairX[f],GenPairY[f], Index, taby);
 
 
-									level[u]=f;
-									tabe[x]=tabe[x]+tabe[u];
-									char * new_s = new char[strlen(cc[x])+2+strlen(cc[u])];
-									strcpy(new_s,cc[x]);
-									strcat(new_s," ");    //espace entre les 2 chaines
-									strcat(new_s,cc[u]);
-									delete []cc[u];
-									cc[u]=0;
-									delete []cc[x];
-									cc[x]=new_s;
-									char * new_s2 = new char[strlen(cl[x])+2+strlen(cl[u])];
-									strcpy(new_s2,cl[x]);
-									strcat(new_s2," ");    //espace entre les 2 chaines
-									strcat(new_s2,cl[u]);
-									delete []cl[u];
-									cl[u]=NULL;
-									delete []cl[x];
-									cl[x]=new_s2;
+							level[u]=f;
+							tabe[x]=tabe[x]+tabe[u];
+							char * new_s = new char[strlen(cc[x])+2+strlen(cc[u])];
+							strcpy(new_s,cc[x]);
+							strcat(new_s," ");    //espace entre les 2 chaines
+							strcat(new_s,cc[u]);
+							delete []cc[u];
+							cc[u]=0;
+							delete []cc[x];
+							cc[x]=new_s;
+							char * new_s2 = new char[strlen(cl[x])+2+strlen(cl[u])];
+							strcpy(new_s2,cl[x]);
+							strcat(new_s2," ");    //espace entre les 2 chaines
+							strcat(new_s2,cl[u]);
+							delete []cl[u];
+							cl[u]=NULL;
+							delete []cl[x];
+							cl[x]=new_s2;
 
-									r--;
-									for (k=j+1;k<=j+tabe[u];k++)
-										taby[x][k]=taby[u][k-j];
-									j=j+tabe[u];
-									tabe[u]=0;
-								}
+							r--;
+							for (k=j+1;k<=j+tabe[u];k++)
+								taby[x][k]=taby[u][k-j];
+							j=j+tabe[u];
+							tabe[u]=0;
 						}
 				}
 				tabo[f]=(int)taby[x][1];
@@ -645,7 +628,6 @@ SEXP similarity(SEXP similarity_matrix,SEXP list_selected_items, SEXP list_occur
   delete []tabz;
   delete []tabo;
   delete []significant_nodes;
-  //delete []Item;
   delete []level;
   return results;
   

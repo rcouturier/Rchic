@@ -26,9 +26,9 @@ callAsirules <- function(){
 #' @export
 #' @useDynLib rchic
 
-callSimilarityComputation <- function(similarity_matrix,list.selected.item,list.occurrences.variables,verbose)  {
+callSimilarityComputation <- function(similarity_matrix,list.occurrences.variables,verbose)  {
     
-    .Call("similarity", similarity_matrix,list.selected.item,list.occurrences.variables,verbose)  
+    .Call("similarity", similarity_matrix,list.occurrences.variables,verbose)  
 }
 
 
