@@ -83,10 +83,7 @@ implicativeGraph <-function(list.variables) {
 
 
 callPlotImplicativeGraph <- function() {
-  print("ICI")
-  #currently we consider that all items are selected
-  #list.selected.item=rep_len(T,length(list.variables))
-  
+ 
   #need to check these parameters here
   thres=100
   for(i in 1:4) {
@@ -115,21 +112,21 @@ callPlotImplicativeGraph <- function() {
 
 
 
-plotImplicativeGraph <- function(threshold=99,value,cbvalue,color,list.selected.item) {
+plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item) {
   
   
   
-  rules<-read.table(file='transaction.out',header=TRUE,row.names=1,sep=',')
+  rules<-read.table(file='transaction.out',header=TRUE,row.names=1,sep=',',stringsAsFactors = FALSE)
   n=dim(rules)[1]
   
   listNodes=strsplit(row.names(rules),split=' -> ')
   
   lNodes=character(0)
   for(i in 1:n) {
-    
-    if(rules[i,5]>threshold & as.numeric(list.selected.item[[rules[i,1]]]) & as.numeric(list.selected.item[[rules[i,2]]])) {
-      from=listNodes[[i]][1]
-      to=listNodes[[i]][2]
+    from=listNodes[[i]][1]
+    to=listNodes[[i]][2]
+    if(as.numeric(rules[i,5])>thres & as.numeric(list.selected.item[[which(list.variables==from)]]) & as.numeric(list.selected.item[[which(list.variables==to)]])) {
+      
       lNodes=c(lNodes,from,to)
     }
   }
@@ -142,7 +139,7 @@ plotImplicativeGraph <- function(threshold=99,value,cbvalue,color,list.selected.
     rule=strsplit(row.names(rules)[i],split=' -> ')
     from=rule[[1]][1]
     to=rule[[1]][2]
-    if(rules[i,1]<rules[i,2] & as.numeric(list.selected.item[[rules[i,1]]]) & as.numeric(list.selected.item[[rules[i,2]]]) & rules[i,5]>threshold) {
+    if(as.numeric(rules[i,5])>thres &  as.numeric(rules[i,1])<as.numeric(rules[i,2]) & as.numeric(list.selected.item[[which(list.variables==from)]]) & as.numeric(list.selected.item[[which(list.variables==to)]])) {
       g1 <- addEdge(from,to,g1)
     }
   }
@@ -199,7 +196,7 @@ plotImplicativeGraph <- function(threshold=99,value,cbvalue,color,list.selected.
           lCoord[2*k-1]=offsetX+slot(cPoints(coord)[[k]],'x')*scalingFactor
           lCoord[2*k]=workingHeight+0-slot(cPoints(coord)[[k]],'y')*scalingFactor
         }
-        val=rules[paste(tail(edge),"->",head(edge)),5]
+        val=as.numeric(rules[paste(tail(edge),"->",head(edge)),5])
         print(val)
         col="black"
         if(cbvalue[[1]]==1 && value[[1]]<val)
