@@ -9,7 +9,7 @@
 
 hierarchyTree <-function(list.variables, verbose=FALSE) {
   
-  rules = read.table(file='transaction.out',header=TRUE,row.names=1,sep=',')
+  rules = read.table(file='transaction.out',header=TRUE,row.names=1,sep=',',stringsAsFactors=F)
   n = dim(rules)[1]
   
   print(list.variables)
@@ -29,10 +29,10 @@ hierarchyTree <-function(list.variables, verbose=FALSE) {
     rule=strsplit(row.names(rules)[i],split=' -> ')
     from=rule[[1]][1]
     to=rule[[1]][2]
-    val=rules[i,5]
+    val=as.numeric(rules[i,5])
     cohesion_matrix[from,to]=val
     
-    list.occurrences.variables[from]=rules[i,1]
+    list.occurrences.variables[from]=as.numeric(rules[i,1])
   }
   
   cohesion_matrix[is.na(cohesion_matrix)]=0 
