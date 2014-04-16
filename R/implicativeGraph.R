@@ -117,6 +117,9 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
   
   
   rules<-read.table(file='transaction.out',header=TRUE,row.names=1,sep=',',stringsAsFactors = FALSE)
+  row=row.names(rules)
+  rules=as.data.frame(lapply(rules,as.numeric))
+  row.names(rules)=row
   n=dim(rules)[1]
   
   listNodes=strsplit(row.names(rules),split=' -> ')
@@ -125,7 +128,7 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
   for(i in 1:n) {
     from=listNodes[[i]][1]
     to=listNodes[[i]][2]
-    if(as.numeric(rules[i,5])>thres & as.numeric(list.selected.item[[which(list.variables==from)]]) & as.numeric(list.selected.item[[which(list.variables==to)]])) {
+    if(rules[i,5]>thres & as.numeric(list.selected.item[[which(list.variables==from)]]) & as.numeric(list.selected.item[[which(list.variables==to)]])) {
       
       lNodes=c(lNodes,from,to)
     }
@@ -139,7 +142,7 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
     rule=strsplit(row.names(rules)[i],split=' -> ')
     from=rule[[1]][1]
     to=rule[[1]][2]
-    if(as.numeric(rules[i,5])>thres &  as.numeric(rules[i,1])<as.numeric(rules[i,2]) & 
+    if(rules[i,5]>thres &  rules[i,1]<rules[i,2] & 
          as.numeric(list.selected.item[[which(list.variables==from)]]) & as.numeric(list.selected.item[[which(list.variables==to)]])) {
       g1 <- addEdge(from,to,g1)
     }
@@ -197,7 +200,7 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
           lCoord[2*k-1]=offsetX+slot(cPoints(coord)[[k]],'x')*scalingFactor
           lCoord[2*k]=workingHeight+0-slot(cPoints(coord)[[k]],'y')*scalingFactor
         }
-        val=as.numeric(rules[paste(tail(edge),"->",head(edge)),5])
+        val=rules[paste(tail(edge),"->",head(edge)),5]
         print(val)
         col="black"
         if(cbvalue[[1]]==1 && value[[1]]<val)

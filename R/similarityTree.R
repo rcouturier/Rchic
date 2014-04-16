@@ -13,6 +13,9 @@
 similarityTree <-function( list.variables, rules = NULL, Verbose=FALSE ) {
   
   rules = read.table(file='transaction.out',header=TRUE,row.names=1,sep=',',stringsAsFactors=F)
+  row=row.names(rules)
+  rules=as.data.frame(lapply(rules,as.numeric))
+  row.names(rules)=row
   n     = dim(rules)[1]
   
   verbose<<-Verbose
@@ -31,10 +34,10 @@ similarityTree <-function( list.variables, rules = NULL, Verbose=FALSE ) {
     rule=strsplit(row.names(rules)[i],split=' -> ')
     from=rule[[1]][1]
     to=rule[[1]][2]
-    val=as.numeric(rules[i,7])
+    val=rules[i,7]
     similarity_matrix[from,to]=val
     
-    list.occurrences.variables[from]<<-as.numeric(rules[i,1])
+    list.occurrences.variables[from]<<-rules[i,1]
   }
   
   
@@ -119,8 +122,6 @@ similarityTree <-function( list.variables, rules = NULL, Verbose=FALSE ) {
   tkpack(yscr, side = "right", fill = "y")
   tkpack(canvas, side = "left", fill="both", expand=1)
   
-  
-  
   callPlotSimilarityTree()
   
 }
@@ -194,6 +195,8 @@ callPlotSimilarityTree <- function() {
   
   
   
+  
+  plotFont <- "Helvetica 8"
   
   
   
