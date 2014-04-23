@@ -4,6 +4,7 @@
 
 library(stringr)
 require(tcltk) || stop("tcltk support is absent")
+require(FactoClass) || stop("FactoClass package is absent")
 
 #select file
 fileName <- tclvalue(tkgetOpenFile())
