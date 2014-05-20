@@ -71,7 +71,7 @@ implicativeGraph <-function(list.variables) {
   tkpack(yscr, side = "right", fill = "y")
   tkpack(canvas, side = "left", fill="both", expand=1)
   
-  plotFont <<- "Helvetica 8"
+  plotFont <<- "Helvetica 12"
   
   
   
@@ -149,7 +149,7 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
   }
   
   #no need to plot thegraph
-  #  plot(g1)
+  # plot(g1)
   
   
   graph1 <- agopen(g1,"foo")
@@ -157,11 +157,12 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
   
   offsetX=40
   
-  scalingFactor=0.6
+  scalingFactorX=1.9
+  scalingFactorY=0.5
   size.x=slot(slot(boundBox(graph1),'upRight'),'x')
   size.y=slot(slot(boundBox(graph1),'upRight'),'y')
-  workingHeight=size.y*scalingFactor+10
-  workingWidth=size.x*scalingFactor+offsetX
+  workingHeight=size.y*scalingFactorY+10
+  workingWidth=size.x*scalingFactorX+offsetX
   
   tkconfigure(canvas, scrollregion=c(0,0,workingWidth,workingHeight))
   
@@ -179,14 +180,15 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
       node=nodes[[i]]
       coord=getNodeXY(node)
       name=name(node)
-      tkcreate(canvas, "text", offsetX+coord$x*scalingFactor, workingHeight+0-coord$y*scalingFactor, text=name,font=plotFont, fill="brown",tags="draw")
+      tkcreate(canvas, "text", offsetX+coord$x*scalingFactorX, workingHeight+0-coord$y*scalingFactorY, text=name,font=plotFont, fill="brown",tags="draw")
     }
     #print (graph1$size)
     
-    
+   print("nb spline") 
     edges = AgEdge(graph1)
     for (i in 1:length(edges)) {
       edge=edges[[i]]
+      print(numSplines(edge))
       for (j in 1:numSplines(edge)) {
         coord=getSpline(edge, j)
         if(j==numSplines(edge)) {
@@ -197,8 +199,8 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
         }
         lCoord=numeric(8)
         for(k in 1:4) {
-          lCoord[2*k-1]=offsetX+slot(cPoints(coord)[[k]],'x')*scalingFactor
-          lCoord[2*k]=workingHeight+0-slot(cPoints(coord)[[k]],'y')*scalingFactor
+          lCoord[2*k-1]=offsetX+slot(cPoints(coord)[[k]],'x')*scalingFactorX
+          lCoord[2*k]=workingHeight+0-slot(cPoints(coord)[[k]],'y')*scalingFactorY
         }
         val=rules[paste(tail(edge),"->",head(edge)),5]
         print(val)
@@ -214,7 +216,7 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
             else
               if(cbvalue[[4]]==1 && value[[4]]<val)
                 col=color[[4]]
-        tkcreate(canvas, "line", lCoord,width=2,arrow=arrow,smooth='bezier',splinesteps=10,tags="draw",fill=col)
+        tkcreate(canvas, "line", lCoord,width=2,arrow=arrow,smooth='bezier',splinesteps=6,tags="draw",fill=col)
       }
     }
   }
