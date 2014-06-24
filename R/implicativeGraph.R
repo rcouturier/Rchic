@@ -9,8 +9,8 @@
 
 implicativeGraph <-function(list.variables) {
   
-
-
+  
+  
   visibleWidth<<-1200
   visibleHeight<<-800
   
@@ -37,10 +37,10 @@ implicativeGraph <-function(list.variables) {
                       yscrollcommand=function(...)tkset(yscr,...), 
                       scrollregion=c(0,0,workingWidth,workingHeight))
   xscr <<- tkscrollbar(tt, orient="horizontal",
-                      command=function(...)tkyview(canvas,...))
+                       command=function(...)tkyview(canvas,...))
   
   yscr <<- tkscrollbar(tt, orient="vertical",
-                      command=function(...)tkyview(canvas,...))
+                       command=function(...)tkyview(canvas,...))
   
   
   
@@ -83,7 +83,7 @@ implicativeGraph <-function(list.variables) {
 
 
 callPlotImplicativeGraph <- function() {
- 
+  
   #need to check these parameters here
   thres=100
   for(i in 1:4) {
@@ -124,20 +124,22 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
   
   listNodes=strsplit(row.names(rules),split=' -> ')
   
+  #determine the list of visible nodes
   lNodes=character(0)
   for(i in 1:n) {
     from=listNodes[[i]][1]
     to=listNodes[[i]][2]
-    if(rules[i,5]>thres & as.numeric(list.selected.item[[which(list.variables==from)]]) & as.numeric(list.selected.item[[which(list.variables==to)]])) {
+    if(rules[i,5]>thres &  rules[i,1]<rules[i,2] & as.numeric(list.selected.item[[which(list.variables==from)]]) & as.numeric(list.selected.item[[which(list.variables==to)]])) {
       
       lNodes=c(lNodes,from,to)
     }
   }
   lNodes=unique(lNodes)
-    
+  
+  #create the graph with the nodes
   g1 <- new("graphNEL", nodes = lNodes,edgemode = "directed")
   
-  #for Pablo: try to use graphAM class
+  #add the edge of the graph
   for(i in 1:n) {
     rule=strsplit(row.names(rules)[i],split=' -> ')
     from=rule[[1]][1]
@@ -145,13 +147,14 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
     if(rules[i,5]>thres &  rules[i,1]<rules[i,2] & 
          as.numeric(list.selected.item[[which(list.variables==from)]]) & as.numeric(list.selected.item[[which(list.variables==to)]])) {
       g1 <- addEdge(from,to,g1)
+      
     }
   }
   
   #no need to plot thegraph
-  # plot(g1)
+  #plot(g1)
   
-  
+  #call rgraphviz to draw a nice graph
   graph1 <- agopen(g1,"foo")
   
   
@@ -168,27 +171,28 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
   
   tkdelete(canvas, "draw")
   
-  
+  #get the list of nodes
   nodes = AgNode(graph1)
   
   
   
   
-  
+  #if the list of nodes is not empty
   if(length(nodes)>0) {
+    #create the text of the nodes
     for (i in 1:length(nodes)) {
       node=nodes[[i]]
       coord=getNodeXY(node)
       name=name(node)
       tkcreate(canvas, "text", offsetX+coord$x*scalingFactorX, workingHeight+0-coord$y*scalingFactorY, text=name,font=plotFont, fill="brown",tags="draw")
     }
-    #print (graph1$size)
     
-   print("nb spline") 
+    #get the list of the edges
     edges = AgEdge(graph1)
+    #for all edges
     for (i in 1:length(edges)) {
       edge=edges[[i]]
-      print(numSplines(edge))
+      #for all splines
       for (j in 1:numSplines(edge)) {
         coord=getSpline(edge, j)
         if(j==numSplines(edge)) {
@@ -210,12 +214,12 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
         else
           if(cbvalue[[2]]==1 && value[[2]]<val)
             col=color[[2]]
-          else
-            if(cbvalue[[3]]==1 && value[[3]]<val)
-              col=color[[3]]
-            else
-              if(cbvalue[[4]]==1 && value[[4]]<val)
-                col=color[[4]]
+        else
+          if(cbvalue[[3]]==1 && value[[3]]<val)
+            col=color[[3]]
+        else
+          if(cbvalue[[4]]==1 && value[[4]]<val)
+            col=color[[4]]
         tkcreate(canvas, "line", lCoord,width=2,arrow=arrow,smooth='bezier',splinesteps=6,tags="draw",fill=col)
       }
     }
