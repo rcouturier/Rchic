@@ -147,7 +147,7 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
     if(rules[i,5]>thres &  rules[i,1]<rules[i,2] & 
          as.numeric(list.selected.item[[which(list.variables==from)]]) & as.numeric(list.selected.item[[which(list.variables==to)]])) {
       g1 <- addEdge(from,to,g1)
-      
+      print(paste("put ",from,"->",to))
     }
   }
   
@@ -174,8 +174,92 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
   #get the list of nodes
   nodes = AgNode(graph1)
   
+  lastX=0
+  lastY=0
+  
+  list.spline <<- list()
+  list.node = list()
   
   
+  moveDown <- function(i) {
+    force(i)
+    
+    function(x,y){
+      
+      ## This procedure is invoked when the mouse is pressed over one
+      ## of the data points.  It sets up state to allow the point
+      ## to be dragged.
+      ##
+      ## Arguments:
+      ## x, y -  The coordinates of the mouse press.
+      #print("aeazeae")
+      x <- as.numeric(x)
+      y <- as.numeric(y)
+      #print(x)
+      #print(y)
+      tkdtag(canvas, "selected")
+      tkaddtag(canvas, "selected", "withtag", "current")
+      tkitemraise(canvas,"current")
+      lastX <<- x
+      lastY <<- y
+      #print(lastX)
+      #print(lastY)
+    }
+  }
+  
+  moveNode <- function(i)
+  {
+    force(i)
+    
+    function(x,y){
+      
+      ## This procedure is invoked during mouse motion events.
+      ## It drags the current item.
+      ##
+      ## Arguments:
+      ## x, y -  The coordinates of the mouse.
+      x <- as.numeric(x)
+      y <- as.numeric(y)
+      tkmove(canvas, "selected", x-lastX,y-lastY)
+      lastX <<- x
+      lastY <<- y
+    }
+  }
+  
+  moveEdges <- function(i){
+    force(i)
+    function(x,y) {
+      print("move edge3")
+      #print("from")
+      #print(list.from[[i]])
+      for(e in list.from[[i]]) {
+        sp=list.spline[[e]]
+        sp$coord[[1]]=as.numeric(x)
+        sp$coord[[2]]=as.numeric(y)+15
+        print(list.spline)
+        list.spline[[e]]<<-sp
+        print(list.spline)
+        tkcoords(canvas,sp$spline,sp$coord)
+      }
+      
+      
+      #print("to")
+      #print(list.to[[i]])
+      for(e in list.to[[i]]) {
+        sp=list.spline[[e]]
+        sp$coord[[7]]=as.numeric(x)
+        sp$coord[[8]]=as.numeric(y)-15
+        print(list.spline)
+        list.spline[[e]]<<-sp
+        print(list.spline)
+        tkcoords(canvas,sp$spline,sp$coord)
+      }
+    }
+  }
+  
+  nodeItem <-  vector("character",length(nodes))
+  
+  nb.spline=1
   
   #if the list of nodes is not empty
   if(length(nodes)>0) {
@@ -184,8 +268,16 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
       node=nodes[[i]]
       coord=getNodeXY(node)
       name=name(node)
-      tkcreate(canvas, "text", offsetX+coord$x*scalingFactorX, workingHeight+0-coord$y*scalingFactorY, text=name,font=plotFont, fill="brown",tags="draw")
+      p<-tkcreate(canvas, "text", offsetX+coord$x*scalingFactorX, workingHeight+0-coord$y*scalingFactorY, text=name,font=plotFont, fill="brown",tags="draw")
+      #tkaddtag(canvas, "point", "withtag", p)
+      tkitembind(canvas, p, "<1>", moveDown(i))
+      tkitembind(canvas, p, "<ButtonRelease-1>",moveEdges(i))
+      tkitembind(canvas, p,"<B1-Motion>", moveNode(i))
+      list.node=c(list.node,name)
     }
+    
+    list.from = vector("list",length(nodes))  
+    list.to = vector("list",length(nodes))  
     
     #get the list of the edges
     edges = AgEdge(graph1)
@@ -193,7 +285,9 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
     for (i in 1:length(edges)) {
       edge=edges[[i]]
       #for all splines
-      for (j in 1:numSplines(edge)) {
+      print(paste("edge",tail(edge),"->",head(edge)))
+      
+      for (j in 1:numSplines(edge)) { 
         coord=getSpline(edge, j)
         if(j==numSplines(edge)) {
           arrow='last'
@@ -220,10 +314,33 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
         else
           if(cbvalue[[4]]==1 && value[[4]]<val)
             col=color[[4]]
-        tkcreate(canvas, "line", lCoord,width=2,arrow=arrow,smooth='bezier',splinesteps=6,tags="draw",fill=col)
+        sp=tkcreate(canvas, "line", lCoord,width=2,arrow=arrow,smooth='bezier',splinesteps=6,tags="draw",fill=col)
+        
+        list.spline <<- c(list.spline,list(list(spline=sp,coord=lCoord)))
+        #print("deb")
+        #print(list.spline)
+        #print("end")
+        if(j==1) {     # from node
+          #print("from")
+          #print(tail(edge))
+          #print(nb.spline)
+          from=which(list.node==tail(edge))
+          list.from[[from]]=c(list.from[[from]],nb.spline)
+        }
+        if(j==numSplines(edge)){ # to node
+          #print("to")
+          #print(head(edge))
+          #print(nb.spline)
+          to=which(list.node==head(edge))
+          #print(to)
+          list.to[[to]]=c(list.to[[to]],nb.spline)
+        }
+        nb.spline=nb.spline+1
       }
     }
   }
+  
+  
   
   #write the current postscript image in the current directory
   tkpostscript(canvas, file="graph.ps",height=workingHeight,width=workingWidth)
