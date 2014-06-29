@@ -147,7 +147,7 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
     if(rules[i,5]>thres &  rules[i,1]<rules[i,2] & 
          as.numeric(list.selected.item[[which(list.variables==from)]]) & as.numeric(list.selected.item[[which(list.variables==to)]])) {
       g1 <- addEdge(from,to,g1)
-      print(paste("put ",from,"->",to))
+      #print(paste("put ",from,"->",to))
     }
   }
   
@@ -169,6 +169,7 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
   
   tkconfigure(canvas, scrollregion=c(0,0,workingWidth,workingHeight))
   
+  ### WARNING: all tk objects MUST have the draw tag !!!
   tkdelete(canvas, "draw")
   
   #get the list of nodes
@@ -178,8 +179,8 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
   lastY=0
   
   list.spline <<- list()
-  list.node = list()
-  
+  list.node <- list()
+  r=3
   
   moveDown <- function(i) {
     force(i)
@@ -192,18 +193,16 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
       ##
       ## Arguments:
       ## x, y -  The coordinates of the mouse press.
-      #print("aeazeae")
+      print("movedown")
+      print(x)
+      print(y)
       x <- as.numeric(x)
       y <- as.numeric(y)
-      #print(x)
-      #print(y)
       tkdtag(canvas, "selected")
       tkaddtag(canvas, "selected", "withtag", "current")
       tkitemraise(canvas,"current")
       lastX <<- x
       lastY <<- y
-      #print(lastX)
-      #print(lastY)
     }
   }
   
@@ -218,6 +217,11 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
       ##
       ## Arguments:
       ## x, y -  The coordinates of the mouse.
+      print("movenode")
+      print(x)
+      print(y)
+      print(lastX)
+      print(lastY)
       x <- as.numeric(x)
       y <- as.numeric(y)
       tkmove(canvas, "selected", x-lastX,y-lastY)
@@ -257,9 +261,88 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
     }
   }
   
-  nodeItem <-  vector("character",length(nodes))
+  
+  
+  control_point_selected <- function (i) {
+    force(i)
+    
+    function(x,y){
+      print("select")
+      print(i)
+      tkdtag(canvas, "selected")
+      tkaddtag(canvas, "selected", "withtag", "current")
+      tkitemraise(canvas,"current")
+      #tkaddtag ( canvas , "selected" , "withtag" , "current" )
+      #tkitemraise ( canvas , "current" )
+      last_pos <<- as.numeric ( c ( x , y ) )
+    }
+  }
+  
+  control_point_move <- function ( i ) {
+    force(i)
+    function(x,y) {
+      pos <- as.numeric ( c ( x , y ) )
+      tkmove ( canvas , "selected" , pos [ 1 ] - last_pos [ 1 ] ,
+               pos [ 2 ] - last_pos [ 2 ] )
+      last_pos <<- pos
+    }
+  }
+  
+  control_point_release <- function ( spline,pos) {
+    force(spline)
+    function(x,y){
+      print("release")
+      
+      print(spline) 
+      print(pos)
+      sp=list.spline[[spline]]
+      if(pos==2) {
+        sp$coord[[3]]=as.numeric(x)
+        sp$coord[[4]]=as.numeric(y)
+      }
+      if(pos==3) {
+        sp$coord[[5]]=as.numeric(x)
+        sp$coord[[6]]=as.numeric(y)
+      }
+      list.spline[[spline]]<<-sp
+      tkcoords(canvas,sp$spline,sp$coord)
+      #tkdtag ( W , "selected" )
+     
+    }
+  }
+  
+  last_pos <<- numeric( 2 )
+  
+  createPoint <- function(nb,x,y,r,spline,pos) {
+    p <- tkcreate ( canvas , "oval" , x - r , y - r , x + r , y + r ,
+                       width = 1 , outline = "black" , fill = "blue",tags="draw" )
+    #tkaddtag ( canvas , "point2" , "withtag" , item )
+    
+    
+    
+    # global to track position
+     tkitembind ( canvas , p , "<1>" , control_point_selected(nb) )
+     tkitembind ( canvas , p,"<B1-Motion>" , control_point_move(nb) )
+     tkitembind ( canvas , p, "<ButtonRelease-1>" , control_point_release(spline,pos))
+    print("spline")
+    print(spline)
+    print(nb)
+    #tkbind ( canvas , "<ButtonRelease-1>" , function ( W ) tkdtag ( W , "selected" ))
+    
+    
+    
+  }
+  
+  
+  
+  #nodeItem <-  vector("character",length(nodes))
+  
+  
+  
   
   nb.spline=1
+  nb.control_point=1
+  
   
   #if the list of nodes is not empty
   if(length(nodes)>0) {
@@ -269,10 +352,11 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
       coord=getNodeXY(node)
       name=name(node)
       p<-tkcreate(canvas, "text", offsetX+coord$x*scalingFactorX, workingHeight+0-coord$y*scalingFactorY, text=name,font=plotFont, fill="brown",tags="draw")
-      #tkaddtag(canvas, "point", "withtag", p)
+      
       tkitembind(canvas, p, "<1>", moveDown(i))
-      tkitembind(canvas, p, "<ButtonRelease-1>",moveEdges(i))
       tkitembind(canvas, p,"<B1-Motion>", moveNode(i))
+      tkitembind(canvas, p, "<ButtonRelease-1>",moveEdges(i))
+    
       list.node=c(list.node,name)
     }
     
@@ -316,33 +400,34 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
             col=color[[4]]
         sp=tkcreate(canvas, "line", lCoord,width=2,arrow=arrow,smooth='bezier',splinesteps=6,tags="draw",fill=col)
         
-        list.spline <<- c(list.spline,list(list(spline=sp,coord=lCoord)))
-        #print("deb")
-        #print(list.spline)
-        #print("end")
-        if(j==1) {     # from node
-          #print("from")
-          #print(tail(edge))
-          #print(nb.spline)
-          from=which(list.node==tail(edge))
+        from=which(list.node==tail(edge))
+        to=which(list.node==head(edge))
+        
+        list.spline <<- c(list.spline,list(list(spline=sp,coord=lCoord,from=from,to=to)))
+        
+        
+        
+        if(j==1) {              # from node
           list.from[[from]]=c(list.from[[from]],nb.spline)
+          createPoint(nb=nb.control_point,x=lCoord[3],y=lCoord[4],r=r,spline=nb.spline,pos=2)
+          nb.control_point=nb.control_point+1
+          
         }
         if(j==numSplines(edge)){ # to node
-          #print("to")
-          #print(head(edge))
-          #print(nb.spline)
-          to=which(list.node==head(edge))
-          #print(to)
           list.to[[to]]=c(list.to[[to]],nb.spline)
+          createPoint(nb=nb.control_point,x=lCoord[5],y=lCoord[6],r=r,spline=nb.spline,pos=3)
+          nb.control_point=nb.control_point+1
         }
         nb.spline=nb.spline+1
       }
     }
   }
   
-  
-  
+    
   #write the current postscript image in the current directory
   tkpostscript(canvas, file="graph.ps",height=workingHeight,width=workingWidth)
+  
+  
+  
+  
 }
-
