@@ -1,3 +1,4 @@
+export(analyzeData)
 export(callAsirules)
 export(callHierarchyComputation)
 export(callSimilarityComputation)

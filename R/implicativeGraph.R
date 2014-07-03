@@ -88,21 +88,19 @@ callPlotImplicativeGraph <- function() {
   thres=100
   for(i in 1:4) {
     check <- as.numeric(tclvalue(mycbvalue[[i]]))
-    print(check)
+    #print(check)
     val=as.numeric(tclvalue(myvalue[[i]]))
-    print(val)
+    #print(val)
     if(check)
       thres=val
   }
-  print("threshold")
-  print(thres)
-  #myvalue<<-sapply(value,tclvalue)
-  #mycbvalue<<-sapply(mycbvalue,tclvalue)
-  #tclvalue(mythreshold)<<-thres
-  print(sapply(mycbvalue,tclvalue))
+  #print("threshold")
+  #print(thres)
+  
+  #print(sapply(mycbvalue,tclvalue))
   
   list.selected.item=lapply(list.tcl,function(i) tclvalue(i))
-  print(list.selected.item)
+  #print(list.selected.item)
   plotImplicativeGraph(thres,sapply(myvalue,tclvalue),sapply(mycbvalue,tclvalue),mycolor,list.selected.item) 
 }
 
