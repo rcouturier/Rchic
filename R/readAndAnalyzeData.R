@@ -1,4 +1,4 @@
-#' @title Analyze data (preprocessing of data)
+#' @title Read and analyze data (preprocessing of data)
 #'
 #' @description Partitions data that require that
 #' 
@@ -11,7 +11,7 @@
 
 
 
-analyzeData <- function (dataCSV, ask_value=FALSE) {
+readAndAnalyzeData <- function (dataCSV, ask_value=FALSE) {
 
 
 
@@ -64,6 +64,17 @@ split_variables <- function(variable) {
     split_variables=variable
   }
     
+}
+
+#read of the file
+dataCSV = read.csv(fileName,sep=";",as.is=T)
+#determine the type of df
+res=lapply(dataCSV,is.numeric)
+#remove 1st element of the list
+res=res[-1]
+if(any(res==FALSE)) {
+  dataCSV = read.csv2(fileName,sep=";",as.is=T)
+  print("READING THE FILE WITH EUROPEAN FORMAT")
 }
 
 #partition all the variables one by one

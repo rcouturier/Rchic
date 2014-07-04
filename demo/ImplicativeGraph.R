@@ -17,11 +17,8 @@ if (!nchar(fileName)) {
   
   
  
-  
-  #read of the file
-  dataCSV = read.csv(fileName,sep=";")
   #transform possible interval variables
-  dataCSV = analyzeData(dataCSV)
+  dataCSV = readAndAnalyzeData(dataCSV)
   #prepare data for apriori
   data2transac(dataCSV)
   #call apriori

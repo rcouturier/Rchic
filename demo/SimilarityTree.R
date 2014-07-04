@@ -15,10 +15,10 @@ if (!nchar(fileName)) {
 } else {
   
   
-  #read of the file
-  dataCSV = read.csv(fileName,sep=";",as.is=T)
+  
+  
   #transform possible interval variables
-  dataCSV = analyzeData(dataCSV)
+  dataCSV = readAndAnalyzeData(dataCSV)
   #prepare data for apriori
   data2transac(dataCSV)
   #call apriori
