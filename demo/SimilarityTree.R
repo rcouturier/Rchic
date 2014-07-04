@@ -16,7 +16,7 @@ if (!nchar(fileName)) {
   
   
   #read of the file
-  dataCSV = read.csv(fileName,sep=";")
+  dataCSV = read.csv(fileName,sep=";",as.is=T)
   #transform possible interval variables
   dataCSV = analyzeData(dataCSV)
   #prepare data for apriori

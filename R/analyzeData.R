@@ -33,15 +33,19 @@ split_variables <- function(variable) {
     else {
       nb.partitions=3
     }
+    print(name)
     #call kmeans to partition the variable
-    cl=kmeans(variable,nb.partitions)
+    #cl=kmeans(variable,nb.partitions)
+    cl=callDynamicCloud(c(t(variable)),as.integer(nb.partitions))
+    
     #nb of elements
-    len=length(cl$cluster)
+    len=length(cl)
     
     #function used to split the variable after the partitionning
     f1 <- function(i,len) {
       t=rep(0,len)
-      t[which(cl$cluster==i)]=1  
+      #t[which(cl$cluster==i)]=1  
+      t[which(cl==i)]=1  
       f1=t
     }
     
@@ -67,6 +71,6 @@ result=lapply(1:ncol(dataCSV),function(i) split_variables(dataCSV[i]))
 
 #create a new dataframe with the partitionned variables
 data2=data.frame(result)
-print(data2)
+#print(data2)
 analyseData = data2
 }

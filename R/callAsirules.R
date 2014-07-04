@@ -36,7 +36,7 @@ callSimilarityComputation <- function(similarity_matrix,list.occurrences.variabl
 #'
 #' @description Interface to call the the C++ hierarchy computation.
 #'
-#' @param	cohesion_matrix				cohesion matrix of the variables
+#' @param  cohesion_matrix				cohesion matrix of the variables
 #' @param	list.selected.item 			subset of variables to apply the computation to.
 #' @param	list.occurrences.variables  list of the occurrences of the variables.
 #' @param verbose                 gives more details
@@ -50,3 +50,20 @@ callHierarchyComputation <- function(cohesion_matrix,list.selected.item,list.occ
   .Call("hierarchy", cohesion_matrix,list.selected.item,list.occurrences.variables,verbose)  
 }
 
+
+#' @title Calls the C++ dynamic_cloud.
+#'
+#' @description Interface to call the the C++ dynamic_cloud.
+#'
+#' @param  vector				          vector representing the data to split
+#' @param	nb.partitions 			    number of partitions
+#' 
+#' @author Rapha\"{e}l Couturier \email{raphael.couturier@@univ-fcomte.fr}
+#' @export
+#' @useDynLib rchic
+
+
+callDynamicCloud <- function(vector, nb.partitions)  {
+  
+  .Call("dynamic_cloud", vector, nb.partitions)  
+}
