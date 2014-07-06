@@ -36,7 +36,7 @@ split_variables <- function(variable) {
     print(name)
     #call kmeans to partition the variable
     #cl=kmeans(variable,nb.partitions)
-    cl=callDynamicCloud(c(t(variable)),as.integer(nb.partitions))
+    cl=callDynamicCloud(as.numeric(c(t(variable))),as.integer(nb.partitions))
     
     #nb of elements
     len=length(cl)
