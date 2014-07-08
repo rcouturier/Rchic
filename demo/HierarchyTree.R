@@ -25,7 +25,7 @@ if (!nchar(fileName)) {
   list.variables=list.variables[-1]
   #list of variables is needed to keep the same order in the variable when the cohesion matrix is built
   verbose=FALSE
-  hierarchyTree(list.variables,verbose=verbose)
+  hierarchyTree(list.variables,Verbose=verbose)
   
 }
 

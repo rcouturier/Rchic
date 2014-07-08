@@ -95,8 +95,6 @@ similarityTree <-function( list.variables, rules = NULL, Verbose=FALSE ) {
   workingWidth=1200
   workingHeight=800
   
-  
-  
   tt <- tktoplevel()
   xscr <<- tkscrollbar(tt, orient="horizontal",
                       command=function(...)tkyview(canvas,...))

@@ -45,9 +45,9 @@ callSimilarityComputation <- function(similarity_matrix,list.occurrences.variabl
 #' @export
 #' @useDynLib rchic
 
-callHierarchyComputation <- function(cohesion_matrix,list.selected.item,list.occurrences.variables,verbose)  {
+callHierarchyComputation <- function(cohesion_matrix,list.occurrences.variables,verbose)  {
   
-  .Call("hierarchy", cohesion_matrix,list.selected.item,list.occurrences.variables,verbose)  
+  .Call("hierarchy", cohesion_matrix,list.occurrences.variables,verbose)  
 }
 
 

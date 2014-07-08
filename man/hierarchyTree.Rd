@@ -3,7 +3,7 @@
 \alias{hierarchyTree}
 \title{Computes and Displays the Hierarchy Tree.}
 \usage{
-hierarchyTree(list.variables, verbose = FALSE)
+hierarchyTree(list.variables, Verbose = FALSE)
 }
 \arguments{
 \item{list.variables}{list of variables to compute the hierarchy tree from.}

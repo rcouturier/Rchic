@@ -139,7 +139,7 @@ extern "C"{
     for(i=0;i<nb_levels;i++)
     {
       if(verbose)
-        cout<<endl<<" Level "<<i+1<<" : ";
+      cout<<endl<<" Level "<<i+1<<" : ";
       
       for(j=0;j<=i;j++)
       {
@@ -711,7 +711,7 @@ extern "C"{
   }
   
   
-  SEXP hierarchy(SEXP similarity_matrix,SEXP list_selected_items, SEXP list_occurrences_variables, SEXP Verbose) {
+  SEXP hierarchy(SEXP similarity_matrix, SEXP list_occurrences_variables, SEXP Verbose) {
     if(!isMatrix(similarity_matrix))
     error("matrix needed");
     
@@ -719,10 +719,6 @@ extern "C"{
     SEXP list_names=getAttrib(similarity_matrix, R_DimNamesSymbol);
     SEXP variables= VECTOR_ELT(list_names, 0);
     
-    if(!isVector(list_selected_items))
-    error("vector needed");
-    //if(INTEGER(getAttrib(list_selected_items, R_DimSymbol))[0]!=nb_col)  
-    //  error("list of selected items should be the same size than the number of elements");
     if(!isLogical(Verbose))
     error("verbose must be a boolean");
     
@@ -739,12 +735,8 @@ extern "C"{
     bool max_found;
     
     int *level= new int[nb_col];
-    //int *Item=new int[nb_col];
-    int *Item = INTEGER(list_selected_items);
     double *Occurrences_variables = REAL(list_occurrences_variables);
-    /*for(i=0;i<nb_col;i++) {
-    Rprintf("%d\n",Item[i]);
-    }*/
+    
     
     int *tabe=new int[nb_col];
     int *tabo=new int[nb_col];
@@ -769,7 +761,7 @@ extern "C"{
     
     for (i=0;i<nb_col;i++)
     {
-      if(Item[i]) taby[i][1]=i;
+      taby[i][1]=i;
       tabe[i]=1;
       int length=strlen(CHAR(STRING_ELT(variables, i)));
       cc[i]=new char[10];	//it is only to have the number of the variable
@@ -778,9 +770,7 @@ extern "C"{
       sprintf(cl[i],"%s",CHAR(STRING_ELT(variables, i)));
     }
     
-    int r=0;
-    for(i=0;i<nb_col;i++) 
-    r+=Item[i];
+    int r=nb_col;
     int f=0;
     
     
@@ -826,14 +816,13 @@ extern "C"{
       for (u=0;u<nb_col;u++)
       for (v=0;v<nb_col;v++)
       {
-        if(Item[u] && Item[v])
-        {
-          if ( tabe[u]==1 && tabe[v]==1)	CurIndex[u][v]=Index[u][v];
-          else if (tabe[u]==0 || tabe[v]==0 || u==v) CurIndex[u][v]=0;
-          else
-          CurIndex[u][v]=Produce(u,v,tabe[u],tabe[v], Index, taby);
-          
-        }
+        
+        if ( tabe[u]==1 && tabe[v]==1)	CurIndex[u][v]=Index[u][v];
+        else if (tabe[u]==0 || tabe[v]==0 || u==v) CurIndex[u][v]=0;
+        else
+        CurIndex[u][v]=Produce(u,v,tabe[u],tabe[v], Index, taby);
+        
+        
       }
       max=-1;
       
@@ -842,8 +831,6 @@ extern "C"{
       for (u=0;u<nb_col;u++)        
       for (v=0;v<nb_col;v++)      
       {
-        if(Item[u] && Item[v])
-        {
           if (u!=v && max<=CurIndex[u][v])
           {
             if (max>0 && max==CurIndex[u][v])//ordre de pref cohe de la nouvelle class,
@@ -884,7 +871,7 @@ extern "C"{
               significant_nodes[f]=0;
             }
           }
-        }
+        
       }
       
       for (u=0;u<nb_col;u++) tabb[u]=-1;
@@ -893,7 +880,7 @@ extern "C"{
       j=tabe[x];
       
       u=y;
-      if(Item[u])
+      
       {                                             //a regarder bizare
       if ((tabb[u]!=-1)&&(CurIndex[x][u]==max)&&(CurIndex[x][u]!=0))
       {
@@ -1230,7 +1217,7 @@ extern "C"{
   SEXP write_transactions(SEXP data) {
     if(!isMatrix(data))
     error("matrix needed");
-
+    
     SEXP list_names=getAttrib(data, R_DimNamesSymbol);
     SEXP name= VECTOR_ELT(list_names, 1);
     
@@ -1243,9 +1230,9 @@ extern "C"{
       var[j]=new char[strlen(CHAR(STRING_ELT(name, j)))+1];
       strcpy(var[j],CHAR(STRING_ELT(name, j)));
     }
-      
-
-
+    
+    
+    
     ofstream file;
     file.open ("transaction.tab");
     for(int i=0;i<nb_row;i++) {
@@ -1253,17 +1240,17 @@ extern "C"{
         //warning inverse order...
         double v=val_mat[j*nb_row+i];
         if(v!=0)
-          file<<var[j]<<" "<<v<<" ";
+        file<<var[j]<<" "<<v<<" ";
       }
       file<<endl;
     }
     file.close();
-
+    
     for(int j=0;j<nb_col;j++) {
       delete []var[j];
     }
     delete []var;
-   
+    
     return(R_NilValue);
   }
   

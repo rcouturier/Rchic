@@ -7,7 +7,7 @@
 #' @author Rapha\"{e}l Couturier \email{raphael.couturier@@univ-fcomte.fr}
 #' @export
 
-hierarchyTree <-function(list.variables, verbose=FALSE) {
+hierarchyTree <-function(list.variables, Verbose=FALSE) {
   
   rules = read.table(file='transaction.out',header=TRUE,row.names=1,sep=',', stringsAsFactors=F,strip.white=T)
   row=row.names(rules)
@@ -15,8 +15,8 @@ hierarchyTree <-function(list.variables, verbose=FALSE) {
   row.names(rules)=row
   
   n = dim(rules)[1]
-  print(n)
-  print(list.variables)
+  
+  verbose<<-Verbose
   
   max.length.variables=max(str_length(list.variables))
   
@@ -27,7 +27,7 @@ hierarchyTree <-function(list.variables, verbose=FALSE) {
   rownames(cohesion_matrix)=list.variables
   
   #list of the occurrences of the variables
-  list.occurrences.variables=vector()
+  list.occurrences.variables<<-vector()
   
   for(i in 1:n) {
     rule=strsplit(row.names(rules)[i],split=' -> ')
@@ -36,7 +36,7 @@ hierarchyTree <-function(list.variables, verbose=FALSE) {
     val=rules[i,5]
     cohesion_matrix[from,to]=val
     
-    list.occurrences.variables[from]=rules[i,1]
+    list.occurrences.variables[from]<<-rules[i,1]
   }
   
   cohesion_matrix[is.na(cohesion_matrix)]=0 
@@ -69,7 +69,7 @@ hierarchyTree <-function(list.variables, verbose=FALSE) {
   list.selected.item=rep_len(T,length(list.variables))
   list.tcl<<-lapply(list.selected.item,function(i) tclVar(i))
   
-  toolbarItem(list.variables,list.tcl,callPlotSimilarityTree) 
+  toolbarItem(list.variables,list.tcl,callPlotHierarchyTree) 
   
   
   visibleWidth=1200
@@ -79,13 +79,13 @@ hierarchyTree <-function(list.variables, verbose=FALSE) {
   workingHeight=800
   
   tt <- tktoplevel()
-  xscr <- tkscrollbar(tt, orient="horizontal",
+  xscr <<- tkscrollbar(tt, orient="horizontal",
                       command=function(...)tkyview(canvas,...))
   
-  yscr <- tkscrollbar(tt, orient="vertical",
+  yscr <<- tkscrollbar(tt, orient="vertical",
                       command=function(...)tkyview(canvas,...))
   
-  canvas <- tkcanvas(tt, relief="raised", width=visibleWidth, height=visibleHeight,
+  canvas <<- tkcanvas(tt, relief="raised", width=visibleWidth, height=visibleHeight,
                      xscrollcommand=function(...)tkset(xscr,...), 
                      yscrollcommand=function(...)tkset(yscr,...), 
                      scrollregion=c(0,0,workingWidth,workingHeight))
@@ -118,7 +118,7 @@ callPlotHierarchyTree <- function() {
   
   
   #call the hierarchy computation written in C
-  res=callHierarchyComputation(cohesion_matrix,list.selected.item,list.occurrences.variables,verbose)
+  res=callHierarchyComputation(sub_matrix,sub.list.occ,verbose)
   
   
   

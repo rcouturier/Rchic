@@ -3,8 +3,7 @@
 \alias{callHierarchyComputation}
 \title{Calls the C++ hierarchy computation.}
 \usage{
-callHierarchyComputation(cohesion_matrix, list.selected.item,
-  list.occurrences.variables, verbose)
+callHierarchyComputation(cohesion_matrix, list.occurrences.variables, verbose)
 }
 \arguments{
 \item{cohesion_matrix}{cohesion matrix of the variables}
