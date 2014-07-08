@@ -16,12 +16,8 @@ Description: This package is intented to implement all the features of
     similarity analysis), an implicative graph and a hierarchical tree.
 Depends:
     R (>= 2.14.0),
-    tcltk,
+    tcltk2,
     Rgraphviz,
-    graphics,
-    stats
-Suggests:
     stringr,
-    tcltk2
 License: GPL
 URL: https://github.com/rchic/Rchic/

@@ -41,7 +41,7 @@ hierarchyTree <-function(list.variables, verbose=FALSE) {
   
   cohesion_matrix[is.na(cohesion_matrix)]=0 
   
- 
+  
   
   
   
@@ -56,7 +56,7 @@ hierarchyTree <-function(list.variables, verbose=FALSE) {
   
   #replace NAN by 0  => NOT NICE...
   cohesion_matrix[is.na(cohesion_matrix)]=0
-  
+  cohesion_matrix <<- cohesion_matrix
   
   
   
@@ -65,10 +65,55 @@ hierarchyTree <-function(list.variables, verbose=FALSE) {
   #cohesion_matrix=data.matrix(cohesion_df)  
   
   
-  
   #currently we consider that all items are selected
   list.selected.item=rep_len(T,length(list.variables))
+  list.tcl<<-lapply(list.selected.item,function(i) tclVar(i))
   
+  toolbarItem(list.variables,list.tcl,callPlotSimilarityTree) 
+  
+  
+  visibleWidth=1200
+  visibleHeight=800
+  
+  workingWidth=1200
+  workingHeight=800
+  
+  tt <- tktoplevel()
+  xscr <- tkscrollbar(tt, orient="horizontal",
+                      command=function(...)tkyview(canvas,...))
+  
+  yscr <- tkscrollbar(tt, orient="vertical",
+                      command=function(...)tkyview(canvas,...))
+  
+  canvas <- tkcanvas(tt, relief="raised", width=visibleWidth, height=visibleHeight,
+                     xscrollcommand=function(...)tkset(xscr,...), 
+                     yscrollcommand=function(...)tkset(yscr,...), 
+                     scrollregion=c(0,0,workingWidth,workingHeight))
+  tkconfigure(xscr, command = function(...) tkxview(canvas, ...))
+  tkconfigure(yscr, command = function(...) tkyview(canvas, ...))
+  
+  tkpack(xscr, side = "bottom", fill = "x")
+  tkpack(yscr, side = "right", fill = "y")
+  tkpack(canvas, side = "left", fill="both", expand=1)
+  
+  
+  callPlotHierarchyTree()
+}
+
+
+callPlotHierarchyTree <- function() {
+  
+  
+  list.selected.item=unlist(lapply(list.tcl,function(i) as.logical(as.numeric(tclvalue(i)))))
+  
+  
+  
+  max.length.variables=max(str_length(list.variables))
+  
+  #extract sub matrix and sub list according to selected items
+  sub_matrix=cohesion_matrix[list.selected.item,list.selected.item]
+  sub.list.item=rep(T,sum(list.selected.item))
+  sub.list.occ=list.occurrences.variables[list.selected.item]
   
   
   
@@ -130,152 +175,107 @@ hierarchyTree <-function(list.variables, verbose=FALSE) {
   
   
   
-
-  
-  tt <- tktoplevel()
-  xscr <- tkscrollbar(tt, orient="horizontal",
-                      command=function(...)tkyview(canvas,...))
-  
-  yscr <- tkscrollbar(tt, orient="vertical",
-                      command=function(...)tkyview(canvas,...))
-  
-  
-  
-  
-  
-  
-  canvas <- tkcanvas(tt, relief="raised", width=visibleWidth, height=visibleHeight,
-                     xscrollcommand=function(...)tkset(xscr,...), 
-                     yscrollcommand=function(...)tkset(yscr,...), 
-                     scrollregion=c(0,0,workingWidth,workingHeight))
-  tkconfigure(xscr, command = function(...) tkxview(canvas, ...))
-  tkconfigure(yscr, command = function(...) tkyview(canvas, ...))
-  #tkconfigure(canvas, xscrollcommand = function(...) tkset(xscr, ...))
-  #tkconfigure(canvas, yscrollcommand = function(...) tkset(yscr, ...))
-  
-  tkpack(xscr, side = "bottom", fill = "x")
-  tkpack(yscr, side = "right", fill = "y")
-  tkpack(canvas, side = "left", fill="both", expand=1)
   
   plotFont <- "Helvetica 8"
   
+  tkconfigure(canvas, scrollregion=c(0,0,workingWidth,workingHeight))
   
+  tkdelete(canvas, "draw")
   
+  level=0
   
-  myreplot <- function(...) {
-    
-    
-    
-    
-    tkconfigure(canvas, scrollregion=c(0,0,workingWidth,workingHeight))
-    
-    tkdelete(canvas, "draw")
-    
-    level=0
-    
-    for (i in 1:length(list.hier.variables)) {
-      #lengtt of current variable
-      length.variable=str_length(list.hier.variables[i])
-      #offset compared to the lenghtest variable
-      offset.length.variable=max.length.variables-length.variable
-      for (j in 1:str_length(list.hier.variables[i])) {
-        tkcreate(canvas, "text", offsetX+i*dx, offsetY+10*(offset.length.variable+j), text=substr(list.hier.variables[i],j,j),font=plotFont, fill="brown",tags="draw")
-      }
+  for (i in 1:length(list.hier.variables)) {
+    #lengtt of current variable
+    length.variable=str_length(list.hier.variables[i])
+    #offset compared to the lenghtest variable
+    offset.length.variable=max.length.variables-length.variable
+    for (j in 1:str_length(list.hier.variables[i])) {
+      tkcreate(canvas, "text", offsetX+i*dx, offsetY+10*(offset.length.variable+j), text=substr(list.hier.variables[i],j,j),font=plotFont, fill="brown",tags="draw")
     }
+  }
+  
+  offsetY=offsetY+10*max.length.variables+10
+  
+  line.coord=numeric(4)
+  for (j in 1:nb.levels) {
+    #for (j in 1:12) {  
     
-    offsetY=offsetY+10*max.length.variables+10
+    y2=dy*j+offsetY;
+    line.coord[1]=offset.variable.x[variable.left[j]]   #tabz = offset.variable.x
+    line.coord[2]=offset.variable.y[variable.left[j]]   #tabh = offset.variable.y
+    line.coord[3]=offset.variable.x[variable.left[j]]
+    line.coord[4]=y2
+    #draw the left horizontal line
+    tkcreate(canvas, "line", line.coord,width=2,tags="draw")
     
-    line.coord=numeric(4)
-    for (j in 1:nb.levels) {
-      #for (j in 1:12) {  
-      
-      y2=dy*j+offsetY;
-      line.coord[1]=offset.variable.x[variable.left[j]]   #tabz = offset.variable.x
-      line.coord[2]=offset.variable.y[variable.left[j]]   #tabh = offset.variable.y
-      line.coord[3]=offset.variable.x[variable.left[j]]
-      line.coord[4]=y2
-      #draw the left horizontal line
-      tkcreate(canvas, "line", line.coord,width=2,tags="draw")
-      
-      line.coord[1]=offset.variable.x[variable.left[j]]
-      line.coord[2]=y2
-      line.coord[3]=offset.variable.x[variable.right[j]]
-      line.coord[4]=y2
-      
-      
-      #draw the vertical line
-      if(list.significant.nodes[j]) {   
-        color="red"
-      }
-      else {
-        color="black"
-      }
-      tkcreate(canvas, "line", line.coord,width=2,tags="draw",fill=color)
-      
-      #draw arrow
-      line.coord[1]=offset.variable.x[variable.right[j]]-5
-      line.coord[2]=y2-5
-      line.coord[3]=offset.variable.x[variable.right[j]]
-      line.coord[4]=y2
-      tkcreate(canvas, "line", line.coord,width=2,tags="draw",fill=color)
-      line.coord[1]=offset.variable.x[variable.right[j]]-5
-      line.coord[2]=y2+5
-      line.coord[3]=offset.variable.x[variable.right[j]]
-      line.coord[4]=y2
-      tkcreate(canvas, "line", line.coord,width=2,tags="draw",fill=color)
-      
-      
-      
-      
-      line.coord[1]=offset.variable.x[variable.right[j]]
-      line.coord[2]=y2
-      line.coord[3]=offset.variable.x[variable.right[j]]
-      line.coord[4]=offset.variable.y[variable.right[j]]
-      
-      #draw the right line
-      tkcreate(canvas, "line", line.coord,width=2,tags="draw")
-      
-      
-      offset.variable.x[variable.left[j]]=(offset.variable.x[variable.left[j]]+offset.variable.x[variable.right[j]])/2
-      
-      offset.variable.x[variable.right[j]]=offset.variable.x[variable.left[j]]
-      
-      offset.variable.y[variable.left[j]]=y2
-      
-      
-      
-      offset.variable.y[variable.right[j]]=y2
-      
-      
-      
-      level[variable.left[j]]=-1;
-      level[variable.right[j]]=-1;
-      
+    line.coord[1]=offset.variable.x[variable.left[j]]
+    line.coord[2]=y2
+    line.coord[3]=offset.variable.x[variable.right[j]]
+    line.coord[4]=y2
+    
+    
+    #draw the vertical line
+    if(list.significant.nodes[j]) {   
+      color="red"
     }
+    else {
+      color="black"
+    }
+    tkcreate(canvas, "line", line.coord,width=2,tags="draw",fill=color)
     
-    for (u in 1:length(list.hier.variables))
+    #draw arrow
+    line.coord[1]=offset.variable.x[variable.right[j]]-5
+    line.coord[2]=y2-5
+    line.coord[3]=offset.variable.x[variable.right[j]]
+    line.coord[4]=y2
+    tkcreate(canvas, "line", line.coord,width=2,tags="draw",fill=color)
+    line.coord[1]=offset.variable.x[variable.right[j]]-5
+    line.coord[2]=y2+5
+    line.coord[3]=offset.variable.x[variable.right[j]]
+    line.coord[4]=y2
+    tkcreate(canvas, "line", line.coord,width=2,tags="draw",fill=color)
+    
+    
+    
+    
+    line.coord[1]=offset.variable.x[variable.right[j]]
+    line.coord[2]=y2
+    line.coord[3]=offset.variable.x[variable.right[j]]
+    line.coord[4]=offset.variable.y[variable.right[j]]
+    
+    #draw the right line
+    tkcreate(canvas, "line", line.coord,width=2,tags="draw")
+    
+    
+    offset.variable.x[variable.left[j]]=(offset.variable.x[variable.left[j]]+offset.variable.x[variable.right[j]])/2
+    
+    offset.variable.x[variable.right[j]]=offset.variable.x[variable.left[j]]
+    
+    offset.variable.y[variable.left[j]]=y2
+    
+    
+    
+    offset.variable.y[variable.right[j]]=y2
+    
+    
+    
+    level[variable.left[j]]=-1;
+    level[variable.right[j]]=-1;
+    
+  }
+  
+  for (u in 1:length(list.hier.variables))
+  {
+    if(list.final.nodes[u])
     {
-      if(list.final.nodes[u])
-      {
-        line.coord[1]=offset.variable.x[u]
-        line.coord[2]=offset.variable.y[u]
-        line.coord[3]=offset.variable.x[u]
-        line.coord[4]=dy*nb.levels+offsetY
-        tkcreate(canvas, "line", line.coord,width=2,tags="draw")
-      }
+      line.coord[1]=offset.variable.x[u]
+      line.coord[2]=offset.variable.y[u]
+      line.coord[3]=offset.variable.x[u]
+      line.coord[4]=dy*nb.levels+offsetY
+      tkcreate(canvas, "line", line.coord,width=2,tags="draw")
     }
-    
-    
-  }
-  
-  have_ttk <- as.character(tcl("info", "tclversion")) >= "8.5"
-  if(have_ttk) {
-    tkframe <- ttkframe
   }
   
   
-  tclServiceMode(TRUE)
   
-  
-  myreplot()
 }

@@ -106,17 +106,12 @@ similarityTree <-function( list.variables, rules = NULL, Verbose=FALSE ) {
   
   
   
-  
-  
-  
   canvas <<- tkcanvas(tt, relief="raised", width=visibleWidth, height=visibleHeight,
                      xscrollcommand=function(...)tkset(xscr,...), 
                      yscrollcommand=function(...)tkset(yscr,...), 
                      scrollregion=c(0,0,workingWidth,workingHeight))
   tkconfigure(xscr, command = function(...) tkxview(canvas, ...))
   tkconfigure(yscr, command = function(...) tkyview(canvas, ...))
-  #tkconfigure(canvas, xscrollcommand = function(...) tkset(xscr, ...))
-  #tkconfigure(canvas, yscrollcommand = function(...) tkset(yscr, ...))
   
   tkpack(xscr, side = "bottom", fill = "x")
   tkpack(yscr, side = "right", fill = "y")

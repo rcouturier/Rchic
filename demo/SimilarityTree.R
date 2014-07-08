@@ -2,9 +2,8 @@
 #############    COMPUTE THE SIMILARITY TREE    ############
 ############################################################
 
-library(stringr)
-require(tcltk) || stop("tcltk support is absent")
-#require(FactoClass) || stop("FactoClass package is absent")
+library(stringr) || stop("stringr support is absent")
+require(tcltk2) || stop("tcltk2 support is absent")
 
 #select file
 fileName <- tclvalue(tkgetOpenFile())
