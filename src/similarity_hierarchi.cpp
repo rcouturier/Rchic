@@ -1,4 +1,5 @@
 #include <iostream>
+#include <ostream>
 #include <stdio.h>
 #include <math.h>
 
@@ -23,18 +24,19 @@
 #include <algorithm> 
 #include <array> 
 
+using namespace std;
 
 //This structure is used to sort the tuples used in the similarity and the hierarchy to compute the significant nodes
 //Tuple are sorted by cohesion (or similarity), if both values are equal we compare the occurrences of x and then y
 struct Local {
   Local(double *Occurrences) { this->Occurrences = Occurrences; }
-  bool operator () (const std::tuple<double,int,int>& a, const std::tuple<double,int,int>& b) {
-    double cohe_a=std::get<0>(a);
-    double cohe_b=std::get<0>(b);
-    int x_a=std::get<1>(a);
-    int x_b=std::get<1>(b);
-    int y_a=std::get<2>(a);
-    int y_b=std::get<2>(b);
+  bool operator () (const tuple<double,int,int>& a, const tuple<double,int,int>& b) {
+    double cohe_a=get<0>(a);
+    double cohe_b=get<0>(b);
+    int x_a=get<1>(a);
+    int x_b=get<1>(b);
+    int y_a=get<2>(a);
+    int y_b=get<2>(b);
     
     
     return (cohe_a<cohe_b || 
@@ -52,9 +54,9 @@ struct Local {
 //If the element does not exist we add it into the vector
 template <class T>
 int
-insertNoDuplicate( std::vector<T>& references, T const& newValue )
+insertNoDuplicate( vector<T>& references, T const& newValue )
 {
-  int results = std::find( references.begin(), references.end(), newValue )
+  int results = find( references.begin(), references.end(), newValue )
   - references.begin();
   if ( results == references.size() ) {
     references.push_back( newValue );
@@ -99,12 +101,12 @@ extern "C"{
     double old_signi=0;
     
     //list of pairs of variables
-    std::vector <std::tuple<double,int,int>> list_pairs;
+    vector <tuple<double,int,int>> list_pairs;
     
     //list of pairs of pairs (all pairs possible at a given level)
     //in thie list we remove all the doublons
-    std::vector <std::tuple<double,int,int>> list_pairs_pairs;   
-    std::vector <std::tuple<double,int,int>>::iterator it;
+    vector <tuple<double,int,int>> list_pairs_pairs;   
+    vector <tuple<double,int,int>>::iterator it;
     
     
     long i,j,k,l=0,m;
@@ -116,18 +118,18 @@ extern "C"{
     {  
       if(i!=j)
       {
-        list_pairs.push_back(std::make_tuple(indexes_values[i][j],i,j));
+        list_pairs.push_back(make_tuple(indexes_values[i][j],i,j));
       }
     }
     
     //pairs are sorted according the the index and the occurrences of variables in case of equality
-    std::sort (list_pairs.begin(), list_pairs.end(), Local(occurrences_variables)); 
+    sort (list_pairs.begin(), list_pairs.end(), Local(occurrences_variables)); 
     
     
     //only to check the content of the list
-    //std::cout << "list contains:"<<std::endl;
+    //cout << "list contains:"<<endl;
     //for (it=list_pairs.begin(); it!=list_pairs.end(); ++it) {
-    //  std::cout << std::get<0>(*it) << ' '<<std::get<1>(*it) << ' '<<std::get<2>(*it) << ' '<<std::endl;
+    //  cout << get<0>(*it) << ' '<<get<1>(*it) << ' '<<get<2>(*it) << ' '<<endl;
     //}
     
     double *signi=new double[nb_levels];
@@ -137,7 +139,7 @@ extern "C"{
     for(i=0;i<nb_levels;i++)
     {
       if(verbose)
-      std::cout<<std::endl<<" Level "<<i+1<<" : ";
+        cout<<endl<<" Level "<<i+1<<" : ";
       
       for(j=0;j<=i;j++)
       {
@@ -153,33 +155,33 @@ extern "C"{
         {
           int i=classes_associated_with[u][l];
           int j=classes_associated_with[u][t];
-          insertNoDuplicate(list_pairs_pairs,std::make_tuple(indexes_values[i][j],i,j));
+          insertNoDuplicate(list_pairs_pairs,make_tuple(indexes_values[i][j],i,j));
           
           //add it for double arrows in hierarchy
           //value>=10 means equivalent nodes
           if(significant_nodes[j]>=10) 
-          insertNoDuplicate(list_pairs_pairs,std::make_tuple(indexes_values[j][i],j,i));
+          insertNoDuplicate(list_pairs_pairs,make_tuple(indexes_values[j][i],j,i));
           
         }
         //if the class has only 2 elements
         if(p==0)
         {
-          insertNoDuplicate(list_pairs_pairs,std::make_tuple(indexes_values[u][v],u,v));
+          insertNoDuplicate(list_pairs_pairs,make_tuple(indexes_values[u][v],u,v));
         }
       }
       
       
       //the list is sorted by index
-      std::sort (list_pairs_pairs.begin(), list_pairs_pairs.end(), Local(occurrences_variables));   
+      sort (list_pairs_pairs.begin(), list_pairs_pairs.end(), Local(occurrences_variables));   
       //number of disctinc elements between all the possible pairs at this level
       int nb_elements_level=list_pairs_pairs.size();
       
       if(verbose) {
-        std::cout<<"size list pairs "<<list_pairs.size()<<std::endl;
+        cout<<"size list pairs "<<list_pairs.size()<<endl;
         for(l=0;l<nb_elements_level;l++)
         {
-          if(l%11==10) std::cout<<std::endl;
-          std::cout<<"c("<<(std::get<1>(list_pairs_pairs[l])+1)<<","<<(std::get<2>(list_pairs_pairs[l])+1)<<")="<<(std::get<0>(list_pairs_pairs[l]))<<" ";
+          if(l%11==10) cout<<endl;
+          cout<<"c("<<(get<1>(list_pairs_pairs[l])+1)<<","<<(get<2>(list_pairs_pairs[l])+1)<<")="<<(get<0>(list_pairs_pairs[l]))<<" ";
         }
       }
       
@@ -205,7 +207,7 @@ extern "C"{
           // get<1> means element x
           // get<2> means element y
           //we compare x and y in both lists
-          if(std::get<1>(list_pairs_pairs[l])==std::get<1>(list_pairs[last]) && std::get<2>(list_pairs_pairs[l])==std::get<2>(list_pairs[last]))
+          if(get<1>(list_pairs_pairs[l])==get<1>(list_pairs[last]) && get<2>(list_pairs_pairs[l])==get<2>(list_pairs[last]))
           {
             mark[last]=val--;
             out=1;
@@ -223,9 +225,9 @@ extern "C"{
         int ind=k+1;
         
         // get<0> means current index value
-        while(k>=0 && std::get<0>(list_pairs[ind])==std::get<0>(list_pairs[k]) 
-        && occurrences_variables[std::get<1>(list_pairs[ind])]==occurrences_variables[std::get<1>(list_pairs[k])] 
-        && occurrences_variables[std::get<2>(list_pairs[ind])]==occurrences_variables[std::get<2>(list_pairs[k])]) 
+        while(k>=0 && get<0>(list_pairs[ind])==get<0>(list_pairs[k]) 
+        && occurrences_variables[get<1>(list_pairs[ind])]==occurrences_variables[get<1>(list_pairs[k])] 
+        && occurrences_variables[get<2>(list_pairs[ind])]==occurrences_variables[get<2>(list_pairs[k])]) 
         {
           k--; 
         }
@@ -240,7 +242,7 @@ extern "C"{
       if(i!=0) localmax[i]=signi[i]-signi[i-1];
       else localmax[i]=signi[0];
       if(verbose)
-      std::cout<<"    G-SR="<<nb<<"  S="<<signi[i]<<"  V="<<localmax[i];
+      cout<<"    G-SR="<<nb<<"  S="<<signi[i]<<"  V="<<localmax[i];
       delete []mark;
     }
     double max=0;
@@ -254,7 +256,7 @@ extern "C"{
       }
     }
     //Debug
-    std::cout<<"Most significant level "<<index+1<<std::endl;
+    cout<<"Most significant level "<<index+1<<endl;
     
     for(i=0;i<nb_levels;i++)
     {
@@ -264,7 +266,7 @@ extern "C"{
       if(i==nb_levels-1 && i>0 && localmax[i]>localmax[i-1]) node=1;
       if(node) 
       {
-        std::cout<<"Significant level "<<i+1<<std::endl; 
+        cout<<"Significant level "<<i+1<<endl; 
         significant_nodes[i]+=1;
       }
     }
@@ -809,7 +811,7 @@ extern "C"{
     Index[i] = new double[nb_col];
     
     
-    //to test how to get data for the matrix and put data into Index
+    //put data into Index
     for(i=0;i<nb_col;i++) {
       for(j=0;j<nb_col;j++) {
         Index[i][j]=val_mat[j*nb_col+i];  //element in the matrix seems to be transposed
@@ -1112,29 +1114,29 @@ extern "C"{
       copy_data[i]=v_data[i];
     }
     int nb_partition=INTEGER(number_partition)[0];
-    std::cout<<nb_partition<<std::endl;
+    cout<<nb_partition<<endl;
     
-    std::cout<<nb_elt<<std::endl;
+    cout<<nb_elt<<endl;
     int i,j,k;
     
     std::vector<double> myvector (v_data, v_data+nb_elt);
-    std::sort (myvector.begin(), myvector.end());
+    sort (myvector.begin(), myvector.end());
     
     for (std::vector<double>::iterator it=myvector.begin(); it!=myvector.end(); ++it){
-      //std::cout << ' ' << *it;
+      //cout << ' ' << *it;
       v_data[i++]=*it;
     }
-    /*std::cout<<std::endl<<std::endl;
+    /*cout<<endl<<endl;
     
     for (int i=0;i<nb_elt;i++){
-    std::cout << ' ' << v_data[i];
+    cout << ' ' << v_data[i];
     }
-    std::cout<<std::endl<<std::endl;
+    cout<<endl<<endl;
     
     for (int i=0;i<nb_elt;i++){
-    std::cout << ' ' << copy_data[i];
+    cout << ' ' << copy_data[i];
     }
-    std::cout<<std::endl;
+    cout<<endl;
     */
     
     int start[nb_partition];
@@ -1192,15 +1194,15 @@ extern "C"{
           old_index=index;
         }
       }
-      std::cout<<"W "<<W<<std::endl;
+      cout<<"W "<<W<<endl;
     }
     
-    std::cout<<std::endl<<"Optimal Parameters"<<std::endl;
+    cout<<endl<<"Optimal Parameters"<<endl;
     for(j=0;j<nb_partition;j++)
     {
       val_start[j]=v_data[start[j]];
       val_end[j]=v_data[end[j]];
-      std::cout<<"From "<<val_start[j]<<" To "<<val_end[j]<<std::endl;
+      cout<<"From "<<val_start[j]<<" To "<<val_end[j]<<endl;
     }
     
     
@@ -1224,7 +1226,46 @@ extern "C"{
   }    
   
   
-  
+  //function to build the file transaction.tab for apriori
+  SEXP write_transactions(SEXP data) {
+    if(!isMatrix(data))
+    error("matrix needed");
+
+    SEXP list_names=getAttrib(data, R_DimNamesSymbol);
+    SEXP name= VECTOR_ELT(list_names, 1);
+    
+    int nb_col=INTEGER(getAttrib(data, R_DimSymbol))[1];
+    int nb_row=INTEGER(getAttrib(data, R_DimSymbol))[0];
+    
+    double *val_mat=REAL(data);
+    char **var=new char*[nb_col];
+    for(int j=0;j<nb_col;j++) {
+      var[j]=new char[strlen(CHAR(STRING_ELT(name, j)))];
+      strcpy(var[j],CHAR(STRING_ELT(name, j)));
+    }
+      
+
+
+    ofstream file;
+    file.open ("transaction.tab");
+    for(int i=0;i<nb_row;i++) {
+      for(int j=0;j<nb_col;j++) {
+        //warning inverse order...
+        double v=val_mat[j*nb_row+i];
+        if(v!=0)
+          file<<var[j]<<" "<<v<<" ";
+      }
+      file<<endl;
+    }
+    file.close();
+
+    for(int j=0;j<nb_col;j++) {
+      delete []var[j];
+    }
+    delete []var;
+   
+    return(R_NilValue);
+  }
   
   
   

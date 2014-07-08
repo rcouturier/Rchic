@@ -67,3 +67,23 @@ callDynamicCloud <- function(vector, nb.partitions)  {
   
   .Call("dynamic_cloud", vector, nb.partitions)  
 }
+
+
+#' @title Calls the C++ write_transactions.
+#'
+#' @description Interface to call the the C++ write_transactions.
+#'
+#' @param  data  			          dataframe representing all the data
+#' 
+#' @author Rapha\"{e}l Couturier \email{raphael.couturier@@univ-fcomte.fr}
+#' @export
+#' @useDynLib rchic
+
+
+callWriteTransactions <- function(data)  {
+  #remove 1st column
+  M=as.matrix(data[,-1])
+  #be sure that we have numeric
+  storage.mode(M)<-"numeric"
+  .Call("write_transactions", M)  
+}
