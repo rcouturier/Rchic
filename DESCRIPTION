@@ -18,6 +18,6 @@ Depends:
     R (>= 2.14.0),
     tcltk2,
     Rgraphviz,
-    stringr,
+    stringr
 License: GPL
 URL: https://github.com/rchic/Rchic/
