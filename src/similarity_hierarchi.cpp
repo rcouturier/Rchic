@@ -1240,7 +1240,7 @@ extern "C"{
     double *val_mat=REAL(data);
     char **var=new char*[nb_col];
     for(int j=0;j<nb_col;j++) {
-      var[j]=new char[strlen(CHAR(STRING_ELT(name, j)))];
+      var[j]=new char[strlen(CHAR(STRING_ELT(name, j)))+1];
       strcpy(var[j],CHAR(STRING_ELT(name, j)));
     }
       
