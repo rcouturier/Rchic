@@ -1109,22 +1109,11 @@ extern "C"{
     std::vector<double> myvector (v_data, v_data+nb_elt);
     sort (myvector.begin(), myvector.end());
     
+    i=0;
     for (std::vector<double>::iterator it=myvector.begin(); it!=myvector.end(); ++it){
-      //cout << ' ' << *it;
+      
       v_data[i++]=*it;
     }
-    /*cout<<endl<<endl;
-    
-    for (int i=0;i<nb_elt;i++){
-    cout << ' ' << v_data[i];
-    }
-    cout<<endl<<endl;
-    
-    for (int i=0;i<nb_elt;i++){
-    cout << ' ' << copy_data[i];
-    }
-    cout<<endl;
-    */
     
     int start[nb_partition];
     int end[nb_partition];
