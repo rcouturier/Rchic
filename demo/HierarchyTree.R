@@ -16,7 +16,10 @@ if (!nchar(fileName)) {
   
   
   #transform possible interval variables
-  dataCSV = readAndAnalyzeData(dataCSV)
+  result = readAndAnalyzeData(dataCSV)
+  dataCSV=result[[1]]
+  supplementary.variable=result[[2]]
+  
   #prepare data for apriori
   data2transac(dataCSV)
   #call apriori

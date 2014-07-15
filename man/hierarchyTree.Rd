@@ -7,6 +7,8 @@ hierarchyTree(list.variables, Verbose = FALSE)
 }
 \arguments{
 \item{list.variables}{list of variables to compute the hierarchy tree from.}
+
+\item{Verbose}{give many details}
 }
 \description{
 Reads the ASI rules, computes the hierarchy tree and displays it.

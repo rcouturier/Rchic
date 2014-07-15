@@ -2,15 +2,16 @@
 #'
 #' @description (Reads the ASI rules) Computes the similarities and displays the Similarity Tree.
 #' 
-#' @param   list.variables  list of variables to compute the similarity tree from
-#' @param   rules           dataframe of ASI rules.
-#' @param   verbose         give many details
+#' @param   list.variables  list of variables to compute the similarity tree from.
+#' @param   Supplementary.variables  list of supplementary variables.
+#' @param   Matrix.values       matrix with values of individuals (used to compute the contributions and typicalities).
+#' @param   Verbose         give many details.
 #'
 #' @author Rapha\"{e}l Couturier \email{raphael.couturier@@univ-fcomte.fr}
 #' @export
 
 
-similarityTree <-function( list.variables, rules = NULL, Verbose=FALSE ) {
+similarityTree <-function( list.variables, Supplementary.variables, Matrix.values, Verbose=FALSE ) {
   
   rules = read.table(file='transaction.out',header=TRUE,row.names=1,sep=',',stringsAsFactors=F)
   row=row.names(rules)
@@ -19,6 +20,8 @@ similarityTree <-function( list.variables, rules = NULL, Verbose=FALSE ) {
   n     = dim(rules)[1]
   
   verbose<<-Verbose
+  supplementary.variables<<-Supplementary.variables
+  matrix.values<<-Matrix.values
   
   max.length.variables=max(str_length(list.variables))
   
@@ -135,10 +138,9 @@ callPlotSimilarityTree <- function() {
   sub_matrix=similarity_matrix[list.selected.item,list.selected.item]
   sub.list.item=rep(T,sum(list.selected.item))
   sub.list.occ=list.occurrences.variables[list.selected.item]
-  
-  
+    
   #call the similarity computation written in C
-  res=callSimilarityComputation(sub_matrix,sub.list.occ,verbose)
+  res=callSimilarityComputation(sub_matrix,sub.list.occ,supplementary.variables,matrix.values,verbose)
   
   list.simi.indexes.variable=res[[1]][[1]]
   list.simi.variables=res[[1]][[2]]
@@ -151,6 +153,7 @@ callPlotSimilarityTree <- function() {
   
   list.significant.nodes=res[[5]]
   
+   
   #remove the () in the classes and convert the indexes from char to integer
   list.simi.indexes.variable=str_replace_all(list.simi.indexes.variable,"([())])","")
   list.simi.indexes.variable=strsplit(list.simi.indexes.variable,' ')
@@ -260,7 +263,6 @@ callPlotSimilarityTree <- function() {
     
     
   }
-  
   
   
   

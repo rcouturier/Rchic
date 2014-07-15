@@ -18,7 +18,6 @@ callAsirules <- function(){
 #' @description Interface to call the the C++ similarity computation.
 #' 
 #' @param similarity_matrix 			matrix of similarities of the variables.
-#' @param list.selected.item 			subset of variables to apply the computation to.
 #' @param list.occurrences.variables 	list of the occurrences of the variables.
 #' @param verbose                 gives more details
 #'
@@ -26,9 +25,9 @@ callAsirules <- function(){
 #' @export
 #' @useDynLib rchic
 
-callSimilarityComputation <- function(similarity_matrix,list.occurrences.variables,verbose)  {
+callSimilarityComputation <- function(similarity_matrix,list.occurrences.variables,supplementary.variables,matrix.values,verbose)  {
     
-    .Call("similarity", similarity_matrix,list.occurrences.variables,verbose)  
+    .Call("similarity", similarity_matrix,list.occurrences.variables,supplementary.variables,matrix.values,verbose)  
 }
 
 
@@ -37,7 +36,6 @@ callSimilarityComputation <- function(similarity_matrix,list.occurrences.variabl
 #' @description Interface to call the the C++ hierarchy computation.
 #'
 #' @param  cohesion_matrix				cohesion matrix of the variables
-#' @param	list.selected.item 			subset of variables to apply the computation to.
 #' @param	list.occurrences.variables  list of the occurrences of the variables.
 #' @param verbose                 gives more details
 #' 
@@ -87,3 +85,4 @@ callWriteTransactions <- function(data)  {
   storage.mode(M)<-"numeric"
   .Call("write_transactions", M)  
 }
+

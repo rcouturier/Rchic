@@ -274,9 +274,328 @@ extern "C"{
   
   
   
-  SEXP similarity(SEXP similarity_matrix, SEXP list_occurrences_variables, SEXP Verbose) {
+  
+  struct ordering {
+    bool operator ()(pair<double, int> const& a, pair<double, int> const& b) {
+      return (a.first) < (b.first);
+    }
+  };
+  
+  
+  void LevelInConstitution(int *level,int& index,int v, int *LevelX, int *LevelY)
+  {
+    level[index++]=v;
+    if(LevelX[v]>=0)
+    {
+      LevelInConstitution(level,index,LevelX[v], LevelX, LevelY);
+    }
+    if(LevelY[v]>=0)
+    {
+      LevelInConstitution(level,index,LevelY[v], LevelX, LevelY);
+    }
+  }
+  
+  
+  long double Cnp(int n,int p) {
+  long double res=1;
+	int i;
+	if(p<n)
+	{
+		for(i=1;i<=n-p;i++)
+			res*=double(i+p)/i;
+	}
+	return res;
+}
+  
+  
+  
+  float Normal(double val)
+{
+  double t1,b1,b2,b3,b4,b5,res;
+  int inv=0;
+	if(val<0) {
+		inv=1;
+		val=-val;
+	}
+	t1=1./(val*0.2316419+1.);
+	b1=0.31938153;
+	b2=-0.356563782;
+	b3=1.781477937;
+	b4=-1.821255978;
+	b5=1.330274429;
+	res=1./sqrt(2*3.14159265358979323846)*exp(-0.5*val*val);
+	res=1-res*(b1*t1+b2*t1*t1+b3*pow(t1,3)+b4*pow(t1,4)+b5*pow(t1,5));
+	if(inv) res=1-res;
+	return (float)res;
+}
+
+  
+  void contributiveCategoriesSimilarity(SEXP supplementary_variables,double **index_simi,int nb_levels,
+  int* GenPairX, int* GenPairY, int *LevelX, int* LevelY, double **matrix_values, 
+  int Typi, int nb_col, int nb_row, SEXP individuals, bool verbose)
+  {
+    
+    int i,j;
+    
+    //nb of supplementary variables
+    int nb_comp_var=INTEGER(getAttrib(supplementary_variables, R_DimSymbol))[1];
+    
+    SEXP list_names=getAttrib(supplementary_variables, R_DimNamesSymbol);
+    SEXP supp_variables= VECTOR_ELT(list_names, 1);
+    
+    
+    
+    //get supp variables    
+    char **supplementary_variable=new char*[nb_comp_var];
+    for(i=0;i<nb_comp_var;i++) {
+      supplementary_variable[i]=new char[strlen(CHAR(STRING_ELT(supp_variables, i)))+5];
+      strncpy(supplementary_variable[i],CHAR(STRING_ELT(supp_variables, i)),strlen(CHAR(STRING_ELT(supp_variables, i)))-2);
+    }
+    
+    
+    //get supp values
+    double **supplementary_values= new double*[nb_row];
+    for(i=0;i<nb_row;i++) {
+      supplementary_values[i] = new double[nb_comp_var];
+    }
+    double *sup_val=REAL(supplementary_variables);
+    
+    for(i=0;i<nb_row;i++) {
+      for(j=0;j<nb_comp_var;j++) {
+        supplementary_values[i][j]=sup_val[j*nb_row+i];  //element in the matrix seems to be transposed
+      }
+    }
+    
+        
+    
+    int k,nb,l;
+    for(nb=0;nb<nb_levels;nb++)
+    {
+      
+      
+      int *level=new int[nb];
+      verbose=true;
+      
+      
+      
+      double *ImpliVector = new double [nb_col];
+      
+      
+      double *Contrib = new double[nb_row];
+      double *Contrib_copy = new double[nb_row];
+      int *Contrib_index = new int[nb_row];
+      
+      
+      
+      int nb_sub_level=0;
+      //compute the sub-levels involved
+      LevelInConstitution(level,nb_sub_level,nb, LevelX, LevelY);
+      sort(level,level+nb_sub_level);
+      
+      
+      for(int i=0;i<nb_sub_level;i++) {
+        ImpliVector[level[i]]=index_simi[GenPairX[i]][GenPairY[i]];
+      }
+      
+      
+      
+      if(Typi)
+      {
+        for(i=0;i<nb_row;i++)
+        {
+          double cont=0;
+          for(j=0;j<nb_sub_level;j++)
+          {
+            double a=matrix_values[i][GenPairX[level[j]]];
+            double b=matrix_values[i][GenPairY[level[j]]];
+            double phi=a*b;
+            if (ImpliVector[level[j]]==1) 
+            ImpliVector[level[j]]=0.999999999999;
+            cont+=pow(ImpliVector[level[j]]-phi,2)/(1-ImpliVector[level[j]]);
+          }
+          cont=pow(1./(double)nb_sub_level*cont,0.5);
+          Contrib[i]=cont;
+        }
+        double max=0;
+        for(i=0;i<nb_row;i++) {
+          if(max<Contrib[i])
+          max=Contrib[i];
+        }
+        for(i=0;i<nb_row;i++) {
+          Contrib[i]=(max-Contrib[i])/max;
+        }
+      }
+      else
+      {
+        for(i=0;i<nb_row;i++)
+        {
+          l=0;
+          double Cont=0;
+          for(j=0;j<nb_sub_level;j++)
+          {
+            double a=matrix_values[i][GenPairX[level[j]]];
+            double b=matrix_values[i][GenPairY[level[j]]];
+            double phi=a*b;
+            Cont+=pow(1-phi,2);
+            l++;
+          }
+          Contrib[i]=1-sqrt(1./(double)nb_sub_level*Cont);
+        }
+      }
+      
+      
+      
+      
+      typedef vector<pair<double, int>>::const_iterator myiter;
+      vector<pair<double, int> > order(nb_row);
+      
+      
+      
+      for(i=0;i<nb_row;i++) 
+      {
+        order[i]=make_pair(Contrib[i],i);
+      }
+      
+      //sort the elements, we need the ordering of the individuals with their contribution
+      sort(order.begin(), order.end(), ordering());
+      
+      i=0;
+      for (myiter it=order.begin(); it!=order.end(); ++it) {
+        //cout << get<0>(*it) << ' '<<get<1>(*it) << ' '<<endl;
+        Contrib_copy[i]=get<0>(*it);
+        Contrib_index[i]=get<1>(*it);
+        i++;
+      }
+      
+      
+      
+      double GroupValue = Contrib_copy[nb_row-1];
+      double MiddleContrib=0;
+      for(i=0;i<nb_row;i++) MiddleContrib+=Contrib[i];
+      MiddleContrib=MiddleContrib/(double)nb_row;
+      
+      i=1;
+      double NewExplainedVariance;
+      double ExplainedVariance=i/(double)(nb_row-i)*(GroupValue-MiddleContrib)*(GroupValue-MiddleContrib);
+      int OptimalGroup=nb_row-1;
+      
+      i=2;
+      GroupValue=GroupValue+1/(double)i*(Contrib_copy[nb_row-i]-GroupValue);
+      NewExplainedVariance=i/(double)(nb_row-i)*(GroupValue-MiddleContrib)*(GroupValue-MiddleContrib);
+      while(NewExplainedVariance>=ExplainedVariance)
+      {
+        OptimalGroup--;
+        ExplainedVariance=NewExplainedVariance;
+        i+=1;
+        GroupValue=GroupValue+1/(double)i*(Contrib_copy[nb_row-i]-GroupValue);
+        NewExplainedVariance=i/(double)(nb_row-i)*(GroupValue-MiddleContrib)*(GroupValue-MiddleContrib);
+      }
+      if(verbose)
+      {
+        
+        cout<<"Optimal group"<<endl;
+        for(i=OptimalGroup;i<nb_row;i++) 
+        {
+          if((i-OptimalGroup-1)%11==10) cout<<endl;
+          cout<<CHAR(STRING_ELT(individuals, Contrib_index[i]))<<" ";
+          
+          
+        }
+        cout<<endl;
+      }
+      
+      
+      double inter;
+      int n0=nb_row-OptimalGroup;
+      double p=(double)n0/(double)nb_row;
+      double un_p=1.-p;
+      double proba;
+      double min=999;
+      int index=0;
+      double occ;
+      
+      int l;
+      if (verbose) {
+        cout<<"card GO "<<n0<<"\t p "<<p<<"\t 1-p "<<un_p<<endl;
+      }
+      for(j=0;j<nb_comp_var;j++)
+      {
+        inter=0;
+        proba=0;
+        for(i=OptimalGroup;i<nb_row;i++)  {
+          inter+=supplementary_values[Contrib_index[i]][j];
+        }
+        occ=0;
+        for(k=0;k<nb_row;k++)
+        occ+=supplementary_values[k][j];
+      
+        
+        if(occ*p*un_p<=10. &&  occ-inter<50)
+        {
+          for(k=inter+1;k<=occ;k++)
+          {
+            //long double combi=Fact_div((int)occ,k)*1/Fact((int)occ-k);
+            long double combi=Cnp((int)occ,k);
+            proba+=combi*pow(p,k)*pow(un_p,occ-k);
+          }
+        }
+        else
+        {
+          double ecart_type=sqrt(occ*p*un_p);
+          double moy=occ*p;
+          proba=1.-Normal((inter-moy)/ecart_type);
+        }
+        cout<<"The variable "<<supplementary_variable[j];
+        if(Typi)
+          cout<<" is typical to this class with a risk of "<<proba<<endl;
+        else
+          cout<<" contributes to this class with a risk of "<<proba<<endl;
+        if(verbose)
+        {
+          cout<<"intersection with the optimal group ";
+          cout<<inter<<endl;
+        }
+        if(min>proba)
+        {
+          index=j;
+          min=proba;
+        }
+        //return;
+      }
+      if(Typi)
+        cout<<endl<<"The most typical variable is "<<supplementary_variable[index];
+      else
+        cout<<endl<<"The most contributive variable is "<<supplementary_variable[index];
+      
+      cout<<" with a risk of "<<min<<endl<<endl;
+      
+      
+      
+      delete []level;
+      delete []ImpliVector;
+      delete []Contrib;
+      delete []Contrib_copy;
+      delete []Contrib_index;
+    }
+    
+  }
+  
+  
+  
+  
+  
+  SEXP similarity(SEXP similarity_matrix, SEXP list_occurrences_variables, SEXP supplementary_variables, SEXP matrix_values, SEXP Verbose) {
+    
+    
     if(!isMatrix(similarity_matrix))
     error("matrix needed");
+    
+    if(!isMatrix(matrix_values))
+    error("matrix needed");
+    
+    if(!isVector(supplementary_variables))
+    error("supplementary_variables must be a list");
+    
     if(!isLogical(Verbose))
     error("verbose must be a boolean");
     
@@ -286,8 +605,17 @@ extern "C"{
     SEXP list_names=getAttrib(similarity_matrix, R_DimNamesSymbol);
     SEXP variables= VECTOR_ELT(list_names, 0);
     
-    if(verbose)
-    Rprintf("Nb col %d\n",nb_col);
+    int nb_row=INTEGER(getAttrib(matrix_values, R_DimSymbol))[0];
+    //if(verbose)
+    Rprintf("Nb col %d  Nb row %d\n",nb_col,nb_row);
+    
+    SEXP matrix_names=getAttrib(matrix_values, R_DimNamesSymbol);
+    SEXP individuals= VECTOR_ELT(matrix_names, 0);
+    /*cout<<"oooooooooooooo "<<length(individuals)<<endl;
+    for(int i=0;i<length(individuals);i++)
+    cout<<CHAR(STRING_ELT(individuals, i))<<endl;
+    */
+    
     
     
     
@@ -358,36 +686,58 @@ extern "C"{
     for(i=0;i<nb_col;i++)
     CurIndex[i] = new double[nb_col];
     
-    double *val_mat=REAL(similarity_matrix);
-    double **Index= new double*[nb_col];
+    double *similarity_mat=REAL(similarity_matrix);
+    double *mat_val=REAL(matrix_values);
+    
+    
+    double **Index_simi= new double*[nb_col];
     for(i=0;i<nb_col;i++)
-    Index[i] = new double[nb_col];
+    Index_simi[i] = new double[nb_col];
+    
+    double **mat_values= new double*[nb_row];
+    for(i=0;i<nb_row;i++)
+    mat_values[i] = new double[nb_col];
     
     
     //to test how to get data for the matrix and put data into Index
     for(i=0;i<nb_col;i++) {
       for(j=0;j<nb_col;j++) {
-        Index[i][j]=val_mat[j*nb_col+i];  //element in the matrix seems to be transposed
-        //Rprintf("%f ",Index[i][j]);   
+        Index_simi[i][j]=similarity_mat[j*nb_col+i];  //element in the matrix seems to be transposed
       }
-      //Rprintf("\n");
     }
+    
+    
+    for(i=0;i<nb_row;i++) {
+      for(j=0;j<nb_col;j++) {
+        mat_values[i][j]=mat_val[j*nb_row+i];  //element in the matrix seems to be transposed
+      }
+    }
+    
+    /*
+    for(i=0;i<nb_row;i++) {
+    for(j=0;j<nb_col;j++) {
+    printf("%f ",mat_values[i][j]);
+    }
+    printf("\n");
+    }
+    */
+    
     
     
     do
     {
       for (u=0;u<nb_col-1;u++)
       for (v=u+1;v<nb_col;v++) {
-        if ( tabe[u]==1 && tabe[v]==1)	CurIndex[u][v]=Index[u][v];
+        if ( tabe[u]==1 && tabe[v]==1)	CurIndex[u][v]=Index_simi[u][v];
         else if (tabe[u]==0 || tabe[v]==0) CurIndex[u][v]=0;
         else {
           x=taby[u][1];
           y=taby[v][1];
-          max=Index[x][y];
+          max=Index_simi[x][y];
           for (j=1;j<=tabe[u];j++)
           for (k=1;k<=tabe[v];k++)
           {
-            double t=Index[taby[u][j]][taby[v][k]];  
+            double t=Index_simi[taby[u][j]][taby[v][k]];  
             if (max<t) max=t;
             t=pow(max,tabe[u]);
             CurIndex[u][v]=pow(t,tabe[v]);
@@ -403,7 +753,7 @@ extern "C"{
       for (v=u+1;v<nb_col;v++)            //v=u+1;<nb_col
       {
         
-        if (tabe[u]==1 && tabe[v]==1) CurIndex[u][v]=Index[u][v];
+        if (tabe[u]==1 && tabe[v]==1) CurIndex[u][v]=Index_simi[u][v];
         if (max<CurIndex[u][v])
         {
           max=CurIndex[u][v];
@@ -466,7 +816,7 @@ extern "C"{
               AlreadyInClasse[y]=f;
             }
             Terminal[y]=0;
-            GenericPair(x,y,tabe[x],tabe[y],GenPairX[f],GenPairY[f], Index, taby);
+            GenericPair(x,y,tabe[x],tabe[y],GenPairX[f],GenPairY[f], Index_simi, taby);
             
             
             level[u]=f;
@@ -560,7 +910,6 @@ extern "C"{
         strcat(chc," ");
         strcat(chl,cl[i]);
         strcat(chl," ");
-        
       }
     }
     
@@ -569,8 +918,10 @@ extern "C"{
     //tabz=variable_right
     //tabee=size_class
     //taby=classes_associated_with
-    SignificantLevel(Index, nb_col, Occurrences_variables,f,tabo,tabz,tabee,taby,significant_nodes,verbose);
+    SignificantLevel(Index_simi, nb_col, Occurrences_variables,f,tabo,tabz,tabee,taby,significant_nodes,verbose);
     
+    if(length(supplementary_variables)>0)
+    contributiveCategoriesSimilarity(supplementary_variables,Index_simi,f,GenPairX,GenPairY,LevelX,LevelY,mat_values,0, nb_col, nb_row, individuals,verbose);
     
     
     SEXP results = PROTECT(allocVector(VECSXP, 5));
@@ -604,8 +955,8 @@ extern "C"{
     UNPROTECT(6); 
     
     for(i;i<nb_col;i++)
-    delete []Index[i];
-    delete []Index;
+    delete []Index_simi[i];
+    delete []Index_simi;
     for(i;i<nb_col;i++)
     delete []CurIndex[i];
     delete []CurIndex;
@@ -711,7 +1062,15 @@ extern "C"{
   }
   
   
-  SEXP hierarchy(SEXP similarity_matrix, SEXP list_occurrences_variables, SEXP Verbose) {
+  
+  
+  
+  
+  
+  
+  
+  
+  SEXP hierarchy(SEXP similarity_matrix, SEXP list_occurrences_variables,  SEXP Verbose) {
     if(!isMatrix(similarity_matrix))
     error("matrix needed");
     
@@ -831,46 +1190,46 @@ extern "C"{
       for (u=0;u<nb_col;u++)        
       for (v=0;v<nb_col;v++)      
       {
-          if (u!=v && max<=CurIndex[u][v])
+        if (u!=v && max<=CurIndex[u][v])
+        {
+          if (max>0 && max==CurIndex[u][v])//ordre de pref cohe de la nouvelle class,
+          {												//impli de la nouvelle classe, cohe interne
+          //calcul de phi(A,B) et phi(B,A)
+          double c1=Cohesion_classX(x,tabe[x],Index,taby);
+          double c2=Cohesion_classX(u,tabe[u],Index,taby);
+          double impl1=ClassImpli(x,y,u,v,c1,c2,Index,taby); //impl de la class max
+          double impl2=ClassImpli(u,v,x,y,c2,c1,Index,taby);
+          if(impl1==impl2)
           {
-            if (max>0 && max==CurIndex[u][v])//ordre de pref cohe de la nouvelle class,
-            {												//impli de la nouvelle classe, cohe interne
-            //calcul de phi(A,B) et phi(B,A)
-            double c1=Cohesion_classX(x,tabe[x],Index,taby);
-            double c2=Cohesion_classX(u,tabe[u],Index,taby);
-            double impl1=ClassImpli(x,y,u,v,c1,c2,Index,taby); //impl de la class max
-            double impl2=ClassImpli(u,v,x,y,c2,c1,Index,taby);
-            if(impl1==impl2)
+            if(c1<c2)
             {
-              if(c1<c2)
-              {
-                x=u;	//on garde la classe qui a la plus forte cohe interne
-                y=v;
-              }
-              else
-              if(c1==c2)
-              {
-                //signale le pb a regis (avec exemple 41)
-                if(x==v && y==u)
-                significant_nodes[f]=10;
-              }
-            }
-            else
-            if(impl1<impl2)
-            {
-              x=u;	//on garde la classe qui a le plus fort phi
+              x=u;	//on garde la classe qui a la plus forte cohe interne
               y=v;
             }
-            
-            }
             else
+            if(c1==c2)
             {
-              max=CurIndex[u][v];
-              x=u;
-              y=v;
-              significant_nodes[f]=0;
+              //signale le pb a regis (avec exemple 41)
+              if(x==v && y==u)
+              significant_nodes[f]=10;
             }
           }
+          else
+          if(impl1<impl2)
+          {
+            x=u;	//on garde la classe qui a le plus fort phi
+            y=v;
+          }
+          
+          }
+          else
+          {
+            max=CurIndex[u][v];
+            x=u;
+            y=v;
+            significant_nodes[f]=0;
+          }
+        }
         
       }
       
@@ -1012,6 +1371,7 @@ extern "C"{
     SignificantLevel(Index, nb_col, Occurrences_variables,f,tabo,tabz,tabee,taby,significant_nodes,verbose);
     
     
+    
     SEXP results = PROTECT(allocVector(VECSXP, 6));
     SEXP listClasses = PROTECT(allocVector(VECSXP, 2));
     SET_VECTOR_ELT(listClasses, 0, mkString(chc));
@@ -1081,6 +1441,17 @@ extern "C"{
     
     
   }
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   
   
   //function to build the dynamic cloud to partition the data

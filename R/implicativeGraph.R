@@ -2,7 +2,7 @@
 #'
 #' @description Reads the ASI rules, selects the rules according to the toolbar and calls rgraphviz before displaying the rules.
 #' 
-#' @param   rules           dataframe of ASI rules.
+#' @param   list.variables           list containing all the variables used in the computation
 #' 
 #' @author Rapha\"{e}l Couturier \email{raphael.couturier@@univ-fcomte.fr}
 #' @export

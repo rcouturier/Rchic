@@ -736,6 +736,8 @@ int ist_rule (ISTREE *ist, int *rule,
 		occ_ab=s_set;          /*a et b*/
 		occ_abb=occ_a-occ_ab;  /*a et b barre*/
 		tmp_b=occ_abb-pi/occ_n;
+    
+    
 		*occhyp=occ_a;
 		*occcon=occ_b;
 		int binary_data=(occ_a==occsqa && occ_b==occsqb);
@@ -755,7 +757,7 @@ int ist_rule (ISTREE *ist, int *rule,
 				*phi=1.-Poisson(occ_a/occ_n*(occ_n-occ_b),(int)occ_abb);
 			}
 			else {
-				if(pi2==0) tmp_c=0;
+  			if(pi2==0) tmp_c=0;
 				else tmp_c=tmp_b/sqrt(pi2/occ_n);
 				*phi=1.-Normal(tmp_c);
 			}

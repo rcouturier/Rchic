@@ -6,7 +6,7 @@
 implicativeGraph(list.variables)
 }
 \arguments{
-\item{rules}{dataframe of ASI rules.}
+\item{list.variables}{list containing all the variables used in the computation}
 }
 \description{
 Reads the ASI rules, selects the rules according to the toolbar and calls rgraphviz before displaying the rules.

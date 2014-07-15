@@ -4,12 +4,10 @@
 \title{Calls the C++ similarity computation.}
 \usage{
 callSimilarityComputation(similarity_matrix, list.occurrences.variables,
-  verbose)
+  supplementary.variables, matrix.values, verbose)
 }
 \arguments{
 \item{similarity_matrix}{matrix of similarities of the variables.}
-
-\item{list.selected.item}{subset of variables to apply the computation to.}
 
 \item{list.occurrences.variables}{list of the occurrences of the variables.}
 
