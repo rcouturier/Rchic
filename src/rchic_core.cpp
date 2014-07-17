@@ -360,6 +360,7 @@ double FormImpli(double a,double b)
     for(i=0;i<nb_comp_var;i++) {
       supplementary_variable[i]=new char[strlen(CHAR(STRING_ELT(supp_variables, i)))+5];
       strncpy(supplementary_variable[i],CHAR(STRING_ELT(supp_variables, i)),strlen(CHAR(STRING_ELT(supp_variables, i)))-2);
+      supplementary_variable[i][strlen(CHAR(STRING_ELT(supp_variables, i)))-2]='\0';
     }
     
     
