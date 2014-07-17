@@ -384,7 +384,7 @@ double FormImpli(double a,double b)
     {
       
       
-      int *level=new int[nb];
+      int *level=new int[nb_col];
       
       
       
