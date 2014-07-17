@@ -38,9 +38,10 @@ if (!nchar(fileName)) {
   supplementary.variables=data.frame(supplementary.variables)
   supplementary.variables=as.matrix(supplementary.variables)
   #add the name of individuals
-  row.names(supplementary.variables)=row.names(dataCSV)
-  storage.mode(supplementary.variables)<-"numeric"
-  
+  if(length(supplementary.variables)>0) {
+    row.names(supplementary.variables)=row.names(dataCSV)
+    storage.mode(supplementary.variables)<-"numeric"
+  }
   
   similarityTree(list.variables,supplementary.variables,matrix.values,Verbose=verbose)
   

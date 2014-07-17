@@ -19,13 +19,16 @@ callAsirules <- function(){
 #' 
 #' @param similarity_matrix 			matrix of similarities of the variables.
 #' @param list.occurrences.variables 	list of the occurrences of the variables.
+#' @param supplementary.variables  list of supplementary variables.
+#' @param matrix.values       matrix with values of individuals (used to compute the contributions and typicalities).
 #' @param verbose                 gives more details
 #'
 #' @author Rapha\"{e}l Couturier \email{raphael.couturier@@univ-fcomte.fr}
 #' @export
 #' @useDynLib rchic
 
-callSimilarityComputation <- function(similarity_matrix,list.occurrences.variables,supplementary.variables,matrix.values,verbose)  {
+callSimilarityComputation <- function(similarity_matrix,list.occurrences.variables,
+                                      supplementary.variables,matrix.values,verbose)  {
     
     .Call("similarity", similarity_matrix,list.occurrences.variables,supplementary.variables,matrix.values,verbose)  
 }
@@ -37,15 +40,18 @@ callSimilarityComputation <- function(similarity_matrix,list.occurrences.variabl
 #'
 #' @param  cohesion_matrix				cohesion matrix of the variables
 #' @param	list.occurrences.variables  list of the occurrences of the variables.
+#' @param supplementary.variables  list of supplementary variables.
+#' @param matrix.values       matrix with values of individuals (used to compute the contributions and typicalities).
 #' @param verbose                 gives more details
 #' 
 #' @author Rapha\"{e}l Couturier \email{raphael.couturier@@univ-fcomte.fr}
 #' @export
 #' @useDynLib rchic
 
-callHierarchyComputation <- function(cohesion_matrix,list.occurrences.variables,verbose)  {
+callHierarchyComputation <- function(cohesion_matrix,list.occurrences.variables,
+                                     supplementary.variables,matrix.values,verbose)  {
   
-  .Call("hierarchy", cohesion_matrix,list.occurrences.variables,verbose)  
+  .Call("hierarchy", cohesion_matrix,list.occurrences.variables,supplementary.variables,matrix.values,verbose)  
 }
 
 

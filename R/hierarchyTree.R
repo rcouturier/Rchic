@@ -2,13 +2,15 @@
 #'
 #' @description Reads the ASI rules, computes the hierarchy tree and displays it.
 #' 
-#' @param   list.variables  list of variables to compute the hierarchy tree from.
-#' @param   Verbose         give many details
+#' @param   list.variables  list of variables to compute the similarity tree from.
+#' @param   Supplementary.variables  list of supplementary variables.
+#' @param   Matrix.values       matrix with values of individuals (used to compute the contributions and typicalities).
+#' @param   Verbose         give many details.
 #'
 #' @author Rapha\"{e}l Couturier \email{raphael.couturier@@univ-fcomte.fr}
 #' @export
 
-hierarchyTree <-function(list.variables, Verbose=FALSE) {
+hierarchyTree <-function(list.variables, Supplementary.variables, Matrix.values, Verbose=FALSE) {
   
   rules = read.table(file='transaction.out',header=TRUE,row.names=1,sep=',', stringsAsFactors=F,strip.white=T)
   row=row.names(rules)
@@ -18,6 +20,8 @@ hierarchyTree <-function(list.variables, Verbose=FALSE) {
   n = dim(rules)[1]
   
   verbose<<-Verbose
+  supplementary.variables<<-Supplementary.variables
+  matrix.values<<-Matrix.values
   
   max.length.variables=max(str_length(list.variables))
   
@@ -119,7 +123,7 @@ callPlotHierarchyTree <- function() {
   
   
   #call the hierarchy computation written in C
-  res=callHierarchyComputation(sub_matrix,sub.list.occ,verbose)
+  res=callHierarchyComputation(sub_matrix,sub.list.occ,supplementary.variables,matrix.values,verbose)
   
   
   
@@ -164,20 +168,20 @@ callPlotHierarchyTree <- function() {
   visibleHeight=800
   
   workingWidth=length(list.hier.variables)*dx+50
-  workingHeight=offsetY+10*(max.length.variables)+nb.levels*dy+50
+  workingHeight=offsetY+12*(max.length.variables)+nb.levels*dy+50
   
   offset.variable.x=0
   offset.variable.y=0
   for(i in 1:length(list.hier.indexes.variable)){
     offset.variable.x[list.hier.indexes.variable[i]]=offsetX+dx*i
-    offset.variable.y[i]=offsetY+10*max.length.variables+10
+    offset.variable.y[i]=offsetY+12*max.length.variables+10
   }
   
   
   
   
   
-  plotFont <- "Helvetica 8"
+  plotFont <- "Helvetica 10"
   
   tkconfigure(canvas, scrollregion=c(0,0,workingWidth,workingHeight))
   
@@ -191,11 +195,11 @@ callPlotHierarchyTree <- function() {
     #offset compared to the lenghtest variable
     offset.length.variable=max.length.variables-length.variable
     for (j in 1:str_length(list.hier.variables[i])) {
-      tkcreate(canvas, "text", offsetX+i*dx, offsetY+10*(offset.length.variable+j), text=substr(list.hier.variables[i],j,j),font=plotFont, fill="brown",tags="draw")
+      tkcreate(canvas, "text", offsetX+i*dx, offsetY+12*(offset.length.variable+j), text=substr(list.hier.variables[i],j,j),font=plotFont, fill="brown",tags="draw")
     }
   }
   
-  offsetY=offsetY+10*max.length.variables+10
+  offsetY=offsetY+12*max.length.variables+10
   
   line.coord=numeric(4)
   for (j in 1:nb.levels) {

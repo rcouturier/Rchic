@@ -94,7 +94,8 @@ extern "C"{
   
   //this function computes significant levels for the hierarchy or similarity tree
   void SignificantLevel(double **indexes_values,int nb_col, double* occurrences_variables, int nb_levels, 
-  int *variable_left,int *variable_right, int *size_class, int** classes_associated_with, int*  significant_nodes, bool verbose)
+      int *variable_left,int *variable_right, int *size_class, int** classes_associated_with, int*  significant_nodes,
+      bool verbose)
   {
     
     long ll=nb_col*(nb_col-1);
@@ -309,7 +310,7 @@ extern "C"{
   
   
   
-  float Normal(double val)
+float Normal(double val)
 {
   double t1,b1,b2,b3,b4,b5,res;
   int inv=0;
@@ -329,10 +330,19 @@ extern "C"{
 	return (float)res;
 }
 
+
+
+
+double FormImpli(double a,double b)
+{
+  if(b>=a) return 0.5+a/2+log((b-a)/5+1);
+	else return 0.5-a/2+b*exp(b-a);
+}
+
   
-  void contributiveCategoriesSimilarity(SEXP supplementary_variables,double **index_simi,int nb_levels,
-  int* GenPairX, int* GenPairY, int *LevelX, int* LevelY, double **matrix_values, 
-  int Typi, int nb_col, int nb_row, SEXP individuals, bool verbose)
+  void contributiveCategories(SEXP supplementary_variables,double **index_simi,int nb_levels,
+      int* GenPairX, int* GenPairY, int *LevelX, int* LevelY, double **matrix_values, 
+      int Typi, int nb_col, int nb_row, SEXP individuals, bool hierarchy, bool verbose)
   {
     
     int i,j;
@@ -374,7 +384,7 @@ extern "C"{
       
       
       int *level=new int[nb];
-      verbose=true;
+      
       
       
       
@@ -393,6 +403,12 @@ extern "C"{
       sort(level,level+nb_sub_level);
       
       
+      cout<<"Contribution to the sublevels: ";
+      for(int i=0;i<nb_sub_level;i++) {
+        cout<<level[i]+1<<" ";
+      }
+      cout<<endl;
+      
       for(int i=0;i<nb_sub_level;i++) {
         ImpliVector[level[i]]=index_simi[GenPairX[i]][GenPairY[i]];
       }
@@ -408,7 +424,13 @@ extern "C"{
           {
             double a=matrix_values[i][GenPairX[level[j]]];
             double b=matrix_values[i][GenPairY[level[j]]];
-            double phi=a*b;
+            double phi;
+            if(hierarchy) {
+              phi=FormImpli(a,b); 
+            }
+            else {
+              phi=a*b;
+            }
             if (ImpliVector[level[j]]==1) 
             ImpliVector[level[j]]=0.999999999999;
             cont+=pow(ImpliVector[level[j]]-phi,2)/(1-ImpliVector[level[j]]);
@@ -435,7 +457,13 @@ extern "C"{
           {
             double a=matrix_values[i][GenPairX[level[j]]];
             double b=matrix_values[i][GenPairY[level[j]]];
-            double phi=a*b;
+            double phi;
+            if(hierarchy) {
+              phi=FormImpli(a,b); 
+            }
+            else {
+              phi=a*b;
+            }
             Cont+=pow(1-phi,2);
             l++;
           }
@@ -522,9 +550,15 @@ extern "C"{
       {
         inter=0;
         proba=0;
+        ///////WARNING if inter is not an integer... what happens
         for(i=OptimalGroup;i<nb_row;i++)  {
           inter+=supplementary_values[Contrib_index[i]][j];
         }
+        //////////WARNING in CHIC the computation of the hierarchy is done with that.... A bug? probably
+        /*for(i=OptimalGroup;i<nb_row;i++) 
+  			  if(supplementary_values[Contrib_index[i]][j]==1)
+					  inter++;
+        */
         occ=0;
         for(k=0;k<nb_row;k++)
         occ+=supplementary_values[k][j];
@@ -584,7 +618,8 @@ extern "C"{
   
   
   
-  SEXP similarity(SEXP similarity_matrix, SEXP list_occurrences_variables, SEXP supplementary_variables, SEXP matrix_values, SEXP Verbose) {
+  SEXP similarity(SEXP similarity_matrix, SEXP list_occurrences_variables, 
+        SEXP supplementary_variables, SEXP matrix_values, SEXP Verbose) {
     
     
     if(!isMatrix(similarity_matrix))
@@ -606,8 +641,8 @@ extern "C"{
     SEXP variables= VECTOR_ELT(list_names, 0);
     
     int nb_row=INTEGER(getAttrib(matrix_values, R_DimSymbol))[0];
-    //if(verbose)
-    Rprintf("Nb col %d  Nb row %d\n",nb_col,nb_row);
+    if(verbose)
+      Rprintf("Nb col %d  Nb row %d\n",nb_col,nb_row);
     
     SEXP matrix_names=getAttrib(matrix_values, R_DimNamesSymbol);
     SEXP individuals= VECTOR_ELT(matrix_names, 0);
@@ -921,7 +956,8 @@ extern "C"{
     SignificantLevel(Index_simi, nb_col, Occurrences_variables,f,tabo,tabz,tabee,taby,significant_nodes,verbose);
     
     if(length(supplementary_variables)>0)
-    contributiveCategoriesSimilarity(supplementary_variables,Index_simi,f,GenPairX,GenPairY,LevelX,LevelY,mat_values,0, nb_col, nb_row, individuals,verbose);
+    contributiveCategories(supplementary_variables,Index_simi,f,GenPairX,GenPairY,LevelX,LevelY,
+        mat_values,0, nb_col, nb_row, individuals,false,verbose);   //false means similarity
     
     
     SEXP results = PROTECT(allocVector(VECSXP, 5));
@@ -1065,28 +1101,34 @@ extern "C"{
   
   
   
-  
-  
-  
-  
-  
-  SEXP hierarchy(SEXP similarity_matrix, SEXP list_occurrences_variables,  SEXP Verbose) {
-    if(!isMatrix(similarity_matrix))
+  SEXP hierarchy(SEXP cohesion_matrix, SEXP list_occurrences_variables, 
+      SEXP supplementary_variables, SEXP matrix_values, SEXP Verbose) {
+    
+    if(!isMatrix(cohesion_matrix))
     error("matrix needed");
     
-    int nb_col=INTEGER(getAttrib(similarity_matrix, R_DimSymbol))[0];
-    SEXP list_names=getAttrib(similarity_matrix, R_DimNamesSymbol);
-    SEXP variables= VECTOR_ELT(list_names, 0);
+    if(!isMatrix(matrix_values))
+    error("matrix needed");
+    
+    if(!isVector(supplementary_variables))
+    error("supplementary_variables must be a list");
     
     if(!isLogical(Verbose))
     error("verbose must be a boolean");
     
     bool verbose=LOGICAL(Verbose)[0];
     
+    
+    int nb_col=INTEGER(getAttrib(cohesion_matrix, R_DimSymbol))[0];
+    SEXP list_names=getAttrib(cohesion_matrix, R_DimNamesSymbol);
+    SEXP variables= VECTOR_ELT(list_names, 0);
+    int nb_row=INTEGER(getAttrib(matrix_values, R_DimSymbol))[0];
+    
     if(verbose)
-    Rprintf("Nb col %d\n",nb_col);
+      Rprintf("Nb col %d\n",nb_col);
     
-    
+    SEXP matrix_names=getAttrib(matrix_values, R_DimNamesSymbol);
+    SEXP individuals= VECTOR_ELT(matrix_names, 0);
     
     int i,j,k,u,v;
     int x,y;
@@ -1154,21 +1196,30 @@ extern "C"{
     for(i=0;i<nb_col;i++)
     CurIndex[i] = new double[nb_col];
     
-    double *val_mat=REAL(similarity_matrix);
-    double **Index= new double*[nb_col];
-    for(i=0;i<nb_col;i++)
-    Index[i] = new double[nb_col];
     
+    double *cohesion_mat=REAL(cohesion_matrix);
+    double *mat_val=REAL(matrix_values);
+    
+    double **Index_cohesion= new double*[nb_col];
+    for(i=0;i<nb_col;i++)
+    Index_cohesion[i] = new double[nb_col];
+    
+    double **mat_values= new double*[nb_row];
+    for(i=0;i<nb_row;i++)
+    mat_values[i] = new double[nb_col];
     
     //put data into Index
     for(i=0;i<nb_col;i++) {
       for(j=0;j<nb_col;j++) {
-        Index[i][j]=val_mat[j*nb_col+i];  //element in the matrix seems to be transposed
-        //Rprintf("%f ",Index[i][j]);   
+        Index_cohesion[i][j]=cohesion_mat[j*nb_col+i];  //element in the matrix seems to be transposed
       }
-      //Rprintf("\n");
     }
     
+    for(i=0;i<nb_row;i++) {
+      for(j=0;j<nb_col;j++) {
+        mat_values[i][j]=mat_val[j*nb_row+i];  //element in the matrix seems to be transposed
+      }
+    }
     
     while(r>1 && max!=0)
     {
@@ -1176,10 +1227,10 @@ extern "C"{
       for (v=0;v<nb_col;v++)
       {
         
-        if ( tabe[u]==1 && tabe[v]==1)	CurIndex[u][v]=Index[u][v];
+        if ( tabe[u]==1 && tabe[v]==1)	CurIndex[u][v]=Index_cohesion[u][v];
         else if (tabe[u]==0 || tabe[v]==0 || u==v) CurIndex[u][v]=0;
         else
-        CurIndex[u][v]=Produce(u,v,tabe[u],tabe[v], Index, taby);
+        CurIndex[u][v]=Produce(u,v,tabe[u],tabe[v], Index_cohesion, taby);
         
         
       }
@@ -1195,10 +1246,10 @@ extern "C"{
           if (max>0 && max==CurIndex[u][v])//ordre de pref cohe de la nouvelle class,
           {												//impli de la nouvelle classe, cohe interne
           //calcul de phi(A,B) et phi(B,A)
-          double c1=Cohesion_classX(x,tabe[x],Index,taby);
-          double c2=Cohesion_classX(u,tabe[u],Index,taby);
-          double impl1=ClassImpli(x,y,u,v,c1,c2,Index,taby); //impl de la class max
-          double impl2=ClassImpli(u,v,x,y,c2,c1,Index,taby);
+          double c1=Cohesion_classX(x,tabe[x],Index_cohesion,taby);
+          double c2=Cohesion_classX(u,tabe[u],Index_cohesion,taby);
+          double impl1=ClassImpli(x,y,u,v,c1,c2,Index_cohesion,taby); //impl de la class max
+          double impl2=ClassImpli(u,v,x,y,c2,c1,Index_cohesion,taby);
           if(impl1==impl2)
           {
             if(c1<c2)
@@ -1275,7 +1326,7 @@ extern "C"{
           AlreadyInClasse[y]=f;
         }
         Terminal[y]=0;
-        GenericPair(x,y,tabe[x],tabe[y],GenPairX[f],GenPairY[f],Index,taby);
+        GenericPair(x,y,tabe[x],tabe[y],GenPairX[f],GenPairY[f],Index_cohesion,taby);
         tabe[x]=tabe[x]+tabe[u];
         char * new_s = new char[strlen(cc[x])+2+strlen(cc[u])];
         strcpy(new_s,cc[x]);
@@ -1319,7 +1370,7 @@ extern "C"{
         strcat(new_s2,")");
         delete []cl[x];
         cl[x]=new_s2;
-        double a=Cohesion_classX(x,tabe[x],Index,taby);
+        double a=Cohesion_classX(x,tabe[x],Index_cohesion,taby);
         Rprintf("Classification %d : %s  Cohesion %f\n",(f+1),cl[x],a);
         //tab_cohe[f]=a;
         if (max) f++;
@@ -1368,10 +1419,15 @@ extern "C"{
     //tabee=size_class
     //taby=classes_associated_with
     //tabe=list_finel_nodes
-    SignificantLevel(Index, nb_col, Occurrences_variables,f,tabo,tabz,tabee,taby,significant_nodes,verbose);
-    
-    
-    
+    SignificantLevel(Index_cohesion, nb_col, Occurrences_variables,f,tabo,tabz,tabee,taby,significant_nodes,verbose);
+  
+  
+  
+    if(length(supplementary_variables)>0)
+        contributiveCategories(supplementary_variables,Index_cohesion,f,GenPairX,GenPairY,LevelX,LevelY,
+          mat_values,0, nb_col, nb_row, individuals,true,verbose); //true means hierarchy
+  
+  
     SEXP results = PROTECT(allocVector(VECSXP, 6));
     SEXP listClasses = PROTECT(allocVector(VECSXP, 2));
     SET_VECTOR_ELT(listClasses, 0, mkString(chc));
@@ -1407,8 +1463,8 @@ extern "C"{
     UNPROTECT(7); 
     
     for(i;i<nb_col;i++)
-    delete []Index[i];
-    delete []Index;
+    delete []Index_cohesion[i];
+    delete []Index_cohesion;
     for(i;i<nb_col;i++)
     delete []CurIndex[i];
     delete []CurIndex;

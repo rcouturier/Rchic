@@ -177,7 +177,7 @@ callPlotSimilarityTree <- function() {
   visibleHeight=800
   
   workingWidth=length(list.simi.variables)*dx+50
-  workingHeight=offsetY+10*(max.length.variables)+nb.levels*dy+50
+  workingHeight=offsetY+12*(max.length.variables)+nb.levels*dy+50
   
   offset.variable.x=0
   offset.variable.y=0
@@ -185,14 +185,14 @@ callPlotSimilarityTree <- function() {
   inc=1
   for(i in 1:length(list.simi.indexes.variable)){
     offset.variable.x[list.simi.indexes.variable[i]]=offsetX+dx*i
-    offset.variable.y[i]=offsetY+10*max.length.variables+10
+    offset.variable.y[i]=offsetY+12*max.length.variables+10
   }
   
   
   
   
   
-  plotFont <- "Helvetica 8"
+  plotFont <- "Helvetica 10"
   
   
   
@@ -209,12 +209,12 @@ callPlotSimilarityTree <- function() {
     #offset compared to the lenghtest variable
     offset.length.variable=max.length.variables-length.variable
     for (j in 1:str_length(list.simi.variables[i])) {
-      tkcreate(canvas, "text", offsetX+i*dx, offsetY+10*(offset.length.variable+j), text=substr(list.simi.variables[i],j,j),font=plotFont, fill="brown",tags="draw")
+      tkcreate(canvas, "text", offsetX+i*dx, offsetY+12*(offset.length.variable+j), text=substr(list.simi.variables[i],j,j),font=plotFont, fill="brown",tags="draw")
     }
   }
   
-  offsetY=offsetY+10*max.length.variables+10
-  plotFont= "Helvetica 8"
+  offsetY=offsetY+12*max.length.variables+10
+  plotFont= "Helvetica 10"
   
   
   line.coord=numeric(4)

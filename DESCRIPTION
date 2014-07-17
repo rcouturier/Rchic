@@ -21,6 +21,6 @@ Depends:
     stringr
 License: GPL
 URL: https://github.com/rchic/Rchic/
-VignetteBuilder: markdown
+VignetteBuilder: knitr
 Suggests:
-    markdown
+    knitr

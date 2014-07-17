@@ -28,7 +28,20 @@ if (!nchar(fileName)) {
   list.variables=list.variables[-1]
   #list of variables is needed to keep the same order in the variable when the cohesion matrix is built
   verbose=FALSE
-  hierarchyTree(list.variables,Verbose=verbose)
+  #matrix to compute the contributions and similarities
+  matrix.values=as.matrix(dataCSV[-1])
+  storage.mode(matrix.values)<-"numeric"
+  row.names(matrix.values)=row.names(dataCSV)
+  
+  #transform list of supplementary variables into a dataframe and then a matrix  
+  supplementary.variables=data.frame(supplementary.variables)
+  supplementary.variables=as.matrix(supplementary.variables)
+  #add the name of individuals
+  if(length(supplementary.variables)>0) {
+    row.names(supplementary.variables)=row.names(dataCSV)
+    storage.mode(supplementary.variables)<-"numeric"
+  }
+  hierarchyTree(list.variables,supplementary.variables,matrix.values,Verbose=verbose)
   
 }
 

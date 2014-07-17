@@ -3,12 +3,17 @@
 \alias{callHierarchyComputation}
 \title{Calls the C++ hierarchy computation.}
 \usage{
-callHierarchyComputation(cohesion_matrix, list.occurrences.variables, verbose)
+callHierarchyComputation(cohesion_matrix, list.occurrences.variables,
+  supplementary.variables, matrix.values, verbose)
 }
 \arguments{
 \item{cohesion_matrix}{cohesion matrix of the variables}
 
 \item{list.occurrences.variables}{list of the occurrences of the variables.}
+
+\item{supplementary.variables}{list of supplementary variables.}
+
+\item{matrix.values}{matrix with values of individuals (used to compute the contributions and typicalities).}
 
 \item{verbose}{gives more details}
 }

@@ -11,6 +11,10 @@ callSimilarityComputation(similarity_matrix, list.occurrences.variables,
 
 \item{list.occurrences.variables}{list of the occurrences of the variables.}
 
+\item{supplementary.variables}{list of supplementary variables.}
+
+\item{matrix.values}{matrix with values of individuals (used to compute the contributions and typicalities).}
+
 \item{verbose}{gives more details}
 }
 \description{
