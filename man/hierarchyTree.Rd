@@ -3,17 +3,21 @@
 \alias{hierarchyTree}
 \title{Computes and Displays the Hierarchy Tree.}
 \usage{
-hierarchyTree(list.variables, Supplementary.variables, Matrix.values,
-  Verbose = FALSE)
+hierarchyTree(list.variables, supplementary.variables, matrix.values,
+  contribution.supp, typicality.supp, verbose = FALSE)
 }
 \arguments{
 \item{list.variables}{list of variables to compute the similarity tree from.}
 
-\item{Supplementary.variables}{list of supplementary variables.}
+\item{supplementary.variables}{list of supplementary variables.}
 
-\item{Matrix.values}{matrix with values of individuals (used to compute the contributions and typicalities).}
+\item{matrix.values}{matrix with values of individuals (used to compute the contributions and typicalities).}
 
-\item{Verbose}{give many details.}
+\item{contribution.supp}{boolean to compute the contribution of supplementary variables}
+
+\item{typicality.supp}{boolean to compute the typicality of supplementary variables}
+
+\item{verbose}{give many details.}
 }
 \description{
 Reads the ASI rules, computes the hierarchy tree and displays it.

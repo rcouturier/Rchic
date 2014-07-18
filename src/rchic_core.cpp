@@ -94,8 +94,8 @@ extern "C"{
   
   //this function computes significant levels for the hierarchy or similarity tree
   void SignificantLevel(double **indexes_values,int nb_col, double* occurrences_variables, int nb_levels, 
-      int *variable_left,int *variable_right, int *size_class, int** classes_associated_with, int*  significant_nodes,
-      bool verbose)
+  int *variable_left,int *variable_right, int *size_class, int** classes_associated_with, int*  significant_nodes,
+  bool verbose)
   {
     
     long ll=nb_col*(nb_col-1);
@@ -298,52 +298,53 @@ extern "C"{
   
   
   long double Cnp(int n,int p) {
-  long double res=1;
-	int i;
-	if(p<n)
-	{
-		for(i=1;i<=n-p;i++)
-			res*=double(i+p)/i;
-	}
-	return res;
-}
+    long double res=1;
+    int i;
+    if(p<n)
+    {
+      for(i=1;i<=n-p;i++)
+      res*=double(i+p)/i;
+    }
+    return res;
+  }
   
   
   
-float Normal(double val)
-{
-  double t1,b1,b2,b3,b4,b5,res;
-  int inv=0;
-	if(val<0) {
-		inv=1;
-		val=-val;
-	}
-	t1=1./(val*0.2316419+1.);
-	b1=0.31938153;
-	b2=-0.356563782;
-	b3=1.781477937;
-	b4=-1.821255978;
-	b5=1.330274429;
-	res=1./sqrt(2*3.14159265358979323846)*exp(-0.5*val*val);
-	res=1-res*(b1*t1+b2*t1*t1+b3*pow(t1,3)+b4*pow(t1,4)+b5*pow(t1,5));
-	if(inv) res=1-res;
-	return (float)res;
-}
-
-
-
-
-double FormImpli(double a,double b)
-{
-  if(b>=a) return 0.5+a/2+log((b-a)/5+1);
-	else return 0.5-a/2+b*exp(b-a);
-}
-
+  float Normal(double val)
+  {
+    double t1,b1,b2,b3,b4,b5,res;
+    int inv=0;
+    if(val<0) {
+      inv=1;
+      val=-val;
+    }
+    t1=1./(val*0.2316419+1.);
+    b1=0.31938153;
+    b2=-0.356563782;
+    b3=1.781477937;
+    b4=-1.821255978;
+    b5=1.330274429;
+    res=1./sqrt(2*3.14159265358979323846)*exp(-0.5*val*val);
+    res=1-res*(b1*t1+b2*t1*t1+b3*pow(t1,3)+b4*pow(t1,4)+b5*pow(t1,5));
+    if(inv) res=1-res;
+    return (float)res;
+  }
+  
+  
+  
+  
+  double FormImpli(double a,double b)
+  {
+    if(b>=a) return 0.5+a/2+log((b-a)/5+1);
+    else return 0.5-a/2+b*exp(b-a);
+  }
+  
   
   void contributiveCategories(SEXP supplementary_variables,double **index_simi,int nb_levels,
-      int* GenPairX, int* GenPairY, int *LevelX, int* LevelY, double **matrix_values, 
-      int Typi, int nb_col, int nb_row, SEXP individuals, bool hierarchy, bool verbose)
+  int* GenPairX, int* GenPairY, int *LevelX, int* LevelY, double **matrix_values, 
+  int Typi, int nb_col, int nb_row, SEXP individuals, char** string_level, bool hierarchy, bool verbose)
   {
+    
     
     int i,j;
     
@@ -377,7 +378,7 @@ double FormImpli(double a,double b)
       }
     }
     
-        
+    
     
     int k,nb,l;
     for(nb=0;nb<nb_levels;nb++)
@@ -403,8 +404,11 @@ double FormImpli(double a,double b)
       LevelInConstitution(level,nb_sub_level,nb, LevelX, LevelY);
       sort(level,level+nb_sub_level);
       
-      
-      cout<<"Contribution to the sublevels: ";
+      if(Typi)
+        cout<<"Typicality to the sublevels: ";
+      else
+        cout<<"Contribution to the sublevels: ";
+      cout<<string_level[nb]<<" with classes at levels ";
       for(int i=0;i<nb_sub_level;i++) {
         cout<<level[i]+1<<" ";
       }
@@ -557,13 +561,13 @@ double FormImpli(double a,double b)
         }
         //////////WARNING in CHIC the computation of the hierarchy is done with that.... A bug? probably
         /*for(i=OptimalGroup;i<nb_row;i++) 
-  			  if(supplementary_values[Contrib_index[i]][j]==1)
-					  inter++;
+        if(supplementary_values[Contrib_index[i]][j]==1)
+        inter++;
         */
         occ=0;
         for(k=0;k<nb_row;k++)
         occ+=supplementary_values[k][j];
-      
+        
         
         if(occ*p*un_p<=10. &&  occ-inter<50)
         {
@@ -582,9 +586,9 @@ double FormImpli(double a,double b)
         }
         cout<<"The variable "<<supplementary_variable[j];
         if(Typi)
-          cout<<" is typical to this class with a risk of "<<proba<<endl;
+        cout<<" is typical to this class with a risk of "<<proba<<endl;
         else
-          cout<<" contributes to this class with a risk of "<<proba<<endl;
+        cout<<" contributes to this class with a risk of "<<proba<<endl;
         if(verbose)
         {
           cout<<"intersection with the optimal group ";
@@ -598,9 +602,9 @@ double FormImpli(double a,double b)
         //return;
       }
       if(Typi)
-        cout<<endl<<"The most typical variable is "<<supplementary_variable[index];
+      cout<<endl<<"The most typical variable is "<<supplementary_variable[index];
       else
-        cout<<endl<<"The most contributive variable is "<<supplementary_variable[index];
+      cout<<endl<<"The most contributive variable is "<<supplementary_variable[index];
       
       cout<<" with a risk of "<<min<<endl<<endl;
       
@@ -620,7 +624,8 @@ double FormImpli(double a,double b)
   
   
   SEXP similarity(SEXP similarity_matrix, SEXP list_occurrences_variables, 
-        SEXP supplementary_variables, SEXP matrix_values, SEXP Verbose) {
+  SEXP supplementary_variables, SEXP matrix_values, 
+  SEXP contribution_supp, SEXP typicality_supp, SEXP Verbose) {
     
     
     if(!isMatrix(similarity_matrix))
@@ -632,25 +637,30 @@ double FormImpli(double a,double b)
     if(!isVector(supplementary_variables))
     error("supplementary_variables must be a list");
     
+    if(!isLogical(contribution_supp))
+    error("verbose must be a boolean");
+    
+    if(!isLogical(typicality_supp))
+    error("verbose must be a boolean");
+    
     if(!isLogical(Verbose))
     error("verbose must be a boolean");
     
     bool verbose=LOGICAL(Verbose)[0];
+    bool contrib_supp=LOGICAL(contribution_supp)[0];
+    bool typi_supp=LOGICAL(typicality_supp)[0];
     
+        
     int nb_col=INTEGER(getAttrib(similarity_matrix, R_DimSymbol))[0];
     SEXP list_names=getAttrib(similarity_matrix, R_DimNamesSymbol);
     SEXP variables= VECTOR_ELT(list_names, 0);
     
     int nb_row=INTEGER(getAttrib(matrix_values, R_DimSymbol))[0];
     if(verbose)
-      Rprintf("Nb col %d  Nb row %d\n",nb_col,nb_row);
+    Rprintf("Nb col %d  Nb row %d\n",nb_col,nb_row);
     
     SEXP matrix_names=getAttrib(matrix_values, R_DimNamesSymbol);
     SEXP individuals= VECTOR_ELT(matrix_names, 0);
-    /*cout<<"oooooooooooooo "<<length(individuals)<<endl;
-    for(int i=0;i<length(individuals);i++)
-    cout<<CHAR(STRING_ELT(individuals, i))<<endl;
-    */
     
     
     
@@ -678,11 +688,13 @@ double FormImpli(double a,double b)
     char **cc=new char*[nb_col];
     char **cl=new char*[nb_col];
     int *significant_nodes=new int[nb_col];
+    char **string_level = new char*[nb_col];
     for(i=0;i<nb_col;i++) 
     {
       cc[i]=0;
       cl[i]=0;
       significant_nodes[i]=0;
+      string_level[i]=0;
     }
     
     for (i=0;i<nb_col;i++)
@@ -903,7 +915,8 @@ double FormImpli(double a,double b)
         delete []cl[x];
         cl[x]=new_s2;
         Rprintf("Classification %d : %s similarity %f\n",f+1,cl[x],max);
-        
+        string_level[f]=new char[strlen(cl[x])+3];
+        strcpy(string_level[f],cl[x]);
         
         //os<<Classification<<(f+1)<<" : "<<cl[x]<<Similarity<<max<<"\r\n\r\n";
         f++;
@@ -946,6 +959,7 @@ double FormImpli(double a,double b)
         strcat(chc," ");
         strcat(chl,cl[i]);
         strcat(chl," ");
+        
       }
     }
     
@@ -956,10 +970,16 @@ double FormImpli(double a,double b)
     //taby=classes_associated_with
     SignificantLevel(Index_simi, nb_col, Occurrences_variables,f,tabo,tabz,tabee,taby,significant_nodes,verbose);
     
-    if(length(supplementary_variables)>0)
-    contributiveCategories(supplementary_variables,Index_simi,f,GenPairX,GenPairY,LevelX,LevelY,
-        mat_values,0, nb_col, nb_row, individuals,false,verbose);   //false means similarity
-    
+    if(length(supplementary_variables)>0) {
+      if(contrib_supp) {
+        contributiveCategories(supplementary_variables,Index_simi,f,GenPairX,GenPairY,LevelX,LevelY,
+        mat_values,0, nb_col, nb_row, individuals,string_level,false,verbose);   //false means similarity     0 means contrib
+      }
+      if(typi_supp) {
+        contributiveCategories(supplementary_variables,Index_simi,f,GenPairX,GenPairY,LevelX,LevelY,
+        mat_values,1, nb_col, nb_row, individuals,string_level,false,verbose);   //false means similarity     1 means typicality
+      }
+    }
     
     SEXP results = PROTECT(allocVector(VECSXP, 5));
     SEXP listClasses = PROTECT(allocVector(VECSXP, 2));
@@ -991,23 +1011,25 @@ double FormImpli(double a,double b)
     
     UNPROTECT(6); 
     
-    for(i;i<nb_col;i++)
+    for(i=0;i<nb_col;i++)
     delete []Index_simi[i];
     delete []Index_simi;
-    for(i;i<nb_col;i++)
+    for(i=0;i<nb_col;i++)
     delete []CurIndex[i];
     delete []CurIndex;
     delete []AlreadyInClasse;
     delete []Terminal;
     delete []LevelX;
     delete []LevelY;
-    for(i;i<nb_col;i++)
+    for(i=0;i<nb_col;i++)
     delete []taby[i];
-    for(i;i<nb_col;i++)
+    for(i=0;i<nb_col;i++)
     if(cl[i]) delete []cl[i];
     delete []cl;
-    for(i;i<nb_col;i++)
+    for(i=0;i<nb_col;i++)
     if(cc[i]) delete []cc[i];
+    for(i=0;i<nb_col;i++)
+    if(string_level[i]) delete []string_level[i];
     delete []cc;
     delete []taby;
     delete []tabe;
@@ -1103,7 +1125,8 @@ double FormImpli(double a,double b)
   
   
   SEXP hierarchy(SEXP cohesion_matrix, SEXP list_occurrences_variables, 
-      SEXP supplementary_variables, SEXP matrix_values, SEXP Verbose) {
+  SEXP supplementary_variables, SEXP matrix_values, 
+  SEXP contribution_supp, SEXP typicality_supp, SEXP Verbose) {
     
     if(!isMatrix(cohesion_matrix))
     error("matrix needed");
@@ -1114,11 +1137,18 @@ double FormImpli(double a,double b)
     if(!isVector(supplementary_variables))
     error("supplementary_variables must be a list");
     
+    if(!isLogical(contribution_supp))
+    error("verbose must be a boolean");
+    
+    if(!isLogical(typicality_supp))
+    error("verbose must be a boolean");
+    
     if(!isLogical(Verbose))
     error("verbose must be a boolean");
     
     bool verbose=LOGICAL(Verbose)[0];
-    
+    bool contrib_supp=LOGICAL(contribution_supp)[0];
+    bool typi_supp=LOGICAL(typicality_supp)[0];
     
     int nb_col=INTEGER(getAttrib(cohesion_matrix, R_DimSymbol))[0];
     SEXP list_names=getAttrib(cohesion_matrix, R_DimNamesSymbol);
@@ -1126,7 +1156,7 @@ double FormImpli(double a,double b)
     int nb_row=INTEGER(getAttrib(matrix_values, R_DimSymbol))[0];
     
     if(verbose)
-      Rprintf("Nb col %d\n",nb_col);
+    Rprintf("Nb col %d\n",nb_col);
     
     SEXP matrix_names=getAttrib(matrix_values, R_DimNamesSymbol);
     SEXP individuals= VECTOR_ELT(matrix_names, 0);
@@ -1153,12 +1183,14 @@ double FormImpli(double a,double b)
     
     char **cc=new char*[nb_col];
     char **cl=new char*[nb_col];
+    char **string_level=new char*[nb_col];
     int *significant_nodes=new int[nb_col];
     for(i=0;i<nb_col;i++) 
     {
       cc[i]=0;
       cl[i]=0;
       significant_nodes[i]=0;
+      string_level[i]=0;
     }
     
     for (i=0;i<nb_col;i++)
@@ -1373,6 +1405,8 @@ double FormImpli(double a,double b)
         cl[x]=new_s2;
         double a=Cohesion_classX(x,tabe[x],Index_cohesion,taby);
         Rprintf("Classification %d : %s  Cohesion %f\n",(f+1),cl[x],a);
+        string_level[f]=new char[strlen(cl[x])+3];
+        strcpy(string_level[f],cl[x]);
         //tab_cohe[f]=a;
         if (max) f++;
         
@@ -1412,8 +1446,7 @@ double FormImpli(double a,double b)
       }
     }
     
-    
-    
+        
     
     //tabo=variable_left
     //tabz=variable_right
@@ -1421,14 +1454,20 @@ double FormImpli(double a,double b)
     //taby=classes_associated_with
     //tabe=list_finel_nodes
     SignificantLevel(Index_cohesion, nb_col, Occurrences_variables,f,tabo,tabz,tabee,taby,significant_nodes,verbose);
-  
-  
-  
-    if(length(supplementary_variables)>0)
+    
+    
+    
+    if(length(supplementary_variables)>0) {
+      if(contrib_supp) {
         contributiveCategories(supplementary_variables,Index_cohesion,f,GenPairX,GenPairY,LevelX,LevelY,
-          mat_values,0, nb_col, nb_row, individuals,true,verbose); //true means hierarchy
-  
-  
+        mat_values,0, nb_col, nb_row, individuals,string_level,true,verbose);   //false means hierarchy     0 means contrib
+      }
+      if(typi_supp) {
+        contributiveCategories(supplementary_variables,Index_cohesion,f,GenPairX,GenPairY,LevelX,LevelY,
+        mat_values,1, nb_col, nb_row, individuals,string_level,true,verbose);   //false means hierarchy     1 means typicality
+      } 
+    }
+    
     SEXP results = PROTECT(allocVector(VECSXP, 6));
     SEXP listClasses = PROTECT(allocVector(VECSXP, 2));
     SET_VECTOR_ELT(listClasses, 0, mkString(chc));
@@ -1475,14 +1514,16 @@ double FormImpli(double a,double b)
     delete []Terminal;
     delete []LevelX;
     delete []LevelY;
-    for(i;i<nb_col;i++)
+    for(i=0;i<nb_col;i++)
     delete []taby[i];
-    for(i;i<nb_col;i++)
+    for(i=0;i<nb_col;i++)
     if(cl[i]) delete []cl[i];
     delete []cl;
-    for(i;i<nb_col;i++)
+    for(i=0;i<nb_col;i++)
     if(cc[i]) delete []cc[i];
     delete []cc;
+    for(i=0;i<nb_col;i++)
+    if(string_level[i]) delete []string_level[i];
     delete []taby;
     delete []tabe;
     delete []GenPairX;

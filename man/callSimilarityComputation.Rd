@@ -4,7 +4,8 @@
 \title{Calls the C++ similarity computation.}
 \usage{
 callSimilarityComputation(similarity_matrix, list.occurrences.variables,
-  supplementary.variables, matrix.values, verbose)
+  supplementary.variables, matrix.values, contribution.supp, typicality.supp,
+  verbose)
 }
 \arguments{
 \item{similarity_matrix}{matrix of similarities of the variables.}
@@ -14,6 +15,10 @@ callSimilarityComputation(similarity_matrix, list.occurrences.variables,
 \item{supplementary.variables}{list of supplementary variables.}
 
 \item{matrix.values}{matrix with values of individuals (used to compute the contributions and typicalities).}
+
+\item{contribution.supp}{boolean to compute the contribution of supplementary variables}
+
+\item{typicality.supp}{boolean to compute the typicality of supplementary variables}
 
 \item{verbose}{gives more details}
 }

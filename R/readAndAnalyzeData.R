@@ -11,7 +11,7 @@
 
 
 
-readAndAnalyzeData <- function (dataCSV, ask.value.partitionning=FALSE) {
+readAndAnalyzeData <- function (filename, ask.value.partitionning=FALSE) {
   
   
   

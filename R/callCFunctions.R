@@ -21,6 +21,9 @@ callAsirules <- function(){
 #' @param list.occurrences.variables 	list of the occurrences of the variables.
 #' @param supplementary.variables  list of supplementary variables.
 #' @param matrix.values       matrix with values of individuals (used to compute the contributions and typicalities).
+#' @param contribution.supp    boolean to compute the contribution of supplementary variables
+#' @param typicality.supp      boolean to compute the typicality of supplementary variables
+
 #' @param verbose                 gives more details
 #'
 #' @author Rapha\"{e}l Couturier \email{raphael.couturier@@univ-fcomte.fr}
@@ -28,9 +31,11 @@ callAsirules <- function(){
 #' @useDynLib rchic
 
 callSimilarityComputation <- function(similarity_matrix,list.occurrences.variables,
-                                      supplementary.variables,matrix.values,verbose)  {
+                                      supplementary.variables,matrix.values,
+                                      contribution.supp, typicality.supp,verbose)  {
     
-    .Call("similarity", similarity_matrix,list.occurrences.variables,supplementary.variables,matrix.values,verbose)  
+    .Call("similarity", similarity_matrix,list.occurrences.variables,supplementary.variables,matrix.values,
+          contribution.supp, typicality.supp, verbose)  
 }
 
 
@@ -42,6 +47,8 @@ callSimilarityComputation <- function(similarity_matrix,list.occurrences.variabl
 #' @param	list.occurrences.variables  list of the occurrences of the variables.
 #' @param supplementary.variables  list of supplementary variables.
 #' @param matrix.values       matrix with values of individuals (used to compute the contributions and typicalities).
+#' @param   contribution.supp    boolean to compute the contribution of supplementary variables
+#' @param   typicality.supp      boolean to compute the typicality of supplementary variables
 #' @param verbose                 gives more details
 #' 
 #' @author Rapha\"{e}l Couturier \email{raphael.couturier@@univ-fcomte.fr}
@@ -49,9 +56,10 @@ callSimilarityComputation <- function(similarity_matrix,list.occurrences.variabl
 #' @useDynLib rchic
 
 callHierarchyComputation <- function(cohesion_matrix,list.occurrences.variables,
-                                     supplementary.variables,matrix.values,verbose)  {
+                                     supplementary.variables,matrix.values,contribution.supp, typicality.supp,verbose)  {
   
-  .Call("hierarchy", cohesion_matrix,list.occurrences.variables,supplementary.variables,matrix.values,verbose)  
+  .Call("hierarchy", cohesion_matrix,list.occurrences.variables,supplementary.variables,matrix.values,
+        contribution.supp, typicality.supp,verbose)  
 }
 
 

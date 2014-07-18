@@ -3,14 +3,16 @@
 #' @description Reads the ASI rules, computes the hierarchy tree and displays it.
 #' 
 #' @param   list.variables  list of variables to compute the similarity tree from.
-#' @param   Supplementary.variables  list of supplementary variables.
-#' @param   Matrix.values       matrix with values of individuals (used to compute the contributions and typicalities).
-#' @param   Verbose         give many details.
+#' @param   supplementary.variables  list of supplementary variables.
+#' @param   matrix.values       matrix with values of individuals (used to compute the contributions and typicalities).
+#' @param   contribution.supp    boolean to compute the contribution of supplementary variables
+#' @param   typicality.supp      boolean to compute the typicality of supplementary variables
+#' @param   verbose         give many details.
 #'
 #' @author Rapha\"{e}l Couturier \email{raphael.couturier@@univ-fcomte.fr}
 #' @export
 
-hierarchyTree <-function(list.variables, Supplementary.variables, Matrix.values, Verbose=FALSE) {
+hierarchyTree <-function(list.variables, supplementary.variables, matrix.values, contribution.supp, typicality.supp, verbose=FALSE) {
   
   rules = read.table(file='transaction.out',header=TRUE,row.names=1,sep=',', stringsAsFactors=F,strip.white=T)
   row=row.names(rules)
@@ -19,9 +21,11 @@ hierarchyTree <-function(list.variables, Supplementary.variables, Matrix.values,
   
   n = dim(rules)[1]
   
-  verbose<<-Verbose
-  supplementary.variables<<-Supplementary.variables
-  matrix.values<<-Matrix.values
+  verbose<<-verbose
+  supplementary.variables<<-supplementary.variables
+  matrix.values<<-matrix.values
+  contribution.supp<<-contribution.supp
+  typicality.supp<<-typicality.supp
   
   max.length.variables=max(str_length(list.variables))
   
@@ -123,7 +127,8 @@ callPlotHierarchyTree <- function() {
   
   
   #call the hierarchy computation written in C
-  res=callHierarchyComputation(sub_matrix,sub.list.occ,supplementary.variables,matrix.values,verbose)
+  res=callHierarchyComputation(sub_matrix,sub.list.occ,supplementary.variables,matrix.values,
+                               contribution.supp,typicality.supp,verbose)
   
   
   

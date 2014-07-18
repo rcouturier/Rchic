@@ -3,25 +3,29 @@
 #' @description (Reads the ASI rules) Computes the similarities and displays the Similarity Tree.
 #' 
 #' @param   list.variables  list of variables to compute the similarity tree from.
-#' @param   Supplementary.variables  list of supplementary variables.
-#' @param   Matrix.values       matrix with values of individuals (used to compute the contributions and typicalities).
-#' @param   Verbose         give many details.
+#' @param   supplementary.variables  list of supplementary variables.
+#' @param   matrix.values       matrix with values of individuals (used to compute the contributions and typicalities).
+#' @param   contribution.supp    boolean to compute the contribution of supplementary variables
+#' @param   typicality.supp      boolean to compute the typicality of supplementary variables
+#' @param   verbose         give many details.
 #'
 #' @author Rapha\"{e}l Couturier \email{raphael.couturier@@univ-fcomte.fr}
 #' @export
 
 
-similarityTree <-function( list.variables, Supplementary.variables, Matrix.values, Verbose=FALSE ) {
+similarityTree <-function( list.variables, supplementary.variables, matrix.values, contribution.supp, typicality.supp, verbose=FALSE ) {
   
   rules = read.table(file='transaction.out',header=TRUE,row.names=1,sep=',',stringsAsFactors=F)
   row=row.names(rules)
   rules=as.data.frame(lapply(rules,as.numeric))
   row.names(rules)=row
-  n     = dim(rules)[1]
+  n = dim(rules)[1]
   
-  verbose<<-Verbose
-  supplementary.variables<<-Supplementary.variables
-  matrix.values<<-Matrix.values
+  verbose<<-verbose
+  supplementary.variables<<-supplementary.variables
+  matrix.values<<-matrix.values
+  contribution.supp<<-contribution.supp
+  typicality.supp<<-typicality.supp
   
   max.length.variables=max(str_length(list.variables))
   
@@ -140,7 +144,8 @@ callPlotSimilarityTree <- function() {
   sub.list.occ=list.occurrences.variables[list.selected.item]
     
   #call the similarity computation written in C
-  res=callSimilarityComputation(sub_matrix,sub.list.occ,supplementary.variables,matrix.values,verbose)
+  res=callSimilarityComputation(sub_matrix,sub.list.occ,supplementary.variables,matrix.values,
+                                contribution.supp,typicality.supp,verbose)
   
   list.simi.indexes.variable=res[[1]][[1]]
   list.simi.variables=res[[1]][[2]]
