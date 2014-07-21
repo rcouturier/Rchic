@@ -113,29 +113,30 @@ toolbarGraph <- function (frame,mycallPlot) {
   
   OnOK <- function()
   {
-#     thres=100
-#     for(i in 1:4) {
-#       check <- as.numeric(tclvalue(mycbvalue[[i]]))
-#       print(check)
-#       val=as.numeric(tclvalue(myvalue[[i]]))
-#       print(val)
-#       if(check)
-#         thres=val
-#     }
-#     print("threshold")
-#     print(thres)
-#     #myvalue<<-sapply(value,tclvalue)
-#     #mycbvalue<<-sapply(mycbvalue,tclvalue)
-#     tclvalue(mythreshold)<<-thres
     mycallPlot()
-    #myrep(threshold,sapply(value,tclvalue),sapply(cbvalue,tclvalue),color)
   }
   OK.but <- tkbutton(frame,text="OK",command=OnOK)
   tkgrid(OK.but)
   tkfocus(frame)
   
   
-  
+  OnEdit <- function()
+  {
+
+    tmp=as.numeric(tclvalue(myedit))
+    print("IIIIIIIIIIIIIIIIII")
+    print(tmp)
+    res=1-tmp
+    print(res)
+    tclvalue(myedit) <-  res 
+    
+        
+    
+    #mycallPlot()
+  }
+  Edit.but <- tkbutton(frame,text="Edit",command=OnEdit)
+  tkgrid(Edit.but)
+  tkfocus(frame)
   
   
   

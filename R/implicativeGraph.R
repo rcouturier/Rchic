@@ -51,6 +51,7 @@ implicativeGraph <-function(list.variables) {
   mycbvalue<<-list(tclVar(1),tclVar(0),tclVar(0),tclVar(0))
   mycolor<<-list("#FF0000","#00FF00","#0000FF","#00FFFF")
   mythreshold<<-tclVar(99)
+  myedit<<-tclVar(0)
   
   #currently we consider that all items are selected
   list.selected.item=rep_len(T,length(list.variables))
@@ -94,14 +95,11 @@ callPlotImplicativeGraph <- function() {
     if(check)
       thres=val
   }
-  #print("threshold")
-  #print(thres)
-  
-  #print(sapply(mycbvalue,tclvalue))
+  edit=as.numeric(tclvalue(myedit))
   
   list.selected.item=lapply(list.tcl,function(i) tclvalue(i))
   #print(list.selected.item)
-  plotImplicativeGraph(thres,sapply(myvalue,tclvalue),sapply(mycbvalue,tclvalue),mycolor,list.selected.item) 
+  plotImplicativeGraph(thres,edit,sapply(myvalue,tclvalue),sapply(mycbvalue,tclvalue),mycolor,list.selected.item) 
 }
 
 
@@ -110,7 +108,7 @@ callPlotImplicativeGraph <- function() {
 
 
 
-plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item) {
+plotImplicativeGraph <- function(thres=99,edit,value,cbvalue,color,list.selected.item) {
   
   
   
@@ -185,7 +183,7 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
   
   #size of the controle nodes
   r=5
-
+  
   #mouse pressed on text item
   text_pressed <- function(i) {
     force(i)
@@ -201,7 +199,7 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
       initY <<- y
     }
   }
-
+  
   #mouse move on the text
   text_move <- function(i)
   {
@@ -326,6 +324,7 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
     tkitembind ( canvas , p , "<1>" , control_point_pressed(nb) )
     tkitembind ( canvas , p,"<B1-Motion>" , control_point_move(nb) )
     tkitembind ( canvas , p, "<ButtonRelease-1>" , control_point_released(spline,pos))
+    
   }
   
   
@@ -350,11 +349,13 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
       #create the text
       p<-tkcreate(canvas, "text", offsetX+coord$x*scalingFactorX, workingHeight+0-coord$y*scalingFactorY, text=name,font=plotFont, fill="brown",tags="draw")
       #function to track the mouse
-      tkitembind(canvas, p, "<1>", text_pressed(i))
-      tkitembind(canvas, p,"<B1-Motion>", text_move(i))
-      tkitembind(canvas, p, "<ButtonRelease-1>",text_released(i))
-      #add the name in the list
-      list.node=c(list.node,name)
+      if(edit==1) {
+        tkitembind(canvas, p, "<1>", text_pressed(i))
+        tkitembind(canvas, p,"<B1-Motion>", text_move(i))
+        tkitembind(canvas, p, "<ButtonRelease-1>",text_released(i))
+        #add the name in the list
+        list.node=c(list.node,name)
+      }
     }
     
     #we need 2 lists: one for the edges from the node and the other one for the edges to the node
@@ -399,60 +400,63 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
             col=color[[4]]
         #draw the spline
         sp=tkcreate(canvas, "line", lCoord,width=2,arrow=arrow,smooth='bezier',splinesteps=6,tags="draw",fill=col)
-        #compute the number of the node from and to
-        from=which(list.node==tail(edge))
-        to=which(list.node==head(edge))
-        #this list contains information on all the splines
-        list.spline <<- c(list.spline,list(list(spline=sp,coord=lCoord,from=from,to=to)))
         
-        
-        #if this is the first spline of the edge
-        if(j==1) {            
-          #add the current spline to the list from for this node
-          list.from[[from]]=c(list.from[[from]],nb.spline)
-          #create control points
-          #control point 2
-          createPoint(nb=nb.control_point,x=lCoord[3],y=lCoord[4],r=r,spline=c(nb.spline),pos=2)
-          nb.control_point=nb.control_point+1
-          #control point 3
-          createPoint(nb=nb.control_point,x=lCoord[5],y=lCoord[6],r=r,spline=c(nb.spline),pos=3)
-          nb.control_point=nb.control_point+1
-          #if there is another spline
-          if(numSplines(edge)!=1) {
-            #control point 4 and 1 for the next spline
-            #warning the field spline is a vector with the current and the next spline
-            createPoint(nb=nb.control_point,x=lCoord[7],y=lCoord[8],r=r,spline=c(nb.spline,nb.spline+1),pos=4)
-            nb.control_point=nb.control_point+1
-          }
-        }
-        #if this is the last spline of the edge
-        if(j==numSplines(edge)){ 
-          #add the current spline to the list to for this node
-          list.to[[to]]=c(list.to[[to]],nb.spline)
-          #if this spline is not the first one
-          if(j!=1) {
+        if(edit==1) {
+          #compute the number of the node from and to
+          from=which(list.node==tail(edge))
+          to=which(list.node==head(edge))
+          #this list contains information on all the splines
+          list.spline <<- c(list.spline,list(list(spline=sp,coord=lCoord,from=from,to=to)))
+          
+          
+          #if this is the first spline of the edge
+          if(j==1) {            
+            #add the current spline to the list from for this node
+            list.from[[from]]=c(list.from[[from]],nb.spline)
+            #create control points
             #control point 2
             createPoint(nb=nb.control_point,x=lCoord[3],y=lCoord[4],r=r,spline=c(nb.spline),pos=2)
             nb.control_point=nb.control_point+1
             #control point 3
             createPoint(nb=nb.control_point,x=lCoord[5],y=lCoord[6],r=r,spline=c(nb.spline),pos=3)
             nb.control_point=nb.control_point+1
+            #if there is another spline
+            if(numSplines(edge)!=1) {
+              #control point 4 and 1 for the next spline
+              #warning the field spline is a vector with the current and the next spline
+              createPoint(nb=nb.control_point,x=lCoord[7],y=lCoord[8],r=r,spline=c(nb.spline,nb.spline+1),pos=4)
+              nb.control_point=nb.control_point+1
+            }
           }
+          #if this is the last spline of the edge
+          if(j==numSplines(edge)){ 
+            #add the current spline to the list to for this node
+            list.to[[to]]=c(list.to[[to]],nb.spline)
+            #if this spline is not the first one
+            if(j!=1) {
+              #control point 2
+              createPoint(nb=nb.control_point,x=lCoord[3],y=lCoord[4],r=r,spline=c(nb.spline),pos=2)
+              nb.control_point=nb.control_point+1
+              #control point 3
+              createPoint(nb=nb.control_point,x=lCoord[5],y=lCoord[6],r=r,spline=c(nb.spline),pos=3)
+              nb.control_point=nb.control_point+1
+            }
+          }
+          #if the spline is neither the first nor the last one
+          if(j!=1 && j!=numSplines(edge)) {
+            #control point 2
+            createPoint(nb=nb.control_point,x=lCoord[3],y=lCoord[4],r=r,spline=c(nb.spline),pos=2)
+            nb.control_point=nb.control_point+1
+            #control point 3
+            createPoint(nb=nb.control_point,x=lCoord[5],y=lCoord[6],r=r,spline=c(nb.spline),pos=3)
+            nb.control_point=nb.control_point+1
+            #control point 4 and 1 (see spline 1)
+            createPoint(nb=nb.control_point,x=lCoord[7],y=lCoord[8],r=r,spline=c(nb.spline,nb.spline+1),pos=4)
+            nb.control_point=nb.control_point+1
+            
+          }
+          nb.spline=nb.spline+1
         }
-        #if the spline is neither the first nor the last one
-        if(j!=1 && j!=numSplines(edge)) {
-          #control point 2
-          createPoint(nb=nb.control_point,x=lCoord[3],y=lCoord[4],r=r,spline=c(nb.spline),pos=2)
-          nb.control_point=nb.control_point+1
-          #control point 3
-          createPoint(nb=nb.control_point,x=lCoord[5],y=lCoord[6],r=r,spline=c(nb.spline),pos=3)
-          nb.control_point=nb.control_point+1
-          #control point 4 and 1 (see spline 1)
-          createPoint(nb=nb.control_point,x=lCoord[7],y=lCoord[8],r=r,spline=c(nb.spline,nb.spline+1),pos=4)
-          nb.control_point=nb.control_point+1
-          
-        }
-        nb.spline=nb.spline+1
       }
     }
   }
