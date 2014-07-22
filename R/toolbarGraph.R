@@ -4,7 +4,8 @@
 #' @description When the user press OK, the routine mycallPlot is called to update the graph
 #' 
 #' @param   frame           frame to display the toolbar, the frame is created first
-#' @param   mycallPlot      routine to call to update the graph
+#' @param   callPlot      routine to compute the graph
+#' @param   updatePlot      routine to update the graph
 #' 
 #' @author Rapha\"{e}l Couturier \email{raphael.couturier@@univ-fcomte.fr}
 #' @export
@@ -16,7 +17,7 @@
 #mycolor
 
 
-toolbarGraph <- function (frame,mycallPlot) {
+toolbarGraph <- function (frame,callPlot,updatePlot) {
   
   spin=list()
   cb=list()
@@ -113,7 +114,7 @@ toolbarGraph <- function (frame,mycallPlot) {
   
   OnOK <- function()
   {
-    mycallPlot()
+    callPlot()
   }
   OK.but <- tkbutton(frame,text="OK",command=OnOK)
   tkgrid(OK.but)
@@ -132,7 +133,7 @@ toolbarGraph <- function (frame,mycallPlot) {
     
         
     
-    #mycallPlot()
+    updatePlot()
   }
   Edit.but <- tkbutton(frame,text="Edit",command=OnEdit)
   tkgrid(Edit.but)
