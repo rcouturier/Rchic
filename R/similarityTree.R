@@ -15,6 +15,11 @@
 
 similarityTree <-function( list.variables, supplementary.variables, matrix.values, contribution.supp, typicality.supp, verbose=FALSE ) {
   
+  if(length(supplementary.variables)==0) {
+    contribution.supp=FALSE
+    typicality.supp=FALSE
+  }
+  
   rules = read.table(file='transaction.out',header=TRUE,row.names=1,sep=',',stringsAsFactors=F)
   row=row.names(rules)
   rules=as.data.frame(lapply(rules,as.numeric))
@@ -69,31 +74,6 @@ similarityTree <-function( list.variables, supplementary.variables, matrix.value
   
   toolbarItem(list.variables,list.tcl,callPlotSimilarityTree)  
   
-  #   #try to convert our tree to use it with the plot function of R
-  #   merge=array(0,c(nb.levels,2))
-  #   in.class=array(0,length(list.simi.indexes.variable))
-  #   for(i in 1:nb.levels) {
-  #     if (in.class[variable.left[i]]==0) {
-  #       merge[i,1]=-variable.left[i]
-  #     }
-  #     else
-  #       merge[i,1]=in.class[variable.left[i]]
-  #     in.class[variable.left[i]]=i
-  #     
-  #     if (in.class[variable.right[i]]==0) {
-  #       merge[i,2]=-variable.right[i]
-  #     }
-  #     else
-  #       merge[i,2]=in.class[variable.right[i]]
-  #     in.class[variable.right[i]]=i
-  #   }
-  #   order=list.simi.indexes.variable
-  #   labels=list.simi.variables
-  #   height=1:nb.levels
-  #   tree=list(merge=merge,height=height,order=order,labels=labels,method='complete',call='test',dist.method='euclidian')
-  #   attr(tree,'class')='hclust'
-  #   plot(tree)
-  
   
   
   visibleWidth=1200
@@ -142,7 +122,9 @@ callPlotSimilarityTree <- function() {
   sub_matrix=similarity_matrix[list.selected.item,list.selected.item]
   sub.list.item=rep(T,sum(list.selected.item))
   sub.list.occ=list.occurrences.variables[list.selected.item]
-    
+ 
+  
+  
   #call the similarity computation written in C
   res=callSimilarityComputation(sub_matrix,sub.list.occ,supplementary.variables,matrix.values,
                                 contribution.supp,typicality.supp,verbose)
@@ -192,6 +174,35 @@ callPlotSimilarityTree <- function() {
     offset.variable.x[list.simi.indexes.variable[i]]=offsetX+dx*i
     offset.variable.y[i]=offsetY+12*max.length.variables+10
   }
+  
+  
+  
+
+#   #try to convert our tree to use it with the plot function of R
+#   merge=array(0,c(nb.levels,2))
+#   in.class=array(0,length(list.simi.indexes.variable))
+#   for(i in 1:nb.levels) {
+#     if (in.class[variable.left[i]]==0) {
+#       merge[i,1]=-variable.left[i]
+#     }
+#     else
+#       merge[i,1]=in.class[variable.left[i]]
+#     in.class[variable.left[i]]=i
+#     
+#     if (in.class[variable.right[i]]==0) {
+#       merge[i,2]=-variable.right[i]
+#     }
+#     else
+#       merge[i,2]=in.class[variable.right[i]]
+#     in.class[variable.right[i]]=i
+#   }
+#   order=list.simi.indexes.variable
+#   labels=list.simi.variables
+#   height=1:nb.levels
+#   tree=list(merge=merge,height=height,order=order,labels=labels,method='complete',call='test',dist.method='euclidian')
+#   attr(tree,'class')='hclust'
+#   plot(tree)
+  
   
   
   

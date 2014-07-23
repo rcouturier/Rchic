@@ -298,8 +298,8 @@ computeImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.i
   list.edge<<-list.edge
   list.node<<-list.node
   list.spline<<-list.spline
-  print("iiiiiiiiiiiiiiiiiiiiiiiii")
-  print(length(list.spline))
+  #print("iiiiiiiiiiiiiiiiiiiiiiiii")
+  #print(length(list.spline))
 }
 
 
@@ -328,11 +328,11 @@ computeImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.i
 plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item,edit=FALSE,first=TRUE) {
   
   
-  print("edit")
-  print(edit)
-  print(edit==TRUE)
-  print("first")
-  print(first)
+  #print("edit")
+  #print(edit)
+  #print(edit==TRUE)
+  #print("first")
+  #print(first)
   
   tkdelete(canvas, "text")
   if(first) {

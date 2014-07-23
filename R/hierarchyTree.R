@@ -14,6 +14,11 @@
 
 hierarchyTree <-function(list.variables, supplementary.variables, matrix.values, contribution.supp, typicality.supp, verbose=FALSE) {
   
+  if(length(supplementary.variables)==0) {
+    contribution.supp=FALSE
+    typicality.supp=FALSE
+  }
+  
   rules = read.table(file='transaction.out',header=TRUE,row.names=1,sep=',', stringsAsFactors=F,strip.white=T)
   row=row.names(rules)
   rules=as.data.frame(lapply(rules,as.numeric))

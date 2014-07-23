@@ -84,8 +84,8 @@ extern "C"{
       ind=Index[taby[u][l]][taby[v][t]];
       if(ind>max) 
       {
-        maxx=(int)taby[u][l];
-        maxy=(int)taby[v][t];
+        maxx=taby[u][l];
+        maxy=taby[v][t];
         max=ind;
       }
     }
@@ -405,9 +405,9 @@ extern "C"{
       sort(level,level+nb_sub_level);
       
       if(Typi)
-        cout<<"Typicality to the sublevels: ";
+      cout<<"Typicality to the sublevels: ";
       else
-        cout<<"Contribution to the sublevels: ";
+      cout<<"Contribution to the sublevels: ";
       cout<<string_level[nb]<<" with classes at levels ";
       for(int i=0;i<nb_sub_level;i++) {
         cout<<level[i]+1<<" ";
@@ -560,10 +560,10 @@ extern "C"{
           inter+=supplementary_values[Contrib_index[i]][j];
         }
         //////////WARNING in CHIC the computation of the hierarchy is done with that.... A bug? probably
-        /*for(i=OptimalGroup;i<nb_row;i++) 
-        if(supplementary_values[Contrib_index[i]][j]==1)
-        inter++;
-        */
+        //for(i=OptimalGroup;i<nb_row;i++) 
+        //if(supplementary_values[Contrib_index[i]][j]==1)
+        //inter++;
+        
         occ=0;
         for(k=0;k<nb_row;k++)
         occ+=supplementary_values[k][j];
@@ -650,7 +650,7 @@ extern "C"{
     bool contrib_supp=LOGICAL(contribution_supp)[0];
     bool typi_supp=LOGICAL(typicality_supp)[0];
     
-        
+    
     int nb_col=INTEGER(getAttrib(similarity_matrix, R_DimSymbol))[0];
     SEXP list_names=getAttrib(similarity_matrix, R_DimNamesSymbol);
     SEXP variables= VECTOR_ELT(list_names, 0);
@@ -679,11 +679,23 @@ extern "C"{
     int *tabb=new int[nb_col];
     int *tabz=new int[nb_col];
     int *tabee=new int[nb_col];
-    int **taby=new int*[nb_col];
-    for(int i;i<nb_col;i++)
-    taby[i]=new int[nb_col];
-    for(i=0;i<nb_col;i++)
-    for(j=0;j<nb_col;j++) taby[i][j]=0;
+    
+    
+    
+    //WARNING taby should be of size nb_col+1 because the similarity can be total
+    int **taby=new int*[nb_col+1];
+    for(int i;i<nb_col+1;i++)
+    taby[i]=new int[nb_col+1];
+    for(i=0;i<nb_col+1;i++) {
+      for(j=0;j<nb_col+1;j++) {
+        taby[i][j]=0;
+      }
+    }
+    
+    
+    
+    
+    //return(R_NilValue);
     
     char **cc=new char*[nb_col];
     char **cl=new char*[nb_col];
@@ -697,13 +709,14 @@ extern "C"{
       string_level[i]=0;
     }
     
+    
     for (i=0;i<nb_col;i++)
     {
       taby[i][1]=i;
       tabe[i]=1;
       int length=strlen(CHAR(STRING_ELT(variables, i)));
       cc[i]=new char[10];	//it is only to have the number of the variable
-      cl[i]=new char[length+1];
+      cl[i]=new char[length+3];
       sprintf(cc[i],"%i",i+1);
       sprintf(cl[i],"%s",CHAR(STRING_ELT(variables, i)));
     }
@@ -761,14 +774,14 @@ extern "C"{
       }
     }
     
-    /*
-    for(i=0;i<nb_row;i++) {
-    for(j=0;j<nb_col;j++) {
-    printf("%f ",mat_values[i][j]);
-    }
-    printf("\n");
-    }
-    */
+    
+    //for(i=0;i<nb_row;i++) {
+    //for(j=0;j<nb_col;j++) {
+    //printf("%f ",mat_values[i][j]);
+    //}
+    //printf("\n");
+    //}
+    
     
     
     
@@ -785,6 +798,9 @@ extern "C"{
           for (j=1;j<=tabe[u];j++)
           for (k=1;k<=tabe[v];k++)
           {
+            //if(u>=nb_col ||j>=nb_col || v>=nb_col || k>=nb_col)
+            //cout<<"PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPBBBBBBBBBBBB"<<endl;
+            
             double t=Index_simi[taby[u][j]][taby[v][k]];  
             if (max<t) max=t;
             t=pow(max,tabe[u]);
@@ -887,14 +903,17 @@ extern "C"{
             cl[x]=new_s2;
             
             r--;
-            for (k=j+1;k<=j+tabe[u];k++)
-            taby[x][k]=taby[u][k-j];
+            for (k=j+1;k<=j+tabe[u] ;k++) {
+              //if(x>=nb_col ||k>=nb_col || u>=nb_col || k-j>=nb_col)
+              //  cout<<"PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPBBBBBBBBBBBB22222 "<<j<<" "<<x<<" "<<k<<" "<<u<<" "<<k-j<<endl;
+              taby[x][k]=taby[u][k-j];
+            }
             j=j+tabe[u];
             tabe[u]=0;
           }
         }
-        tabo[f]=(int)taby[x][1];
-        tabz[f]=(int)taby[x][tabe[x]];
+        tabo[f]=taby[x][1];
+        tabz[f]=taby[x][tabe[x]];
         if(verbose)
         Rprintf("Level %d tabo %d tabz %d\n",f,tabo[f],tabz[f]);
         tabee[f]=tabe[x];			
@@ -921,18 +940,13 @@ extern "C"{
         //os<<Classification<<(f+1)<<" : "<<cl[x]<<Similarity<<max<<"\r\n\r\n";
         f++;
         
-        /*
-        if(f%10==9)
-        {
-        os<<'\0';
-        if(DisplayResult && !TextDesactivated) PView->GetEditCtrl().ReplaceSel(str);
-        os.seekp(0);
-        }
-        */
+        
       }
       
       
     }while(r>1 && max>1e-12);    
+    
+    
     
     
     j=0;
@@ -1011,6 +1025,8 @@ extern "C"{
     
     UNPROTECT(6); 
     
+    
+    
     for(i=0;i<nb_col;i++)
     delete []Index_simi[i];
     delete []Index_simi;
@@ -1021,17 +1037,28 @@ extern "C"{
     delete []Terminal;
     delete []LevelX;
     delete []LevelY;
-    for(i=0;i<nb_col;i++)
-    delete []taby[i];
+    
+    
+    
     for(i=0;i<nb_col;i++)
     if(cl[i]) delete []cl[i];
     delete []cl;
     for(i=0;i<nb_col;i++)
     if(cc[i]) delete []cc[i];
-    for(i=0;i<nb_col;i++)
-    if(string_level[i]) delete []string_level[i];
-    delete []cc;
+    for(i=0;i<nb_col;i++) {
+      if(string_level[i]) 
+      delete []string_level[i];
+    }
+    delete []string_level;
+    
+    for(i=0;i<nb_col+1;i++) {
+      delete []taby[i];
+    }
     delete []taby;
+    
+    
+    
+    delete []cc;
     delete []tabe;
     delete []GenPairX;
     delete []GenPairY;
@@ -1041,6 +1068,7 @@ extern "C"{
     delete []tabo;
     delete []significant_nodes;
     delete []level;
+    
     return results;
     
     
@@ -1175,11 +1203,12 @@ extern "C"{
     int *tabb=new int[nb_col];
     int *tabz=new int[nb_col];
     int *tabee=new int[nb_col];
-    int **taby=new int*[nb_col];
-    for(int i;i<nb_col;i++)
-    taby[i]=new int[nb_col];
-    for(i=0;i<nb_col;i++)
-    for(j=0;j<nb_col;j++) taby[i][j]=0;
+    //WARNING nb_col+1 needed in case the hierarchy is complete
+    int **taby=new int*[nb_col+1];
+    for(int i;i<nb_col+1;i++)
+    taby[i]=new int[nb_col+1];
+    for(i=0;i<nb_col+1;i++)
+    for(j=0;j<nb_col+1;j++) taby[i][j]=0;
     
     char **cc=new char*[nb_col];
     char **cl=new char*[nb_col];
@@ -1446,7 +1475,7 @@ extern "C"{
       }
     }
     
-        
+    
     
     //tabo=variable_left
     //tabz=variable_right
@@ -1514,8 +1543,10 @@ extern "C"{
     delete []Terminal;
     delete []LevelX;
     delete []LevelY;
-    for(i=0;i<nb_col;i++)
+    //WARNING nb_col+1 needed
+    for(i=0;i<nb_col+1;i++)
     delete []taby[i];
+    delete []taby;
     for(i=0;i<nb_col;i++)
     if(cl[i]) delete []cl[i];
     delete []cl;
@@ -1524,7 +1555,7 @@ extern "C"{
     delete []cc;
     for(i=0;i<nb_col;i++)
     if(string_level[i]) delete []string_level[i];
-    delete []taby;
+    
     delete []tabe;
     delete []GenPairX;
     delete []GenPairY;
@@ -1562,6 +1593,7 @@ extern "C"{
     
     int nb_elt=length(vector);
     double *v_data=new double[nb_elt];
+    
     for (int i=0;i<nb_elt;i++){
       v_data[i]=REAL(vector)[i];
     }
@@ -1576,6 +1608,9 @@ extern "C"{
     int i,j,k;
     
     std::vector<double> myvector (v_data, v_data+nb_elt);
+    
+    
+  
     sort (myvector.begin(), myvector.end());
     
     i=0;
@@ -1584,6 +1619,7 @@ extern "C"{
       v_data[i++]=*it;
     }
     
+  
     int start[nb_partition];
     int end[nb_partition];
     double val_start[nb_partition];
@@ -1711,7 +1747,5 @@ extern "C"{
     
     return(R_NilValue);
   }
-  
-  
   
 }
