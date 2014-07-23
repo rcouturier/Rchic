@@ -13,7 +13,7 @@
 #' @export
 
 
-similarityTree <-function( list.variables, supplementary.variables, matrix.values, contribution.supp, typicality.supp, verbose=FALSE ) {
+similarityTree <-function(list.variables, supplementary.variables, matrix.values, contribution.supp, typicality.supp, verbose=FALSE) {
   
   if(length(supplementary.variables)==0) {
     contribution.supp=FALSE
@@ -31,6 +31,7 @@ similarityTree <-function( list.variables, supplementary.variables, matrix.value
   matrix.values<<-matrix.values
   contribution.supp<<-contribution.supp
   typicality.supp<<-typicality.supp
+  list.variables<<-list.variables
   
   max.length.variables=max(str_length(list.variables))
   

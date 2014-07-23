@@ -31,6 +31,7 @@ hierarchyTree <-function(list.variables, supplementary.variables, matrix.values,
   matrix.values<<-matrix.values
   contribution.supp<<-contribution.supp
   typicality.supp<<-typicality.supp
+  list.variables<<-list.variables
   
   max.length.variables=max(str_length(list.variables))
   

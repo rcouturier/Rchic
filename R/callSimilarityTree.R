@@ -23,8 +23,8 @@ callSimilarityTree <- function(filename,contribution.supp=FALSE,typicality.supp=
   #call apriori
   callAsirules()
   #list of variables is needed to keep the same order in the variable when the cohesion matrix is built
-  list.variables=names(dataCSV)
-  list.variables=list.variables[-1]
+  list.variables<-names(dataCSV)
+  list.variables<-list.variables[-1]
   
   
   #matrix to compute the contributions and similarities
@@ -41,7 +41,9 @@ callSimilarityTree <- function(filename,contribution.supp=FALSE,typicality.supp=
     storage.mode(supplementary.variables)<-"numeric"
   }
  
-  print(supplementary.variables)
+  print(list.variables)
+  
+  
   
   similarityTree(list.variables, supplementary.variables,matrix.values, contribution.supp, typicality.supp, verbose=verbose)
 }
