@@ -1583,7 +1583,7 @@ extern "C"{
   
   
   
-  
+  /*
   
   //function to build the dynamic cloud to partition the data
   SEXP dynamic_cloud(SEXP vector, SEXP number_partition) {
@@ -1612,7 +1612,7 @@ extern "C"{
     std::vector<double> myvector (v_data, v_data+nb_elt);
     
     
-  
+    
     sort (myvector.begin(), myvector.end());
     
     i=0;
@@ -1621,7 +1621,7 @@ extern "C"{
       v_data[i++]=*it;
     }
     
-  
+    
     int start[nb_partition];
     int end[nb_partition];
     double val_start[nb_partition];
@@ -1708,48 +1708,53 @@ extern "C"{
     
   }    
   
+  */
   
+  
+  
+  
+  /*
   //function to build the file transaction.tab for apriori
   SEXP write_transactions(SEXP data) {
-    if(!isMatrix(data))
-    error("matrix needed");
-    
-    SEXP list_names=getAttrib(data, R_DimNamesSymbol);
-    SEXP name= VECTOR_ELT(list_names, 1);
-    
-    int nb_col=INTEGER(getAttrib(data, R_DimSymbol))[1];
-    int nb_row=INTEGER(getAttrib(data, R_DimSymbol))[0];
-    
-    double *val_mat=REAL(data);
-    char **var=new char*[nb_col];
-    for(int j=0;j<nb_col;j++) {
-      var[j]=new char[strlen(CHAR(STRING_ELT(name, j)))+5];
-      strcpy(var[j],CHAR(STRING_ELT(name, j)));
-    }
-    
-    
-    
-    ofstream file;
-    file.open ("transaction.tab");
-    for(int i=0;i<nb_row;i++) {
-      for(int j=0;j<nb_col;j++) {
-        //warning inverse order...
-        double v=val_mat[j*nb_row+i];
-        if(v!=0)
-        file<<var[j]<<" "<<v<<" ";
-      }
-      file<<endl;
-    }
-    file.close();
-    
-    for(int j=0;j<nb_col;j++) {
-      delete []var[j];
-    }
-    delete []var;
-    
-    return(R_NilValue);
+  if(!isMatrix(data))
+  error("matrix needed");
+  
+  SEXP list_names=getAttrib(data, R_DimNamesSymbol);
+  SEXP name= VECTOR_ELT(list_names, 1);
+  
+  int nb_col=INTEGER(getAttrib(data, R_DimSymbol))[1];
+  int nb_row=INTEGER(getAttrib(data, R_DimSymbol))[0];
+  
+  double *val_mat=REAL(data);
+  char **var=new char*[nb_col];
+  for(int j=0;j<nb_col;j++) {
+  var[j]=new char[strlen(CHAR(STRING_ELT(name, j)))+5];
+  strcpy(var[j],CHAR(STRING_ELT(name, j)));
   }
   
+  
+  
+  ofstream file;
+  file.open ("transaction.tab");
+  for(int i=0;i<nb_row;i++) {
+  for(int j=0;j<nb_col;j++) {
+  //warning inverse order...
+  double v=val_mat[j*nb_row+i];
+  if(v!=0)
+  file<<var[j]<<" "<<v<<" ";
+  }
+  file<<endl;
+  }
+  file.close();
+  
+  for(int j=0;j<nb_col;j++) {
+  delete []var[j];
+  }
+  delete []var;
+  
+  return(R_NilValue);
+  }
+  */
   
   
   
@@ -1761,71 +1766,183 @@ extern "C"{
 
 
 using namespace Rcpp;
-   //function to build the file transaction.tab for apriori
-  // [[Rcpp::export]]
-  void write_transactions2(NumericMatrix data) {
-   
-    
-    //SEXP list_names=getAttrib(data, R_DimNamesSymbol);
-    //SEXP name= VECTOR_ELT(list_names, 1);
-    
-    List l=data.attr("dimnames");
-    List l2=l[1];
-    int nb_col=data.ncol();
-    int nb_row=data.nrow();
-    
-    cout<<"DEB"<<endl;
-    /*
-    cout<<nb_col<<" "<<nb_row<<" "<<l2.size()<<endl;
-    for(int i=0;i<l2.size();i++) {
-      string v=l2[i];
-      cout<<v<<endl;
-    }
-    
-    
-    for(int i=0;i<nb_row;i++) {
-    for(int j=0;j<nb_col;j++) {
-      cout<<data(i,j)<<" ";
-    }
-    cout<<endl;
-    }
-    
-    cout<<"FIN"<<endl;
-    */
-    
-    
-    
-/*    
-    double *val_mat=REAL(data);
-    char **var=new char*[nb_col];
-    for(int j=0;j<nb_col;j++) {
-      var[j]=new char[strlen(CHAR(STRING_ELT(name, j)))+5];
-      strcpy(var[j],CHAR(STRING_ELT(name, j)));
-    }
-    */
-    
-    
-    ofstream file;
-    file.open ("transaction.tab");
-    for(int i=0;i<nb_row;i++) {
-      for(int j=0;j<nb_col;j++) {
-        
-        double v=data(i,j);
-        string name=l2[j];
-        if(v!=0)
-          file<<name<<" "<<v<<" ";
-      }
-      file<<endl;
-    }
-    file.close();
-    /*
-    for(int j=0;j<nb_col;j++) {
-      delete []var[j];
-    }
-    delete []var;
-  */  
-    
+//function to build the file transaction.tab for apriori
+// [[Rcpp::export]]
+void write_transactions(NumericMatrix data) {
+  
+  
+  
+  List l=data.attr("dimnames");
+  List l2=l[1];
+  int nb_col=data.ncol();
+  int nb_row=data.nrow();
+  
+  /*cout<<"DEB"<<endl;
+  
+  cout<<nb_col<<" "<<nb_row<<" "<<l2.size()<<endl;
+  for(int i=0;i<l2.size();i++) {
+  string v=l2[i];
+  cout<<v<<endl;
   }
   
   
+  for(int i=0;i<nb_row;i++) {
+  for(int j=0;j<nb_col;j++) {
+  cout<<data(i,j)<<" ";
+  }
+  cout<<endl;
+  }
   
+  cout<<"FIN"<<endl;
+  */
+  
+  
+  
+  /*    
+  double *val_mat=REAL(data);
+  char **var=new char*[nb_col];
+  for(int j=0;j<nb_col;j++) {
+  var[j]=new char[strlen(CHAR(STRING_ELT(name, j)))+5];
+  strcpy(var[j],CHAR(STRING_ELT(name, j)));
+  }
+  */
+  
+  
+  ofstream file;
+  file.open ("transaction.tab");
+  for(int i=0;i<nb_row;i++) {
+    for(int j=0;j<nb_col;j++) {
+      
+      double v=data(i,j);
+      string name=l2[j];
+      if(v!=0)
+      file<<name<<" "<<v<<" ";
+    }
+    file<<endl;
+  }
+  file.close();
+  /*
+  for(int j=0;j<nb_col;j++) {
+  delete []var[j];
+  }
+  delete []var;
+  */  
+  
+}
+
+
+
+
+
+//function to build the dynamic cloud to partition the data
+// [[Rcpp::export]]
+IntegerVector dynamic_cloud(NumericVector vector, IntegerVector number_partition) {
+
+  if(length(number_partition)>1)
+  throw std::range_error("number of partition must be a scalar");
+  
+  int nb_elt=vector.size();
+  
+  int nb_partition=number_partition[0];
+  cout<<nb_partition<<endl;
+  
+  cout<<nb_elt<<endl;
+  int i,j,k;
+  
+  //vector<double> myvector (v_data, v_data+nb_elt);
+  
+  
+  std::vector<double> copy_data(vector.size());
+  
+  for (int i=0;i<vector.size();i++){
+    copy_data[i]=vector[i];
+  }
+  
+  sort (vector.begin(), vector.end());
+  
+  i=0;
+  for (NumericVector::iterator it=vector.begin(); it!=vector.end(); ++it){
+    cout<<*it<<endl;
+    //v_data[i++]=*it;
+  }
+  
+  
+  int start[nb_partition];
+  int end[nb_partition];
+  double val_start[nb_partition];
+  double val_end[nb_partition];
+  double W,old_W; 
+  double g[nb_partition];
+  int index,old_index;
+  
+  double min,exp;
+  
+  start[0]=0;
+  end[nb_partition-1]=nb_elt-1;
+  for(j=0;j<nb_partition-1;j++)
+  {
+    end[j]=((j+1)*nb_elt)/(nb_partition)-1;
+    start[j+1]=((j+1)*nb_elt)/(nb_partition);
+  }
+  old_W=-1;
+  W=0;
+  while(old_W!=W)
+  {
+    old_W=W;
+    W=0;
+    for(j=0;j<nb_partition;j++)
+    {
+      g[j]=0;
+      for(k=start[j];k<=end[j];k++) {
+        g[j]+=vector[k];
+      }
+      g[j]/=(end[j]-start[j]+1);
+    }
+    old_index=0;
+    for(k=0;k<nb_elt;k++)
+    {
+      min=1E300;
+      index=-1;
+      
+      for(j=0;j<nb_partition;j++)
+      {
+        exp=pow(g[j]-vector[k],2);
+        
+        if(min>exp)
+        {
+          min=exp;
+          index=j;
+        }
+      }
+      W+=min;
+      if(index!=old_index)
+      {
+        end[old_index]=k-1;
+        start[index]=k;
+        old_index=index;
+      }
+    }
+    cout<<"W "<<W<<endl;
+  }
+  
+  cout<<endl<<"Optimal Parameters"<<endl;
+  for(j=0;j<nb_partition;j++)
+  {
+    val_start[j]=vector[start[j]];
+    val_end[j]=vector[end[j]];
+    cout<<"From "<<val_start[j]<<" To "<<val_end[j]<<endl;
+  }
+  
+  
+  IntegerVector result(nb_elt);
+  for(i=0;i<nb_elt;i++) {
+    int v=0;
+    for(k=0;k<nb_partition;k++)
+    if(copy_data[i]>=val_start[k] && copy_data[i]<=val_end[k])
+    v=k+1;
+    result[i]=v;
+  }
+  
+  return result;
+  
+} 

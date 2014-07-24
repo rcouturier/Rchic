@@ -80,7 +80,8 @@ callHierarchyComputation <- function(cohesion_matrix,list.occurrences.variables,
 
 callDynamicCloud <- function(vector, nb.partitions)  {
   
-  .Call("dynamic_cloud", vector, nb.partitions)  
+  #.Call("dynamic_cloud", vector, nb.partitions)  
+  .Call("rchic_dynamic_cloud", vector, nb.partitions)  
 }
 
 
@@ -102,6 +103,6 @@ callWriteTransactions <- function(data)  {
   storage.mode(M)<-"numeric"
   
   #.Call('write_transactions', M)  
-  .Call('rchic_write_transactions2', M)  
+  .Call('rchic_write_transactions', M)  
 }
 
