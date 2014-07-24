@@ -4,6 +4,9 @@
 #' 
 #' @author Rapha\"{e}l Couturier \email{raphael.couturier@@univ-fcomte.fr}
 #' @export
+#' 
+#' @importFrom Rcpp evalCpp
+#'
 #' @useDynLib rchic
 
 callAsirules <- function(){
@@ -97,6 +100,8 @@ callWriteTransactions <- function(data)  {
   M=as.matrix(data[,-1])
   #be sure that we have numeric
   storage.mode(M)<-"numeric"
-  .Call("write_transactions", M)  
+  
+  #.Call('write_transactions', M)  
+  .Call('rchic_write_transactions2', M)  
 }
 

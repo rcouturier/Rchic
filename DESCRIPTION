@@ -19,6 +19,7 @@ Depends:
     tcltk2,
     Rgraphviz,
     stringr
+LinkingTo: Rcpp
 License: GPL
 URL: https://github.com/rchic/Rchic/
 VignetteBuilder: knitr

@@ -24,6 +24,8 @@
 #include <algorithm> 
 #include <array> 
 
+#include <Rcpp.h>
+
 using namespace std;
 
 //This structure is used to sort the tuples used in the similarity and the hierarchy to compute the significant nodes
@@ -1748,4 +1750,82 @@ extern "C"{
     return(R_NilValue);
   }
   
+  
+  
+  
+  
+  
 }
+
+
+
+
+using namespace Rcpp;
+   //function to build the file transaction.tab for apriori
+  // [[Rcpp::export]]
+  void write_transactions2(NumericMatrix data) {
+   
+    
+    //SEXP list_names=getAttrib(data, R_DimNamesSymbol);
+    //SEXP name= VECTOR_ELT(list_names, 1);
+    
+    List l=data.attr("dimnames");
+    List l2=l[1];
+    int nb_col=data.ncol();
+    int nb_row=data.nrow();
+    
+    cout<<"DEB"<<endl;
+    /*
+    cout<<nb_col<<" "<<nb_row<<" "<<l2.size()<<endl;
+    for(int i=0;i<l2.size();i++) {
+      string v=l2[i];
+      cout<<v<<endl;
+    }
+    
+    
+    for(int i=0;i<nb_row;i++) {
+    for(int j=0;j<nb_col;j++) {
+      cout<<data(i,j)<<" ";
+    }
+    cout<<endl;
+    }
+    
+    cout<<"FIN"<<endl;
+    */
+    
+    
+    
+/*    
+    double *val_mat=REAL(data);
+    char **var=new char*[nb_col];
+    for(int j=0;j<nb_col;j++) {
+      var[j]=new char[strlen(CHAR(STRING_ELT(name, j)))+5];
+      strcpy(var[j],CHAR(STRING_ELT(name, j)));
+    }
+    */
+    
+    
+    ofstream file;
+    file.open ("transaction.tab");
+    for(int i=0;i<nb_row;i++) {
+      for(int j=0;j<nb_col;j++) {
+        
+        double v=data(i,j);
+        string name=l2[j];
+        if(v!=0)
+          file<<name<<" "<<v<<" ";
+      }
+      file<<endl;
+    }
+    file.close();
+    /*
+    for(int j=0;j<nb_col;j++) {
+      delete []var[j];
+    }
+    delete []var;
+  */  
+    
+  }
+  
+  
+  
