@@ -29,9 +29,12 @@
 using namespace std;
 
 
+//template <typename T>
+//using TwoD = vector<vector<T>>;
 
-template <typename T>
-using TwoD = vector<vector<T>>;
+
+
+typedef vector < vector< double > > TwoD;
 
 
 //This structure is used to sort the tuples used in the similarity and the hierarchy to compute the significant nodes
@@ -1687,7 +1690,7 @@ IntegerVector dynamic_cloud(NumericVector vector, IntegerVector number_partition
 
   //define a generic pair as page 31 in the book: Statistical implicative analysis theory and applications
   //a generic pair has the greater index among all the possible pairs in a class
-  void GenericPair(int u,int v,int p,int q,int &maxx, int& maxy, TwoD<double> & Index, int **taby)
+  void GenericPair(int u,int v,int p,int q,int &maxx, int& maxy, TwoD & Index, int **taby)
   {
     int l,t;
     double max=-1;
@@ -1709,7 +1712,7 @@ IntegerVector dynamic_cloud(NumericVector vector, IntegerVector number_partition
 
 
 
-  double Produce(int u,int v,int p,int q, TwoD<double>& Index, int** taby)
+  double Produce(int u,int v,int p,int q, TwoD& Index, int** taby)
   {
     double prod1=1,prod2=1,prod3=1;
     long l,t,nq;
@@ -1735,7 +1738,7 @@ IntegerVector dynamic_cloud(NumericVector vector, IntegerVector number_partition
   
   
   
-  double Cohesion_classX(int q,int p, TwoD<double>& Index, int** taby)
+  double Cohesion_classX(int q,int p, TwoD& Index, int** taby)
   {
     int ordre;
     long l,t;
@@ -1763,7 +1766,7 @@ IntegerVector dynamic_cloud(NumericVector vector, IntegerVector number_partition
     return d;
   }
   
-  double ClassImpli(int l,int n,int p,int q, double c1, double c2, TwoD<double>& Index, int **taby)
+  double ClassImpli(int l,int n,int p,int q, double c1, double c2, TwoD& Index, int **taby)
   {
     int z;
     long i,j;
@@ -1785,7 +1788,7 @@ IntegerVector dynamic_cloud(NumericVector vector, IntegerVector number_partition
 
  
   //this function computes significant levels for the hierarchy or similarity tree
-  void SignificantLevel(TwoD<double>& indexes_values,int nb_col, vector<double>& occurrences_variables, int nb_levels, 
+  void SignificantLevel(TwoD& indexes_values,int nb_col, vector<double>& occurrences_variables, int nb_levels, 
   int *variable_left,int *variable_right, int *size_class, int** classes_associated_with, int*  significant_nodes,
   bool verbose)
   {
@@ -2086,14 +2089,14 @@ LogicalVector contribution_supp, LogicalVector typicality_supp, LogicalVector Ve
   
 
 
-  TwoD<double> Index_cohesion(nb_col,vector<double> (nb_col));
+  TwoD Index_cohesion(nb_col,vector<double> (nb_col));
   
   for(int i=0;i<nb_col;i++)
     for(int j=0;j<nb_col;j++) {
       Index_cohesion[i][j]=cohesion_matrix(i,j);
     }
 
-  TwoD<double> matrix_val(nb_row,vector<double> (nb_col));
+  TwoD matrix_val(nb_row,vector<double> (nb_col));
   
   for(int i=0;i<nb_row;i++)
     for(int j=0;j<nb_col;j++) {
@@ -2112,7 +2115,7 @@ LogicalVector contribution_supp, LogicalVector typicality_supp, LogicalVector Ve
   */
   
   
-  TwoD<double> CurIndex(nb_col,vector<double> (nb_col));
+  TwoD CurIndex(nb_col,vector<double> (nb_col));
 
   /*double **CurIndex = new double*[nb_col];
   for(i=0;i<nb_col;i++)
