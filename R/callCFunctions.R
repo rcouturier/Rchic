@@ -61,7 +61,9 @@ callSimilarityComputation <- function(similarity_matrix,list.occurrences.variabl
 callHierarchyComputation <- function(cohesion_matrix,list.occurrences.variables,
                                      supplementary.variables,matrix.values,contribution.supp, typicality.supp,verbose)  {
   
-  .Call("hierarchy", cohesion_matrix,list.occurrences.variables,supplementary.variables,matrix.values,
+  #.Call("hierarchy", cohesion_matrix,list.occurrences.variables,supplementary.variables,matrix.values,
+  #      contribution.supp, typicality.supp,verbose)  
+  .Call("rchic_hierarchy", cohesion_matrix,list.occurrences.variables,supplementary.variables,matrix.values,
         contribution.supp, typicality.supp,verbose)  
 }
 
