@@ -40,7 +40,7 @@ typedef vector < vector< double > > TwoD;
 //This structure is used to sort the tuples used in the similarity and the hierarchy to compute the significant nodes
 //Tuple are sorted by cohesion (or similarity), if both values are equal we compare the occurrences of x and then y
 struct Local {
-  Local(vector<double>& Occurrences2) { Occurrences = Occurrences2; }
+  Local( vector<double>& Occurrences2):Occurrences(Occurrences2) {  }
   bool operator () (const tuple<double,int,int>& a, const tuple<double,int,int>& b) {
     double cohe_a=get<0>(a);
     double cohe_b=get<0>(b);
@@ -56,7 +56,7 @@ struct Local {
     Occurrences[y_a]>Occurrences[y_b]))));
   }
   
-  vector<double> Occurrences;
+  vector<double>& Occurrences;
 };
 
 
