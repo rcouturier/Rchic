@@ -1,15 +1,10 @@
 #include <iostream>
 #include <ostream>
-#include <stdio.h>
 #include <math.h>
 
 
 #include <fstream>
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <string.h>
 #include <cstring>
 #include <math.h>
 #include <R.h>
@@ -22,13 +17,13 @@
 #include <list>
 #include <string>
 #include <cctype>
-#include <algorithm> 
+
 #include <array> 
 
 #include <Rcpp.h>
 
 using namespace std;
-
+using namespace Rcpp;
 
 //template <typename T>
 //using TwoD = vector<vector<T>>;
@@ -79,13 +74,6 @@ insertNoDuplicate( vector<T>& references, T const& newValue )
 
 
 
-//functions from R should be in this part
-extern "C"{
-  
-  
-  
-  
-  
   
   struct ordering {
     bool operator ()(pair<double, int> const& a, pair<double, int> const& b) {
@@ -107,39 +95,10 @@ extern "C"{
     }
   }
   
+  //defined in istree.c
+  long double Cnp(int n,int p) ;
   
-  long double Cnp(int n,int p) {
-    long double res=1;
-    int i;
-    if(p<n)
-    {
-      for(i=1;i<=n-p;i++)
-      res*=double(i+p)/i;
-    }
-    return res;
-  }
-  
-  
-  
-  float Normal(double val)
-  {
-    double t1,b1,b2,b3,b4,b5,res;
-    int inv=0;
-    if(val<0) {
-      inv=1;
-      val=-val;
-    }
-    t1=1./(val*0.2316419+1.);
-    b1=0.31938153;
-    b2=-0.356563782;
-    b3=1.781477937;
-    b4=-1.821255978;
-    b5=1.330274429;
-    res=1./sqrt(2*3.14159265358979323846)*exp(-0.5*val*val);
-    res=1-res*(b1*t1+b2*t1*t1+b3*pow(t1,3)+b4*pow(t1,4)+b5*pow(t1,5));
-    if(inv) res=1-res;
-    return (float)res;
-  }
+  float Normal(double val);
   
   
   
@@ -157,620 +116,17 @@ extern "C"{
   
   
   
-  /*
   
-  SEXP hierarchy(SEXP cohesion_matrix, SEXP list_occurrences_variables, 
-  SEXP supplementary_variables, SEXP matrix_values, 
-  SEXP contribution_supp, SEXP typicality_supp, SEXP Verbose) {
   
-  if(!isMatrix(cohesion_matrix))
-  error("matrix needed");
   
-  if(!isMatrix(matrix_values))
-  error("matrix needed");
   
-  if(!isVector(supplementary_variables))
-  error("supplementary_variables must be a list");
   
-  if(!isLogical(contribution_supp))
-  error("verbose must be a boolean");
-  
-  if(!isLogical(typicality_supp))
-  error("verbose must be a boolean");
-  
-  if(!isLogical(Verbose))
-  error("verbose must be a boolean");
-  
-  bool verbose=LOGICAL(Verbose)[0];
-  bool contrib_supp=LOGICAL(contribution_supp)[0];
-  bool typi_supp=LOGICAL(typicality_supp)[0];
-  
-  int nb_col=INTEGER(getAttrib(cohesion_matrix, R_DimSymbol))[0];
-  SEXP list_names=getAttrib(cohesion_matrix, R_DimNamesSymbol);
-  SEXP variables= VECTOR_ELT(list_names, 0);
-  int nb_row=INTEGER(getAttrib(matrix_values, R_DimSymbol))[0];
-  
-  if(verbose)
-  Rprintf("Nb col %d\n",nb_col);
-  
-  SEXP matrix_names=getAttrib(matrix_values, R_DimNamesSymbol);
-  SEXP individuals= VECTOR_ELT(matrix_names, 0);
-  
-  int i,j,k,u,v;
-  int x,y;
-  double max=-1;
-  bool max_found;
-  
-  int *level= new int[nb_col];
-  double *Occurrences_variables = REAL(list_occurrences_variables);
-  
-  
-  int *tabe=new int[nb_col];
-  int *tabo=new int[nb_col];
-  int *tabb=new int[nb_col];
-  int *tabz=new int[nb_col];
-  int *tabee=new int[nb_col];
-  //WARNING nb_col+1 needed in case the hierarchy is complete
-  int **taby=new int*[nb_col+1];
-  for(int i;i<nb_col+1;i++)
-  taby[i]=new int[nb_col+1];
-  for(i=0;i<nb_col+1;i++)
-  for(j=0;j<nb_col+1;j++) taby[i][j]=0;
-  
-  char **cc=new char*[nb_col];
-  char **cl=new char*[nb_col];
-  char **string_level=new char*[nb_col];
-  int *significant_nodes=new int[nb_col];
-  for(i=0;i<nb_col;i++) 
-  {
-  cc[i]=0;
-  cl[i]=0;
-  significant_nodes[i]=0;
-  string_level[i]=0;
-  }
-  
-  for (i=0;i<nb_col;i++)
-  {
-  taby[i][1]=i;
-  tabe[i]=1;
-  int length=strlen(CHAR(STRING_ELT(variables, i)));
-  cc[i]=new char[10];	//it is only to have the number of the variable
-  cl[i]=new char[length+1];
-  sprintf(cc[i],"%i",i+1);
-  sprintf(cl[i],"%s",CHAR(STRING_ELT(variables, i)));
-  }
-  
-  int r=nb_col;
-  int f=0;
-  
-  
-  
-  int *AlreadyInClasse = new int[nb_col];
-  for(i=0;i<nb_col;i++) AlreadyInClasse[i]=-999999;
-  
-  int  *GenPairX = new int[nb_col];
-  int  *GenPairY = new int[nb_col];
-  
-  int	*Terminal = new int[nb_col];
-  for(i=0;i<nb_col;i++) Terminal[i]=1;
-  
-  
-  int *LevelX=new int[r];
-  for(i=0;i<r;i++) LevelX[i]=-1;
-  
-  int *LevelY=new int[r];
-  for(i=0;i<r;i++) LevelY[i]=-1;
-  
-  double **CurIndex = new double*[nb_col];
-  for(i=0;i<nb_col;i++)
-  CurIndex[i] = new double[nb_col];
-  
-  
-  double *cohesion_mat=REAL(cohesion_matrix);
-  double *mat_val=REAL(matrix_values);
-  
-  double **Index_cohesion= new double*[nb_col];
-  for(i=0;i<nb_col;i++)
-  Index_cohesion[i] = new double[nb_col];
-  
-  double **mat_values= new double*[nb_row];
-  for(i=0;i<nb_row;i++)
-  mat_values[i] = new double[nb_col];
-  
-  //put data into Index
-  for(i=0;i<nb_col;i++) {
-  for(j=0;j<nb_col;j++) {
-  Index_cohesion[i][j]=cohesion_mat[j*nb_col+i];  //element in the matrix seems to be transposed
-  }
-  }
-  
-  for(i=0;i<nb_row;i++) {
-  for(j=0;j<nb_col;j++) {
-  mat_values[i][j]=mat_val[j*nb_row+i];  //element in the matrix seems to be transposed
-  }
-  }
-  
-  while(r>1 && max!=0)
-  {
-  for (u=0;u<nb_col;u++)
-  for (v=0;v<nb_col;v++)
-  {
-  
-  if ( tabe[u]==1 && tabe[v]==1)	CurIndex[u][v]=Index_cohesion[u][v];
-  else if (tabe[u]==0 || tabe[v]==0 || u==v) CurIndex[u][v]=0;
-  else
-  CurIndex[u][v]=Produce(u,v,tabe[u],tabe[v], Index_cohesion, taby);
-  
-  
-  }
-  max=-1;
-  
-  x=0;
-  y=0;
-  for (u=0;u<nb_col;u++)        
-  for (v=0;v<nb_col;v++)      
-  {
-  if (u!=v && max<=CurIndex[u][v])
-  {
-  if (max>0 && max==CurIndex[u][v])//ordre de pref cohe de la nouvelle class,
-  {												//impli de la nouvelle classe, cohe interne
-  //calcul de phi(A,B) et phi(B,A)
-  double c1=Cohesion_classX(x,tabe[x],Index_cohesion,taby);
-  double c2=Cohesion_classX(u,tabe[u],Index_cohesion,taby);
-  double impl1=ClassImpli(x,y,u,v,c1,c2,Index_cohesion,taby); //impl de la class max
-  double impl2=ClassImpli(u,v,x,y,c2,c1,Index_cohesion,taby);
-  if(impl1==impl2)
-  {
-  if(c1<c2)
-  {
-  x=u;	//on garde la classe qui a la plus forte cohe interne
-  y=v;
-  }
-  else
-  if(c1==c2)
-  {
-  //signale le pb a regis (avec exemple 41)
-  if(x==v && y==u)
-  significant_nodes[f]=10;
-  }
-  }
-  else
-  if(impl1<impl2)
-  {
-  x=u;	//on garde la classe qui a le plus fort phi
-  y=v;
-  }
-  
-  }
-  else
-  {
-  max=CurIndex[u][v];
-  x=u;
-  y=v;
-  significant_nodes[f]=0;
-  }
-  }
-  
-  }
-  
-  for (u=0;u<nb_col;u++) tabb[u]=-1;
-  tabb[x]=x;tabb[y]=y;
-  
-  j=tabe[x];
-  
-  u=y;
-  
-  {                                             //a regarder bizare
-  if ((tabb[u]!=-1)&&(CurIndex[x][u]==max)&&(CurIndex[x][u]!=0))
-  {
-  
-  if(AlreadyInClasse[x]==-999999 && AlreadyInClasse[y]==-999999)
-  {
-  AlreadyInClasse[x]=f;
-  AlreadyInClasse[y]=f;
-  LevelX[f]=-x-1;
-  LevelY[f]=-y-1;
-  }
-  else
-  if(AlreadyInClasse[x]==-999999) 
-  {
-  LevelX[f]=-x-1;
-  LevelY[f]=AlreadyInClasse[y];
-  AlreadyInClasse[x]=f;
-  AlreadyInClasse[y]=f;
-  }
-  else
-  if(AlreadyInClasse[y]==-999999)
-  {
-  LevelX[f]=AlreadyInClasse[x];
-  LevelY[f]=-y-1;
-  AlreadyInClasse[x]=f;
-  AlreadyInClasse[y]=f;
-  }
-  else
-  {
-  LevelX[f]=AlreadyInClasse[x];
-  LevelY[f]=AlreadyInClasse[y];
-  AlreadyInClasse[x]=f;
-  AlreadyInClasse[y]=f;
-  }
-  Terminal[y]=0;
-  GenericPair(x,y,tabe[x],tabe[y],GenPairX[f],GenPairY[f],Index_cohesion,taby);
-  tabe[x]=tabe[x]+tabe[u];
-  char * new_s = new char[strlen(cc[x])+2+strlen(cc[u])];
-  strcpy(new_s,cc[x]);
-  strcat(new_s," ");    //espace entre les 2 chaines
-  strcat(new_s,cc[u]);
-  delete []cc[u];
-  cc[u]=NULL;
-  delete []cc[x];
-  cc[x]=new_s;
-  char * new_s2 = new char[strlen(cl[x])+2+strlen(cl[u])];
-  strcpy(new_s2,cl[x]);
-  strcat(new_s2," ");    //espace entre les 2 chaines
-  strcat(new_s2,cl[u]);
-  delete []cl[u];
-  cl[u]=NULL;
-  delete []cl[x];
-  cl[x]=new_s2;
-  
-  r=r-1;
-  for (k=j+1;k<=j+tabe[u];k++)
-  taby[x][k]=taby[u][k-j];
-  j=j+tabe[u];
-  tabe[u]=0;
-  }
-  }
-  if (max!=0)
-  {
-  tabo[f]=taby[x][1];
-  tabz[f]=taby[x][tabe[x]];
-  tabee[f]=tabe[x];
-  char *new_s=new char[strlen(cc[x])+3];  //3 a cause des ()
-  char *new_s2=new char[strlen(cl[x])+3];
-  //wsprintf(new_s,"(%s)",cc[x]);         //on met la classe formée entre ()
-  strcpy(new_s,"(");
-  strcat(new_s,cc[x]);    //espace entre les 2 chaines
-  strcat(new_s,")");
-  delete []cc[x];
-  cc[x]=new_s;
-  strcpy(new_s2,"(");
-  strcat(new_s2,cl[x]);    //espace entre les 2 chaines
-  strcat(new_s2,")");
-  delete []cl[x];
-  cl[x]=new_s2;
-  double a=Cohesion_classX(x,tabe[x],Index_cohesion,taby);
-  Rprintf("Classification %d : %s  Cohesion %f\n",(f+1),cl[x],a);
-  string_level[f]=new char[strlen(cl[x])+3];
-  strcpy(string_level[f],cl[x]);
-  //tab_cohe[f]=a;
-  if (max) f++;
-  
-  }
-  
-  
-  
-  
-  
-  }
-  
-  
-  j=0;
-  k=0;
-  for(i=0;i<nb_col;i++)
-  {
-  if(cc[i]) j+=strlen(cc[i])+1;
-  }
-  for(i=0;i<nb_col;i++)
-  {
-  if(cc[i]) k+=strlen(cl[i])+1;
-  }
-  
-  char *chc=new char[j+1];
-  chc[0]='\0';
-  char *chl=new char[k+1];
-  chl[0]='\0';
-  for(i=0;i<nb_col;i++)
-  {
-  if(tabe[i])
-  {
-  strcat(chc,cc[i]);
-  strcat(chc," ");
-  strcat(chl,cl[i]);
-  strcat(chl," ");
-  
-  }
-  }
-  
-  
-  
-  //tabo=variable_left
-  //tabz=variable_right
-  //tabee=size_class
-  //taby=classes_associated_with
-  //tabe=list_finel_nodes
-  SignificantLevel(Index_cohesion, nb_col, Occurrences_variables,f,tabo,tabz,tabee,taby,significant_nodes,verbose);
-  
-  
-  
-  if(length(supplementary_variables)>0) {
-  if(contrib_supp) {
-  contributiveCategories(supplementary_variables,Index_cohesion,f,GenPairX,GenPairY,LevelX,LevelY,
-  mat_values,0, nb_col, nb_row, individuals,string_level,true,verbose);   //false means hierarchy     0 means contrib
-  }
-  if(typi_supp) {
-  contributiveCategories(supplementary_variables,Index_cohesion,f,GenPairX,GenPairY,LevelX,LevelY,
-  mat_values,1, nb_col, nb_row, individuals,string_level,true,verbose);   //false means hierarchy     1 means typicality
-  } 
-  }
-  
-  SEXP results = PROTECT(allocVector(VECSXP, 6));
-  SEXP listClasses = PROTECT(allocVector(VECSXP, 2));
-  SET_VECTOR_ELT(listClasses, 0, mkString(chc));
-  SET_VECTOR_ELT(listClasses, 1, mkString(chl));
-  SET_VECTOR_ELT(results, 0, listClasses);
-  
-  SEXP Rtabo = PROTECT(allocVector(INTSXP, f));
-  for(i=0;i<f;i++)
-  INTEGER(Rtabo)[i]=tabo[i]+1;  //+1 because in R indexes start at 1
-  SET_VECTOR_ELT(results, 1, Rtabo);
-  
-  SEXP Rtabz = PROTECT(allocVector(INTSXP, f));
-  for(i=0;i<f;i++)
-  INTEGER(Rtabz)[i]=tabz[i]+1;  //idem
-  SET_VECTOR_ELT(results, 2, Rtabz);
-  
-  
-  SEXP RnbLevel=PROTECT(allocVector(INTSXP, 1));
-  INTEGER(RnbLevel)[0] = f;
-  SET_VECTOR_ELT(results, 3, RnbLevel);
-  
-  SEXP Rsignificant_nodes=PROTECT(allocVector(INTSXP, nb_col));
-  for(i=0;i<nb_col;i++)
-  INTEGER(Rsignificant_nodes)[i]=significant_nodes[i];
-  SET_VECTOR_ELT(results, 4, Rsignificant_nodes);
-  
-  SEXP Rfinal_nodes=PROTECT(allocVector(INTSXP, nb_col));
-  for(i=0;i<nb_col;i++)
-  INTEGER(Rfinal_nodes)[i]=tabe[i];
-  SET_VECTOR_ELT(results, 5, Rfinal_nodes);
-  
-  
-  UNPROTECT(7); 
-  
-  for(i;i<nb_col;i++)
-  delete []Index_cohesion[i];
-  delete []Index_cohesion;
-  for(i;i<nb_col;i++)
-  delete []CurIndex[i];
-  delete []CurIndex;
-  
-  delete []AlreadyInClasse;
-  
-  delete []Terminal;
-  delete []LevelX;
-  delete []LevelY;
-  //WARNING nb_col+1 needed
-  for(i=0;i<nb_col+1;i++)
-  delete []taby[i];
-  delete []taby;
-  for(i=0;i<nb_col;i++)
-  if(cl[i]) delete []cl[i];
-  delete []cl;
-  for(i=0;i<nb_col;i++)
-  if(cc[i]) delete []cc[i];
-  delete []cc;
-  for(i=0;i<nb_col;i++)
-  if(string_level[i]) delete []string_level[i];
-  
-  delete []tabe;
-  delete []GenPairX;
-  delete []GenPairY;
-  delete []tabee;
-  delete []tabb;
-  delete []tabz;
-  delete []tabo;
-  delete []significant_nodes;
-  //delete []Item;
-  delete []level;
-  return results;
-  
-  
-  }
-  
-  
-  */
-  
-  
-  
-  
-  
-  
-  
-  
-  /*
-  
-  //function to build the dynamic cloud to partition the data
-  SEXP dynamic_cloud(SEXP vector, SEXP number_partition) {
-  
-  if(!isVector(vector))
-  error("vector needed");
-  if(!isInteger(number_partition))
-  error("integer needed");
-  
-  int nb_elt=length(vector);
-  double *v_data=new double[nb_elt];
-  
-  for (int i=0;i<nb_elt;i++){
-  v_data[i]=REAL(vector)[i];
-  }
-  double *copy_data=new double[nb_elt];
-  for (int i=0;i<nb_elt;i++){
-  copy_data[i]=v_data[i];
-  }
-  int nb_partition=INTEGER(number_partition)[0];
-  cout<<nb_partition<<endl;
-  
-  cout<<nb_elt<<endl;
-  int i,j,k;
-  
-  std::vector<double> myvector (v_data, v_data+nb_elt);
-  
-  
-  
-  sort (myvector.begin(), myvector.end());
-  
-  i=0;
-  for (std::vector<double>::iterator it=myvector.begin(); it!=myvector.end(); ++it){
-  
-  v_data[i++]=*it;
-  }
-  
-  
-  int start[nb_partition];
-  int end[nb_partition];
-  double val_start[nb_partition];
-  double val_end[nb_partition];
-  double W,old_W; 
-  double g[nb_partition];
-  int index,old_index;
-  
-  double min,exp;
-  
-  start[0]=0;
-  end[nb_partition-1]=nb_elt-1;
-  for(j=0;j<nb_partition-1;j++)
-  {
-  end[j]=((j+1)*nb_elt)/(nb_partition)-1;
-  start[j+1]=((j+1)*nb_elt)/(nb_partition);
-  }
-  old_W=-1;
-  W=0;
-  while(old_W!=W)
-  {
-  old_W=W;
-  W=0;
-  for(j=0;j<nb_partition;j++)
-  {
-  g[j]=0;
-  for(k=start[j];k<=end[j];k++) {
-  g[j]+=v_data[k];
-  }
-  g[j]/=(end[j]-start[j]+1);
-  }
-  old_index=0;
-  for(k=0;k<nb_elt;k++)
-  {
-  min=1E300;
-  index=-1;
-  
-  for(j=0;j<nb_partition;j++)
-  {
-  exp=pow(g[j]-v_data[k],2);
-  
-  if(min>exp)
-  {
-  min=exp;
-  index=j;
-  }
-  }
-  W+=min;
-  if(index!=old_index)
-  {
-  end[old_index]=k-1;
-  start[index]=k;
-  old_index=index;
-  }
-  }
-  cout<<"W "<<W<<endl;
-  }
-  
-  cout<<endl<<"Optimal Parameters"<<endl;
-  for(j=0;j<nb_partition;j++)
-  {
-  val_start[j]=v_data[start[j]];
-  val_end[j]=v_data[end[j]];
-  cout<<"From "<<val_start[j]<<" To "<<val_end[j]<<endl;
-  }
-  
-  
-  SEXP result = PROTECT(allocVector(INTSXP, nb_elt));
-  for(i=0;i<nb_elt;i++) {
-  int v=0;
-  for(k=0;k<nb_partition;k++)
-  if(copy_data[i]>=val_start[k] && copy_data[i]<=val_end[k])
-  v=k+1;
-  INTEGER(result)[i]=v;
-  }
-  //SEXP result = PROTECT(allocVector(REALSXP, 1));
-  //REAL(result)[0] = 12+12;
-  UNPROTECT(1);
-  
-  return result;
-  
-  delete []v_data;
-  delete []copy_data;
-  
-  }    
-  
-  */
-  
-  
-  
-  
-  /*
-  //function to build the file transaction.tab for apriori
-  SEXP write_transactions(SEXP data) {
-  if(!isMatrix(data))
-  error("matrix needed");
-  
-  SEXP list_names=getAttrib(data, R_DimNamesSymbol);
-  SEXP name= VECTOR_ELT(list_names, 1);
-  
-  int nb_col=INTEGER(getAttrib(data, R_DimSymbol))[1];
-  int nb_row=INTEGER(getAttrib(data, R_DimSymbol))[0];
-  
-  double *val_mat=REAL(data);
-  char **var=new char*[nb_col];
-  for(int j=0;j<nb_col;j++) {
-  var[j]=new char[strlen(CHAR(STRING_ELT(name, j)))+5];
-  strcpy(var[j],CHAR(STRING_ELT(name, j)));
-  }
-  
-  
-  
-  ofstream file;
-  file.open ("transaction.tab");
-  for(int i=0;i<nb_row;i++) {
-  for(int j=0;j<nb_col;j++) {
-  //warning inverse order...
-  double v=val_mat[j*nb_row+i];
-  if(v!=0)
-  file<<var[j]<<" "<<v<<" ";
-  }
-  file<<endl;
-  }
-  file.close();
-  
-  for(int j=0;j<nb_col;j++) {
-  delete []var[j];
-  }
-  delete []var;
-  
-  return(R_NilValue);
-  }
-  */
-  
-  
-  
-  
-  
-}
 
 
 
 
-using namespace Rcpp;
+
+
 //function to build the file transaction.tab for apriori
 // [[Rcpp::export]]
 void write_transactions(NumericMatrix data) {
@@ -781,36 +137,6 @@ void write_transactions(NumericMatrix data) {
   List l2=l[1];
   int nb_col=data.ncol();
   int nb_row=data.nrow();
-  
-  /*cout<<"DEB"<<endl;
-  
-  cout<<nb_col<<" "<<nb_row<<" "<<l2.size()<<endl;
-  for(int i=0;i<l2.size();i++) {
-  string v=l2[i];
-  cout<<v<<endl;
-  }
-  
-  
-  for(int i=0;i<nb_row;i++) {
-  for(int j=0;j<nb_col;j++) {
-  cout<<data(i,j)<<" ";
-  }
-  cout<<endl;
-  }
-  
-  cout<<"FIN"<<endl;
-  */
-  
-  
-  
-  /*    
-  double *val_mat=REAL(data);
-  char **var=new char*[nb_col];
-  for(int j=0;j<nb_col;j++) {
-  var[j]=new char[strlen(CHAR(STRING_ELT(name, j)))+5];
-  strcpy(var[j],CHAR(STRING_ELT(name, j)));
-  }
-  */
   
   
   ofstream file;
@@ -826,12 +152,6 @@ void write_transactions(NumericMatrix data) {
     file<<endl;
   }
   file.close();
-  /*
-  for(int j=0;j<nb_col;j++) {
-  delete []var[j];
-  }
-  delete []var;
-  */  
   
 }
 
@@ -1261,40 +581,10 @@ bool verbose)
     
     for(int i=0;i<nb_comp_var;i++) {
       string v=supplementary_variable[i];
-      int len=strlen(v.c_str())-2;
-      string v2(v,0,len);
-      //string v2(v.c_str(),0,strlen(v)-2);
-      //std::strncpy(v2,v,strlen(v)-2);
+      string v2(v,0,strlen(v.c_str())-2);
       supp_var[i]=v2;
     }
     
-    //SEXP list_names=getAttrib(supplementary_variables, R_DimNamesSymbol);
-    //SEXP supp_variables= VECTOR_ELT(list_names, 1);
-    
-    
-  /*  
-    //get supp variables    
-    char **supplementary_variable=new char*[nb_comp_var];
-    for(i=0;i<nb_comp_var;i++) {
-      supplementary_variable[i]=new char[strlen(CHAR(STRING_ELT(supp_variables, i)))+5];
-      strncpy(supplementary_variable[i],CHAR(STRING_ELT(supp_variables, i)),strlen(CHAR(STRING_ELT(supp_variables, i)))-2);
-      supplementary_variable[i][strlen(CHAR(STRING_ELT(supp_variables, i)))-2]='\0';
-    }
-    
-    
-    //get supp values
-    double **supplementary_values= new double*[nb_row];
-    for(i=0;i<nb_row;i++) {
-      supplementary_values[i] = new double[nb_comp_var];
-    }
-    double *sup_val=REAL(supplementary_variables);
-    
-    for(i=0;i<nb_row;i++) {
-      for(j=0;j<nb_comp_var;j++) {
-        supplementary_values[i][j]=sup_val[j*nb_row+i];  //element in the matrix seems to be transposed
-      }
-    }
-    */
   
   TwoD supplementary_values(nb_row,vector<double> (nb_comp_var));
   
@@ -1485,10 +775,6 @@ bool verbose)
         for(i=OptimalGroup;i<nb_row;i++)  {
           inter+=supplementary_values[Contrib_index[i]][j];
         }
-        //////////WARNING in CHIC the computation of the hierarchy is done with that.... A bug? probably
-        //for(i=OptimalGroup;i<nb_row;i++) 
-        //if(supplementary_values[Contrib_index[i]][j]==1)
-        //inter++;
         
         occ=0;
         for(k=0;k<nb_row;k++)
@@ -1681,47 +967,9 @@ LogicalVector contribution_supp, LogicalVector typicality_supp, LogicalVector Ve
   
   
   
-  /*
-  for(int i=0;i<nb_col;i++) {
-  for(int j=0;j<nb_col;j++) {
-  cout<<cohesion_mat[i][j]<<" "<<cohesion_matrix(i,j)<<" ";
-  }
-  cout<<endl;
-  }
-  */
-  
   
   TwoD CurIndex(nb_col,vector<double> (nb_col));
   
-  /*double **CurIndex = new double*[nb_col];
-  for(i=0;i<nb_col;i++)
-  CurIndex[i] = new double[nb_col];
-  */
-  
-  //double *cohesion_mat=REAL(cohesion_matrix);
-  //double *mat_val=REAL(matrix_values);
-  /*
-  double **Index_cohesion= new double*[nb_col];
-  for(i=0;i<nb_col;i++)
-  Index_cohesion[i] = new double[nb_col];
-  
-  double **mat_values= new double*[nb_row];
-  for(i=0;i<nb_row;i++)
-  mat_values[i] = new double[nb_col];
-  */
-  /*
-  //put data into Index
-  for(i=0;i<nb_col;i++) {
-  for(j=0;j<nb_col;j++) {
-  Index_cohesion[i][j]=cohesion_mat[j*nb_col+i];  //element in the matrix seems to be transposed
-  }
-  }
-  
-  for(i=0;i<nb_row;i++) {
-  for(j=0;j<nb_col;j++) {
-  mat_values[i][j]=mat_val[j*nb_row+i];  //element in the matrix seems to be transposed
-  }
-  }*/
   
   while(r>1 && max!=0)
   {
@@ -1973,49 +1221,6 @@ LogicalVector contribution_supp, LogicalVector typicality_supp, LogicalVector Ve
   results[5]=Rfinal_nodes;
   
   
-  /*
-  SEXP results = PROTECT(allocVector(VECSXP, 6));
-  SEXP listClasses = PROTECT(allocVector(VECSXP, 2));
-  SET_VECTOR_ELT(listClasses, 0, mkString(chc));
-  SET_VECTOR_ELT(listClasses, 1, mkString(chl));
-  SET_VECTOR_ELT(results, 0, listClasses);
-  
-  SEXP Rtabo = PROTECT(allocVector(INTSXP, f));
-  for(i=0;i<f;i++)
-  INTEGER(Rtabo)[i]=tabo[i]+1;  //+1 because in R indexes start at 1
-  SET_VECTOR_ELT(results, 1, Rtabo);
-  
-  SEXP Rtabz = PROTECT(allocVector(INTSXP, f));
-  for(i=0;i<f;i++)
-  INTEGER(Rtabz)[i]=tabz[i]+1;  //idem
-  SET_VECTOR_ELT(results, 2, Rtabz);
-  
-  
-  SEXP RnbLevel=PROTECT(allocVector(INTSXP, 1));
-  INTEGER(RnbLevel)[0] = f;
-  SET_VECTOR_ELT(results, 3, RnbLevel);
-  
-  SEXP Rsignificant_nodes=PROTECT(allocVector(INTSXP, nb_col));
-  for(i=0;i<nb_col;i++)
-  INTEGER(Rsignificant_nodes)[i]=significant_nodes[i];
-  SET_VECTOR_ELT(results, 4, Rsignificant_nodes);
-  
-  SEXP Rfinal_nodes=PROTECT(allocVector(INTSXP, nb_col));
-  for(i=0;i<nb_col;i++)
-  INTEGER(Rfinal_nodes)[i]=tabe[i];
-  SET_VECTOR_ELT(results, 5, Rfinal_nodes);
-  
-  
-  UNPROTECT(7); 
-  */
-  
-  
-  //for(i;i<nb_col;i++)
-  //delete []Index_cohesion[i];
-  //delete []Index_cohesion;
-  //for(i;i<nb_col;i++)
-  //delete []CurIndex[i];
-  //delete []CurIndex;
   
   delete []AlreadyInClasse;
   
@@ -2064,25 +1269,6 @@ List similarity(NumericMatrix  similarity_matrix, NumericVector list_occurrences
 NumericMatrix supplementary_variables, NumericMatrix matrix_values, 
 LogicalVector contribution_supp, LogicalVector typicality_supp, LogicalVector Verbose) {
   
-  /*
-  if(!isMatrix(similarity_matrix))
-  error("matrix needed");
-  
-  if(!isMatrix(matrix_values))
-  error("matrix needed");
-  
-  if(!isVector(supplementary_variables))
-  error("supplementary_variables must be a list");
-  
-  if(!isLogical(contribution_supp))
-  error("verbose must be a boolean");
-  
-  if(!isLogical(typicality_supp))
-  error("verbose must be a boolean");
-  
-  if(!isLogical(Verbose))
-  error("verbose must be a boolean");
-  */
   
   bool verbose=Verbose[0];
   bool contrib_supp=contribution_supp[0];
@@ -2218,46 +1404,6 @@ LogicalVector contribution_supp, LogicalVector typicality_supp, LogicalVector Ve
   TwoD CurIndex(nb_col,vector<double> (nb_col));
 
   
-  /*double **CurIndex = new double*[nb_col];
-  for(i=0;i<nb_col;i++)
-  CurIndex[i] = new double[nb_col];
-  
-  double *similarity_mat=REAL(similarity_matrix);
-  double *mat_val=REAL(matrix_values);
-  
-  
-  double **Index_simi= new double*[nb_col];
-  for(i=0;i<nb_col;i++)
-  Index_simi[i] = new double[nb_col];
-  
-  double **mat_values= new double*[nb_row];
-  for(i=0;i<nb_row;i++)
-  mat_values[i] = new double[nb_col];
-  
-  
-  //to test how to get data for the matrix and put data into Index
-  for(i=0;i<nb_col;i++) {
-    for(j=0;j<nb_col;j++) {
-      Index_simi[i][j]=similarity_mat[j*nb_col+i];  //element in the matrix seems to be transposed
-    }
-  }
-  
-  
-  for(i=0;i<nb_row;i++) {
-    for(j=0;j<nb_col;j++) {
-      mat_values[i][j]=mat_val[j*nb_row+i];  //element in the matrix seems to be transposed
-    }
-  }
-  */
-  
-  //for(i=0;i<nb_row;i++) {
-  //for(j=0;j<nb_col;j++) {
-  //printf("%f ",mat_values[i][j]);
-  //}
-  //printf("\n");
-  //}
-  
-  
   
   
   do
@@ -2273,9 +1419,6 @@ LogicalVector contribution_supp, LogicalVector typicality_supp, LogicalVector Ve
         for (j=1;j<=tabe[u];j++)
         for (k=1;k<=tabe[v];k++)
         {
-          //if(u>=nb_col ||j>=nb_col || v>=nb_col || k>=nb_col)
-          //cout<<"PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPBBBBBBBBBBBB"<<endl;
-          
           double t=Index_simi[taby[u][j]][taby[v][k]];  
           if (max<t) max=t;
           t=pow(max,tabe[u]);
@@ -2379,8 +1522,6 @@ LogicalVector contribution_supp, LogicalVector typicality_supp, LogicalVector Ve
           
           r--;
           for (k=j+1;k<=j+tabe[u] ;k++) {
-            //if(x>=nb_col ||k>=nb_col || u>=nb_col || k-j>=nb_col)
-            //  cout<<"PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPBBBBBBBBBBBB22222 "<<j<<" "<<x<<" "<<k<<" "<<u<<" "<<k-j<<endl;
             taby[x][k]=taby[u][k-j];
           }
           j=j+tabe[u];
@@ -2412,7 +1553,6 @@ LogicalVector contribution_supp, LogicalVector typicality_supp, LogicalVector Ve
       string_level[f]=new char[strlen(cl[x])+3];
       strcpy(string_level[f],cl[x]);
       
-      //os<<Classification<<(f+1)<<" : "<<cl[x]<<Similarity<<max<<"\r\n\r\n";
       f++;
       
       
@@ -2501,45 +1641,6 @@ LogicalVector contribution_supp, LogicalVector typicality_supp, LogicalVector Ve
   
   
   
-  /*
-  SEXP results = PROTECT(allocVector(VECSXP, 5));
-  SEXP listClasses = PROTECT(allocVector(VECSXP, 2));
-  SET_VECTOR_ELT(listClasses, 0, mkString(chc));
-  SET_VECTOR_ELT(listClasses, 1, mkString(chl));
-  SET_VECTOR_ELT(results, 0, listClasses);
-  
-  SEXP Rtabo = PROTECT(allocVector(INTSXP, f));
-  for(i=0;i<f;i++)
-  INTEGER(Rtabo)[i]=tabo[i]+1;  //+1 because in R indexes start at 1
-  SET_VECTOR_ELT(results, 1, Rtabo);
-  
-  SEXP Rtabz = PROTECT(allocVector(INTSXP, f));
-  for(i=0;i<f;i++)
-  INTEGER(Rtabz)[i]=tabz[i]+1;  //idem
-  SET_VECTOR_ELT(results, 2, Rtabz);
-  
-  
-  SEXP RnbLevel=PROTECT(allocVector(INTSXP, 1));
-  INTEGER(RnbLevel)[0] = f;
-  SET_VECTOR_ELT(results, 3, RnbLevel);
-  
-  SEXP Rsignificant_nodes=PROTECT(allocVector(INTSXP, nb_col));
-  for(i=0;i<nb_col;i++)
-  INTEGER(Rsignificant_nodes)[i]=significant_nodes[i];
-  
-  SET_VECTOR_ELT(results, 4, Rsignificant_nodes);
-  
-  
-  UNPROTECT(6); 
-  */
-  
-  
-//  for(i=0;i<nb_col;i++)
-//  delete []Index_simi[i];
-//  delete []Index_simi;
-//  for(i=0;i<nb_col;i++)
-//  delete []CurIndex[i];
-//  delete []CurIndex;
   
   delete []AlreadyInClasse;
   delete []Terminal;

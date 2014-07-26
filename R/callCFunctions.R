@@ -61,8 +61,6 @@ callSimilarityComputation <- function(similarity_matrix,list.occurrences.variabl
 callHierarchyComputation <- function(cohesion_matrix,list.occurrences.variables,
                                      supplementary.variables,matrix.values,contribution.supp, typicality.supp,verbose)  {
   
-  #.Call("hierarchy", cohesion_matrix,list.occurrences.variables,supplementary.variables,matrix.values,
-  #      contribution.supp, typicality.supp,verbose)  
   .Call("rchic_hierarchy", cohesion_matrix,list.occurrences.variables,supplementary.variables,matrix.values,
         contribution.supp, typicality.supp,verbose)  
 }
@@ -82,7 +80,6 @@ callHierarchyComputation <- function(cohesion_matrix,list.occurrences.variables,
 
 callDynamicCloud <- function(vector, nb.partitions)  {
   
-  #.Call("dynamic_cloud", vector, nb.partitions)  
   .Call("rchic_dynamic_cloud", vector, nb.partitions)  
 }
 
@@ -103,8 +100,6 @@ callWriteTransactions <- function(data)  {
   M=as.matrix(data[,-1])
   #be sure that we have numeric
   storage.mode(M)<-"numeric"
-  
-  #.Call('write_transactions', M)  
   .Call('rchic_write_transactions', M)  
 }
 
