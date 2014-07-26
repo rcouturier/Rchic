@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
+#include <cstring>
 #include <math.h>
 #include <R.h>
 #include <Rinternals.h>
@@ -147,286 +148,6 @@ extern "C"{
   {
     if(b>=a) return 0.5+a/2+log((b-a)/5+1);
     else return 0.5-a/2+b*exp(b-a);
-  }
-  
-  
-  void contributiveCategories(SEXP supplementary_variables,double **index_simi,int nb_levels,
-  int* GenPairX, int* GenPairY, int *LevelX, int* LevelY, double **matrix_values, 
-  int Typi, int nb_col, int nb_row, SEXP individuals, char** string_level, bool hierarchy, bool verbose)
-  {
-    
-    
-    int i,j;
-    
-    //nb of supplementary variables
-    int nb_comp_var=INTEGER(getAttrib(supplementary_variables, R_DimSymbol))[1];
-    
-    SEXP list_names=getAttrib(supplementary_variables, R_DimNamesSymbol);
-    SEXP supp_variables= VECTOR_ELT(list_names, 1);
-    
-    
-    
-    //get supp variables    
-    char **supplementary_variable=new char*[nb_comp_var];
-    for(i=0;i<nb_comp_var;i++) {
-      supplementary_variable[i]=new char[strlen(CHAR(STRING_ELT(supp_variables, i)))+5];
-      strncpy(supplementary_variable[i],CHAR(STRING_ELT(supp_variables, i)),strlen(CHAR(STRING_ELT(supp_variables, i)))-2);
-      supplementary_variable[i][strlen(CHAR(STRING_ELT(supp_variables, i)))-2]='\0';
-    }
-    
-    
-    //get supp values
-    double **supplementary_values= new double*[nb_row];
-    for(i=0;i<nb_row;i++) {
-      supplementary_values[i] = new double[nb_comp_var];
-    }
-    double *sup_val=REAL(supplementary_variables);
-    
-    for(i=0;i<nb_row;i++) {
-      for(j=0;j<nb_comp_var;j++) {
-        supplementary_values[i][j]=sup_val[j*nb_row+i];  //element in the matrix seems to be transposed
-      }
-    }
-    
-    
-    
-    int k,nb,l;
-    for(nb=0;nb<nb_levels;nb++)
-    {
-      
-      
-      int *level=new int[nb_col];
-      
-      
-      
-      
-      double *ImpliVector = new double [nb_col];
-      
-      
-      double *Contrib = new double[nb_row];
-      double *Contrib_copy = new double[nb_row];
-      int *Contrib_index = new int[nb_row];
-      
-      
-      
-      int nb_sub_level=0;
-      //compute the sub-levels involved
-      LevelInConstitution(level,nb_sub_level,nb, LevelX, LevelY);
-      sort(level,level+nb_sub_level);
-      
-      if(Typi)
-      cout<<"Typicality to the sublevels: ";
-      else
-      cout<<"Contribution to the sublevels: ";
-      cout<<string_level[nb]<<" with classes at levels ";
-      for(int i=0;i<nb_sub_level;i++) {
-        cout<<level[i]+1<<" ";
-      }
-      cout<<endl;
-      
-      for(int i=0;i<nb_sub_level;i++) {
-        ImpliVector[level[i]]=index_simi[GenPairX[i]][GenPairY[i]];
-      }
-      
-      
-      
-      if(Typi)
-      {
-        for(i=0;i<nb_row;i++)
-        {
-          double cont=0;
-          for(j=0;j<nb_sub_level;j++)
-          {
-            double a=matrix_values[i][GenPairX[level[j]]];
-            double b=matrix_values[i][GenPairY[level[j]]];
-            double phi;
-            if(hierarchy) {
-              phi=FormImpli(a,b); 
-            }
-            else {
-              phi=a*b;
-            }
-            if (ImpliVector[level[j]]==1) 
-            ImpliVector[level[j]]=0.999999999999;
-            cont+=pow(ImpliVector[level[j]]-phi,2)/(1-ImpliVector[level[j]]);
-          }
-          cont=pow(1./(double)nb_sub_level*cont,0.5);
-          Contrib[i]=cont;
-        }
-        double max=0;
-        for(i=0;i<nb_row;i++) {
-          if(max<Contrib[i])
-          max=Contrib[i];
-        }
-        for(i=0;i<nb_row;i++) {
-          Contrib[i]=(max-Contrib[i])/max;
-        }
-      }
-      else
-      {
-        for(i=0;i<nb_row;i++)
-        {
-          l=0;
-          double Cont=0;
-          for(j=0;j<nb_sub_level;j++)
-          {
-            double a=matrix_values[i][GenPairX[level[j]]];
-            double b=matrix_values[i][GenPairY[level[j]]];
-            double phi;
-            if(hierarchy) {
-              phi=FormImpli(a,b); 
-            }
-            else {
-              phi=a*b;
-            }
-            Cont+=pow(1-phi,2);
-            l++;
-          }
-          Contrib[i]=1-sqrt(1./(double)nb_sub_level*Cont);
-        }
-      }
-      
-      
-      
-      
-      typedef vector<pair<double, int>>::const_iterator myiter;
-      vector<pair<double, int> > order(nb_row);
-      
-      
-      
-      for(i=0;i<nb_row;i++) 
-      {
-        order[i]=make_pair(Contrib[i],i);
-      }
-      
-      //sort the elements, we need the ordering of the individuals with their contribution
-      sort(order.begin(), order.end(), ordering());
-      
-      i=0;
-      for (myiter it=order.begin(); it!=order.end(); ++it) {
-        //cout << get<0>(*it) << ' '<<get<1>(*it) << ' '<<endl;
-        Contrib_copy[i]=get<0>(*it);
-        Contrib_index[i]=get<1>(*it);
-        i++;
-      }
-      
-      
-      
-      double GroupValue = Contrib_copy[nb_row-1];
-      double MiddleContrib=0;
-      for(i=0;i<nb_row;i++) MiddleContrib+=Contrib[i];
-      MiddleContrib=MiddleContrib/(double)nb_row;
-      
-      i=1;
-      double NewExplainedVariance;
-      double ExplainedVariance=i/(double)(nb_row-i)*(GroupValue-MiddleContrib)*(GroupValue-MiddleContrib);
-      int OptimalGroup=nb_row-1;
-      
-      i=2;
-      GroupValue=GroupValue+1/(double)i*(Contrib_copy[nb_row-i]-GroupValue);
-      NewExplainedVariance=i/(double)(nb_row-i)*(GroupValue-MiddleContrib)*(GroupValue-MiddleContrib);
-      while(NewExplainedVariance>=ExplainedVariance)
-      {
-        OptimalGroup--;
-        ExplainedVariance=NewExplainedVariance;
-        i+=1;
-        GroupValue=GroupValue+1/(double)i*(Contrib_copy[nb_row-i]-GroupValue);
-        NewExplainedVariance=i/(double)(nb_row-i)*(GroupValue-MiddleContrib)*(GroupValue-MiddleContrib);
-      }
-      if(verbose)
-      {
-        
-        cout<<"Optimal group"<<endl;
-        for(i=OptimalGroup;i<nb_row;i++) 
-        {
-          if((i-OptimalGroup-1)%11==10) cout<<endl;
-          cout<<CHAR(STRING_ELT(individuals, Contrib_index[i]))<<" ";
-          
-          
-        }
-        cout<<endl;
-      }
-      
-      
-      double inter;
-      int n0=nb_row-OptimalGroup;
-      double p=(double)n0/(double)nb_row;
-      double un_p=1.-p;
-      double proba;
-      double min=999;
-      int index=0;
-      double occ;
-      
-      int l;
-      if (verbose) {
-        cout<<"card GO "<<n0<<"\t p "<<p<<"\t 1-p "<<un_p<<endl;
-      }
-      for(j=0;j<nb_comp_var;j++)
-      {
-        inter=0;
-        proba=0;
-        ///////WARNING if inter is not an integer... what happens
-        for(i=OptimalGroup;i<nb_row;i++)  {
-          inter+=supplementary_values[Contrib_index[i]][j];
-        }
-        //////////WARNING in CHIC the computation of the hierarchy is done with that.... A bug? probably
-        //for(i=OptimalGroup;i<nb_row;i++) 
-        //if(supplementary_values[Contrib_index[i]][j]==1)
-        //inter++;
-        
-        occ=0;
-        for(k=0;k<nb_row;k++)
-        occ+=supplementary_values[k][j];
-        
-        
-        if(occ*p*un_p<=10. &&  occ-inter<50)
-        {
-          for(k=inter+1;k<=occ;k++)
-          {
-            //long double combi=Fact_div((int)occ,k)*1/Fact((int)occ-k);
-            long double combi=Cnp((int)occ,k);
-            proba+=combi*pow(p,k)*pow(un_p,occ-k);
-          }
-        }
-        else
-        {
-          double ecart_type=sqrt(occ*p*un_p);
-          double moy=occ*p;
-          proba=1.-Normal((inter-moy)/ecart_type);
-        }
-        cout<<"The variable "<<supplementary_variable[j];
-        if(Typi)
-        cout<<" is typical to this class with a risk of "<<proba<<endl;
-        else
-        cout<<" contributes to this class with a risk of "<<proba<<endl;
-        if(verbose)
-        {
-          cout<<"intersection with the optimal group ";
-          cout<<inter<<endl;
-        }
-        if(min>proba)
-        {
-          index=j;
-          min=proba;
-        }
-        //return;
-      }
-      if(Typi)
-      cout<<endl<<"The most typical variable is "<<supplementary_variable[index];
-      else
-      cout<<endl<<"The most contributive variable is "<<supplementary_variable[index];
-      
-      cout<<" with a risk of "<<min<<endl<<endl;
-      
-      
-      
-      delete []level;
-      delete []ImpliVector;
-      delete []Contrib;
-      delete []Contrib_copy;
-      delete []Contrib_index;
-    }
-    
   }
   
   
@@ -1521,11 +1242,316 @@ bool verbose)
 
 
 
+  void contributiveCategories(NumericMatrix supplementary_variables,TwoD &index_simi,int nb_levels,
+  int* GenPairX, int* GenPairY, int *LevelX, int* LevelY, TwoD& matrix_values, 
+  int Typi, int nb_col, int nb_row, List individuals, char** string_level, bool hierarchy, bool verbose)
+  {
+    
+    
+    int i,j;
+    
+    //nb of supplementary variables
+  
+  List list_names=supplementary_variables.attr("dimnames");
+  List supplementary_variable=list_names[1];
+  
+  int nb_comp_var=supplementary_variable.size();
+    
+  vector<string>   supp_var(nb_comp_var);
+    
+    for(int i=0;i<nb_comp_var;i++) {
+      string v=supplementary_variable[i];
+      int len=strlen(v.c_str())-2;
+      string v2(v,0,len);
+      //string v2(v.c_str(),0,strlen(v)-2);
+      //std::strncpy(v2,v,strlen(v)-2);
+      supp_var[i]=v2;
+    }
+    
+    //SEXP list_names=getAttrib(supplementary_variables, R_DimNamesSymbol);
+    //SEXP supp_variables= VECTOR_ELT(list_names, 1);
+    
+    
+  /*  
+    //get supp variables    
+    char **supplementary_variable=new char*[nb_comp_var];
+    for(i=0;i<nb_comp_var;i++) {
+      supplementary_variable[i]=new char[strlen(CHAR(STRING_ELT(supp_variables, i)))+5];
+      strncpy(supplementary_variable[i],CHAR(STRING_ELT(supp_variables, i)),strlen(CHAR(STRING_ELT(supp_variables, i)))-2);
+      supplementary_variable[i][strlen(CHAR(STRING_ELT(supp_variables, i)))-2]='\0';
+    }
+    
+    
+    //get supp values
+    double **supplementary_values= new double*[nb_row];
+    for(i=0;i<nb_row;i++) {
+      supplementary_values[i] = new double[nb_comp_var];
+    }
+    double *sup_val=REAL(supplementary_variables);
+    
+    for(i=0;i<nb_row;i++) {
+      for(j=0;j<nb_comp_var;j++) {
+        supplementary_values[i][j]=sup_val[j*nb_row+i];  //element in the matrix seems to be transposed
+      }
+    }
+    */
+  
+  TwoD supplementary_values(nb_row,vector<double> (nb_comp_var));
+  
+  for(int i=0;i<nb_row;i++)
+    for(int j=0;j<nb_comp_var;j++) {
+      supplementary_values[i][j]=supplementary_variables(i,j);
+    }
+
+  
+    
+    int k,nb,l;
+    for(nb=0;nb<nb_levels;nb++)
+    {
+      
+      
+      int *level=new int[nb_col];
+      
+      
+      
+      
+      double *ImpliVector = new double [nb_col];
+      
+      
+      double *Contrib = new double[nb_row];
+      double *Contrib_copy = new double[nb_row];
+      int *Contrib_index = new int[nb_row];
+      
+      
+      
+      int nb_sub_level=0;
+      //compute the sub-levels involved
+      LevelInConstitution(level,nb_sub_level,nb, LevelX, LevelY);
+      sort(level,level+nb_sub_level);
+      
+      if(Typi)
+      cout<<"Typicality to the sublevels: ";
+      else
+      cout<<"Contribution to the sublevels: ";
+      cout<<string_level[nb]<<" with classes at levels ";
+      for(int i=0;i<nb_sub_level;i++) {
+        cout<<level[i]+1<<" ";
+      }
+      cout<<endl;
+      
+      for(int i=0;i<nb_sub_level;i++) {
+        ImpliVector[level[i]]=index_simi[GenPairX[i]][GenPairY[i]];
+      }
+      
+      
+      
+      if(Typi)
+      {
+        for(i=0;i<nb_row;i++)
+        {
+          double cont=0;
+          for(j=0;j<nb_sub_level;j++)
+          {
+            double a=matrix_values[i][GenPairX[level[j]]];
+            double b=matrix_values[i][GenPairY[level[j]]];
+            double phi;
+            if(hierarchy) {
+              phi=FormImpli(a,b); 
+            }
+            else {
+              phi=a*b;
+            }
+            if (ImpliVector[level[j]]==1) 
+            ImpliVector[level[j]]=0.999999999999;
+            cont+=pow(ImpliVector[level[j]]-phi,2)/(1-ImpliVector[level[j]]);
+          }
+          cont=pow(1./(double)nb_sub_level*cont,0.5);
+          Contrib[i]=cont;
+        }
+        double max=0;
+        for(i=0;i<nb_row;i++) {
+          if(max<Contrib[i])
+          max=Contrib[i];
+        }
+        for(i=0;i<nb_row;i++) {
+          Contrib[i]=(max-Contrib[i])/max;
+        }
+      }
+      else
+      {
+        for(i=0;i<nb_row;i++)
+        {
+          l=0;
+          double Cont=0;
+          for(j=0;j<nb_sub_level;j++)
+          {
+            double a=matrix_values[i][GenPairX[level[j]]];
+            double b=matrix_values[i][GenPairY[level[j]]];
+            double phi;
+            if(hierarchy) {
+              phi=FormImpli(a,b); 
+            }
+            else {
+              phi=a*b;
+            }
+            Cont+=pow(1-phi,2);
+            l++;
+          }
+          Contrib[i]=1-sqrt(1./(double)nb_sub_level*Cont);
+        }
+      }
+      
+      
+      
+      
+      typedef vector<pair<double, int>>::const_iterator myiter;
+      vector<pair<double, int> > order(nb_row);
+      
+      
+      
+      for(i=0;i<nb_row;i++) 
+      {
+        order[i]=make_pair(Contrib[i],i);
+      }
+      
+      //sort the elements, we need the ordering of the individuals with their contribution
+      sort(order.begin(), order.end(), ordering());
+      
+      i=0;
+      for (myiter it=order.begin(); it!=order.end(); ++it) {
+        //cout << get<0>(*it) << ' '<<get<1>(*it) << ' '<<endl;
+        Contrib_copy[i]=get<0>(*it);
+        Contrib_index[i]=get<1>(*it);
+        i++;
+      }
+      
+      
+      
+      double GroupValue = Contrib_copy[nb_row-1];
+      double MiddleContrib=0;
+      for(i=0;i<nb_row;i++) MiddleContrib+=Contrib[i];
+      MiddleContrib=MiddleContrib/(double)nb_row;
+      
+      i=1;
+      double NewExplainedVariance;
+      double ExplainedVariance=i/(double)(nb_row-i)*(GroupValue-MiddleContrib)*(GroupValue-MiddleContrib);
+      int OptimalGroup=nb_row-1;
+      
+      i=2;
+      GroupValue=GroupValue+1/(double)i*(Contrib_copy[nb_row-i]-GroupValue);
+      NewExplainedVariance=i/(double)(nb_row-i)*(GroupValue-MiddleContrib)*(GroupValue-MiddleContrib);
+      while(NewExplainedVariance>=ExplainedVariance)
+      {
+        OptimalGroup--;
+        ExplainedVariance=NewExplainedVariance;
+        i+=1;
+        GroupValue=GroupValue+1/(double)i*(Contrib_copy[nb_row-i]-GroupValue);
+        NewExplainedVariance=i/(double)(nb_row-i)*(GroupValue-MiddleContrib)*(GroupValue-MiddleContrib);
+      }
+      if(verbose)
+      {
+        
+        cout<<"Optimal group"<<endl;
+        for(i=OptimalGroup;i<nb_row;i++) 
+        {
+          if((i-OptimalGroup-1)%11==10) cout<<endl;
+          string v=individuals[Contrib_index[i]];
+          cout<<v<<" ";
+          
+          
+        }
+        cout<<endl;
+      }
+      
+      
+      double inter;
+      int n0=nb_row-OptimalGroup;
+      double p=(double)n0/(double)nb_row;
+      double un_p=1.-p;
+      double proba;
+      double min=999;
+      int index=0;
+      double occ;
+      
+      int l;
+      if (verbose) {
+        cout<<"card GO "<<n0<<"\t p "<<p<<"\t 1-p "<<un_p<<endl;
+      }
+      for(j=0;j<nb_comp_var;j++)
+      {
+        inter=0;
+        proba=0;
+        ///////WARNING if inter is not an integer... what happens
+        for(i=OptimalGroup;i<nb_row;i++)  {
+          inter+=supplementary_values[Contrib_index[i]][j];
+        }
+        //////////WARNING in CHIC the computation of the hierarchy is done with that.... A bug? probably
+        //for(i=OptimalGroup;i<nb_row;i++) 
+        //if(supplementary_values[Contrib_index[i]][j]==1)
+        //inter++;
+        
+        occ=0;
+        for(k=0;k<nb_row;k++)
+        occ+=supplementary_values[k][j];
+        
+        
+        if(occ*p*un_p<=10. &&  occ-inter<50)
+        {
+          for(k=inter+1;k<=occ;k++)
+          {
+            //long double combi=Fact_div((int)occ,k)*1/Fact((int)occ-k);
+            long double combi=Cnp((int)occ,k);
+            proba+=combi*pow(p,k)*pow(un_p,occ-k);
+          }
+        }
+        else
+        {
+          double ecart_type=sqrt(occ*p*un_p);
+          double moy=occ*p;
+          proba=1.-Normal((inter-moy)/ecart_type);
+        }
+        string v=supp_var[j];
+        cout<<"The variable "<<v;
+        if(Typi)
+        cout<<" is typical to this class with a risk of "<<proba<<endl;
+        else
+        cout<<" contributes to this class with a risk of "<<proba<<endl;
+        if(verbose)
+        {
+          cout<<"intersection with the optimal group ";
+          cout<<inter<<endl;
+        }
+        if(min>proba)
+        {
+          index=j;
+          min=proba;
+        }
+        //return;
+      }
+      string v=supp_var[index];
+      if(Typi)
+      cout<<endl<<"The most typical variable is "<<v;
+      else
+      cout<<endl<<"The most contributive variable is "<<v;
+      
+      cout<<" with a risk of "<<min<<endl<<endl;
+      
+      
+      
+      delete []level;
+      delete []ImpliVector;
+      delete []Contrib;
+      delete []Contrib_copy;
+      delete []Contrib_index;
+    }
+    
+  }
+
 
 
 // [[Rcpp::export]]
 List hierarchy(NumericMatrix cohesion_matrix, NumericVector list_occurrences_variables, 
-List supplementary_variables, NumericMatrix matrix_values, 
+NumericMatrix supplementary_variables, NumericMatrix matrix_values, 
 LogicalVector contribution_supp, LogicalVector typicality_supp, LogicalVector Verbose) {
   
   
@@ -1646,11 +1672,11 @@ LogicalVector contribution_supp, LogicalVector typicality_supp, LogicalVector Ve
     Index_cohesion[i][j]=cohesion_matrix(i,j);
   }
   
-  TwoD matrix_val(nb_row,vector<double> (nb_col));
+  TwoD mat_values(nb_row,vector<double> (nb_col));
   
   for(int i=0;i<nb_row;i++)
   for(int j=0;j<nb_col;j++) {
-    matrix_val[i][j]=matrix_values(i,j);
+    mat_values[i][j]=matrix_values(i,j);
   }
   
   
@@ -1901,7 +1927,7 @@ LogicalVector contribution_supp, LogicalVector typicality_supp, LogicalVector Ve
   SignificantLevel(Index_cohesion, nb_col, Occurrences_variables,f,tabo,tabz,tabee,taby,significant_nodes,verbose);
   
   
-  /*
+  
   if(length(supplementary_variables)>0) {
   if(contrib_supp) {
   contributiveCategories(supplementary_variables,Index_cohesion,f,GenPairX,GenPairY,LevelX,LevelY,
@@ -1912,7 +1938,7 @@ LogicalVector contribution_supp, LogicalVector typicality_supp, LogicalVector Ve
   mat_values,1, nb_col, nb_row, individuals,string_level,true,verbose);   //false means hierarchy     1 means typicality
   } 
   }
-  */
+  
   
   List results(6);
   List listClasses(2);
@@ -2027,9 +2053,15 @@ LogicalVector contribution_supp, LogicalVector typicality_supp, LogicalVector Ve
 
 
 
+
+  
+  
+
+
+
 // [[Rcpp::export]]
 List similarity(NumericMatrix  similarity_matrix, NumericVector list_occurrences_variables, 
-List supplementary_variables, NumericMatrix matrix_values, 
+NumericMatrix supplementary_variables, NumericMatrix matrix_values, 
 LogicalVector contribution_supp, LogicalVector typicality_supp, LogicalVector Verbose) {
   
   /*
@@ -2176,11 +2208,11 @@ LogicalVector contribution_supp, LogicalVector typicality_supp, LogicalVector Ve
       Index_simi[i][j]=similarity_matrix(i,j);
     }
 
-  TwoD matrix_val(nb_row,vector<double> (nb_col));
+  TwoD mat_values(nb_row,vector<double> (nb_col));
   
   for(int i=0;i<nb_row;i++)
     for(int j=0;j<nb_col;j++) {
-      matrix_val[i][j]=matrix_values(i,j);
+      mat_values[i][j]=matrix_values(i,j);
     }
 
   TwoD CurIndex(nb_col,vector<double> (nb_col));
@@ -2426,7 +2458,7 @@ LogicalVector contribution_supp, LogicalVector typicality_supp, LogicalVector Ve
   //tabee=size_class
   //taby=classes_associated_with
   SignificantLevel(Index_simi, nb_col, Occurrences_variables,f,tabo,tabz,tabee,taby,significant_nodes,verbose);
-  /*
+  
   if(length(supplementary_variables)>0) {
     if(contrib_supp) {
       contributiveCategories(supplementary_variables,Index_simi,f,GenPairX,GenPairY,LevelX,LevelY,
@@ -2437,7 +2469,7 @@ LogicalVector contribution_supp, LogicalVector typicality_supp, LogicalVector Ve
       mat_values,1, nb_col, nb_row, individuals,string_level,false,verbose);   //false means similarity     1 means typicality
     }
   }
-  */
+  
   
   
   List results(5);
