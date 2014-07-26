@@ -37,7 +37,7 @@ callSimilarityComputation <- function(similarity_matrix,list.occurrences.variabl
                                       supplementary.variables,matrix.values,
                                       contribution.supp, typicality.supp,verbose)  {
     
-    .Call("similarity", similarity_matrix,list.occurrences.variables,supplementary.variables,matrix.values,
+    .Call("rchic_similarity", similarity_matrix,list.occurrences.variables,supplementary.variables,matrix.values,
           contribution.supp, typicality.supp, verbose)  
 }
 
