@@ -162,12 +162,12 @@ void write_transactions(NumericMatrix data) {
 
 //function to build the dynamic cloud to partition the data
 // [[Rcpp::export]]
-IntegerVector dynamic_cloud(NumericVector vector, IntegerVector number_partition) {
+IntegerVector dynamic_cloud(NumericVector data, IntegerVector number_partition) {
   
   if(length(number_partition)>1)
   throw std::range_error("number of partition must be a scalar");
   
-  int nb_elt=vector.size();
+  int nb_elt=data.size();
   
   int nb_partition=number_partition[0];
   cout<<nb_partition<<endl;
@@ -178,16 +178,16 @@ IntegerVector dynamic_cloud(NumericVector vector, IntegerVector number_partition
   //vector<double> myvector (v_data, v_data+nb_elt);
   
   
-  std::vector<double> copy_data(vector.size());
+  vector<double> copy_data(data.size());
   
-  for (int i=0;i<vector.size();i++){
-    copy_data[i]=vector[i];
+  for (int i=0;i<data.size();i++){
+    copy_data[i]=data[i];
   }
   
-  sort (vector.begin(), vector.end());
+  sort (data.begin(), data.end());
   
   i=0;
-  for (NumericVector::iterator it=vector.begin(); it!=vector.end(); ++it){
+  for (NumericVector::iterator it=data.begin(); it!=data.end(); ++it){
     cout<<*it<<endl;
     //v_data[i++]=*it;
   }
@@ -220,7 +220,7 @@ IntegerVector dynamic_cloud(NumericVector vector, IntegerVector number_partition
     {
       g[j]=0;
       for(k=start[j];k<=end[j];k++) {
-        g[j]+=vector[k];
+        g[j]+=data[k];
       }
       g[j]/=(end[j]-start[j]+1);
     }
@@ -232,7 +232,7 @@ IntegerVector dynamic_cloud(NumericVector vector, IntegerVector number_partition
       
       for(j=0;j<nb_partition;j++)
       {
-        exp=pow(g[j]-vector[k],2);
+        exp=pow(g[j]-data[k],2);
         
         if(min>exp)
         {
@@ -254,8 +254,8 @@ IntegerVector dynamic_cloud(NumericVector vector, IntegerVector number_partition
   cout<<endl<<"Optimal Parameters"<<endl;
   for(j=0;j<nb_partition;j++)
   {
-    val_start[j]=vector[start[j]];
-    val_end[j]=vector[end[j]];
+    val_start[j]=data[start[j]];
+    val_end[j]=data[end[j]];
     cout<<"From "<<val_start[j]<<" To "<<val_end[j]<<endl;
   }
   
@@ -568,8 +568,8 @@ bool verbose)
 
 
 void contributiveCategories(NumericMatrix supplementary_variables,TwoDdouble &index_simi,int nb_levels,
-int* GenPairX, int* GenPairY, vector<int>& LevelX, vector<int>& LevelY, TwoDdouble& matrix_values, 
-int Typi, int nb_col, int nb_row, List individuals, char** string_level, bool hierarchy, bool verbose)
+vector<int>& GenPairX, vector<int>& GenPairY, vector<int>& LevelX, vector<int>& LevelY, TwoDdouble& matrix_values, 
+int Typi, int nb_col, int nb_row, List individuals, vector<string>& string_level, bool hierarchy, bool verbose)
 {
   
   
@@ -901,17 +901,20 @@ LogicalVector contribution_supp, LogicalVector typicality_supp, LogicalVector Ve
   
   
   
+  vector<string> cc(nb_col);
+  vector<string> cl(nb_col);
+  //char **cc=new char*[nb_col];
+  //char **cl=new char*[nb_col];
+  //char **string_level=new char*[nb_col];
+  vector<string> string_level(nb_col);
   
-  char **cc=new char*[nb_col];
-  char **cl=new char*[nb_col];
-  char **string_level=new char*[nb_col];
   vector<int> significant_nodes(nb_col);
   for(i=0;i<nb_col;i++) 
   {
-    cc[i]=0;
-    cl[i]=0;
-    significant_nodes[i]=0;
-    string_level[i]=0;
+    //cc[i]="";
+    //cl[i]=0;
+    //significant_nodes[i]=0;
+    //string_level[i]=0;
   }
   
   for (i=0;i<nb_col;i++)
@@ -919,11 +922,13 @@ LogicalVector contribution_supp, LogicalVector typicality_supp, LogicalVector Ve
     classes_associated_with[i][1]=i;
     size_class[i]=1;
     int length=strlen(variables[i]);
-    cc[i]=new char[10];  //it is only to have the number of the variable
-    cl[i]=new char[length+1];
-    sprintf(cc[i],"%i",i+1);
+    //cc[i]=new char[10];  //it is only to have the number of the variable
+    //cl[i]=new char[length+1];
+    //sprintf(cc[i],"%i",i+1);
+    cc[i]= to_string(i+1);
     string v=variables[i];
-    sprintf(cl[i],"%s", (char*)v.c_str());
+    //sprintf(cl[i],"%s", (char*)v.c_str());
+    cl[i]=v.c_str();
   }
   
   int r=nb_col;
@@ -931,13 +936,12 @@ LogicalVector contribution_supp, LogicalVector typicality_supp, LogicalVector Ve
   
   
   
-  int *AlreadyInClasse = new int[nb_col];
+  vector<int> AlreadyInClasse(nb_col);
   for(i=0;i<nb_col;i++) AlreadyInClasse[i]=-999999;
   
-  int  *GenPairX = new int[nb_col];
-  int  *GenPairY = new int[nb_col];
-  
-  int	*Terminal = new int[nb_col];
+  vector<int> GenPairX(nb_col);
+  vector<int> GenPairY(nb_col);
+  vector<int> Terminal(nb_col);
   for(i=0;i<nb_col;i++) Terminal[i]=1;
   
   
@@ -1077,22 +1081,31 @@ LogicalVector contribution_supp, LogicalVector typicality_supp, LogicalVector Ve
       Terminal[y]=0;
       GenericPair(x,y,size_class[x],size_class[y],GenPairX[f],GenPairY[f],Index_cohesion,classes_associated_with);
       size_class[x]=size_class[x]+size_class[u];
-      char * new_s = new char[strlen(cc[x])+2+strlen(cc[u])];
-      strcpy(new_s,cc[x]);
-      strcat(new_s," ");    //espace entre les 2 chaines
-      strcat(new_s,cc[u]);
-      delete []cc[u];
-      cc[u]=NULL;
-      delete []cc[x];
-      cc[x]=new_s;
-      char * new_s2 = new char[strlen(cl[x])+2+strlen(cl[u])];
-      strcpy(new_s2,cl[x]);
-      strcat(new_s2," ");    //espace entre les 2 chaines
-      strcat(new_s2,cl[u]);
-      delete []cl[u];
-      cl[u]=NULL;
-      delete []cl[x];
-      cl[x]=new_s2;
+      //char * new_s = new char[strlen(cc[x])+2+strlen(cc[u])];
+      //strcpy(new_s,cc[x]);
+      //strcat(new_s," ");    //espace entre les 2 chaines
+      //strcat(new_s,cc[u]);
+      ostringstream stringStream;
+      stringStream << cc[x]<<" "<<cc[u];
+      cc[x] = stringStream.str();
+      //delete []cc[u];
+      //cc[u]=NULL;
+      cc[u]="";
+      
+      //delete []cc[x];
+      //cc[x]=new_s;
+      //char * new_s2 = new char[strlen(cl[x])+2+strlen(cl[u])];
+      //strcpy(new_s2,cl[x]);
+      //strcat(new_s2," ");    //espace entre les 2 chaines
+      //strcat(new_s2,cl[u]);
+      //delete []cl[u];
+      //cl[u]=NULL;
+      //delete []cl[x];
+      //cl[x]=new_s2;
+      ostringstream stringStream2;
+      stringStream2 << cl[x]<<" "<<cl[u];
+      cl[x] = stringStream2.str();
+      cl[u]="";
       
       r=r-1;
       for (k=j+1;k<=j+size_class[u];k++)
@@ -1106,23 +1119,34 @@ LogicalVector contribution_supp, LogicalVector typicality_supp, LogicalVector Ve
       variable_left[f]=classes_associated_with[x][1];
       variable_right[f]=classes_associated_with[x][size_class[x]];
       size_classe[f]=size_class[x];
-      char *new_s=new char[strlen(cc[x])+3];  //3 a cause des ()
-      char *new_s2=new char[strlen(cl[x])+3];
+      //char *new_s=new char[strlen(cc[x])+3];  //3 a cause des ()
+      //char *new_s2=new char[strlen(cl[x])+3];
       //wsprintf(new_s,"(%s)",cc[x]);         //on met la classe formée entre ()
-      strcpy(new_s,"(");
-      strcat(new_s,cc[x]);    //espace entre les 2 chaines
-      strcat(new_s,")");
-      delete []cc[x];
-      cc[x]=new_s;
-      strcpy(new_s2,"(");
-      strcat(new_s2,cl[x]);    //espace entre les 2 chaines
-      strcat(new_s2,")");
-      delete []cl[x];
-      cl[x]=new_s2;
+      //strcpy(new_s,"(");
+      //strcat(new_s,cc[x]);    //espace entre les 2 chaines
+      //strcat(new_s,")");
+      //delete []cc[x];
+      //cc[x]=new_s;
+      ostringstream stringStream;
+      stringStream << "(" << cc[x] << ")";
+      cc[x] = stringStream.str();
+      
+      
+      //strcpy(new_s2,"(");
+      //strcat(new_s2,cl[x]);    //espace entre les 2 chaines
+      //strcat(new_s2,")");
+      //delete []cl[x];
+      //cl[x]=new_s2;
+      ostringstream stringStream2;
+      stringStream2 << "(" << cl[x] << ")";
+      cl[x] = stringStream2.str();
+      
       double a=Cohesion_classX(x,size_class[x],Index_cohesion,classes_associated_with);
-      Rprintf("Classification %d : %s  Cohesion %f\n",(f+1),cl[x],a);
-      string_level[f]=new char[strlen(cl[x])+3];
-      strcpy(string_level[f],cl[x]);
+      //Rprintf("Classification %d : %s  Cohesion %f\n",(f+1),cl[x],a);
+      cout<<"Classification "<<f+1<<" : "<<cl[x]<<" Cohesion "<<a<<endl;
+      //string_level[f]=new char[strlen(cl[x])+3];
+      //strcpy(string_level[f],cl[x]);
+      string_level[f]=cl[x];
       //tab_cohe[f]=a;
       if (max) f++;
       
@@ -1137,32 +1161,39 @@ LogicalVector contribution_supp, LogicalVector typicality_supp, LogicalVector Ve
   
   j=0;
   k=0;
-  for(i=0;i<nb_col;i++)
-  {
-    if(cc[i]) j+=strlen(cc[i])+1;
-  }
-  for(i=0;i<nb_col;i++)
-  {
-    if(cc[i]) k+=strlen(cl[i])+1;
-  }
+//  for(i=0;i<nb_col;i++)
+//  {
+//    if(cc[i]) j+=strlen(cc[i])+1;
+//  }
+//  for(i=0;i<nb_col;i++)
+//  {
+//    if(cl[i]) k+=strlen(cl[i])+1;
+//  }
   
-  char *chc=new char[j+1];
-  chc[0]='\0';
-  char *chl=new char[k+1];
-  chl[0]='\0';
+  ostringstream stringStream;
+  ostringstream stringStream2;
+  
+ 
+  
+//  char *chc=new char[j+1];
+//  chc[0]='\0';
+//  char *chl=new char[k+1];
+//  chl[0]='\0';
   for(i=0;i<nb_col;i++)
   {
     if(size_class[i])
     {
-      strcat(chc,cc[i]);
-      strcat(chc," ");
-      strcat(chl,cl[i]);
-      strcat(chl," ");
-      
+//      strcat(chc,cc[i]);
+//      strcat(chc," ");
+      stringStream << cc[i]<<" ";
+//      strcat(chl,cl[i]);
+//      strcat(chl," ");
+      stringStream2 << cl[i]<<" ";
     }
   }
   
-  
+  string chc = stringStream.str(); 
+  string chl = stringStream2.str(); 
   
   
   
@@ -1216,20 +1247,18 @@ LogicalVector contribution_supp, LogicalVector typicality_supp, LogicalVector Ve
   
   
   
-  delete []AlreadyInClasse;
   
-  delete []Terminal;
-  for(i=0;i<nb_col;i++)
-  if(cl[i]) delete []cl[i];
-  delete []cl;
-  for(i=0;i<nb_col;i++)
-  if(cc[i]) delete []cc[i];
-  delete []cc;
-  for(i=0;i<nb_col;i++)
-  if(string_level[i]) delete []string_level[i];
   
-  delete []GenPairX;
-  delete []GenPairY;
+  
+//  for(i=0;i<nb_col;i++)
+//  if(cl[i]) delete []cl[i];
+//  delete []cl;
+//  for(i=0;i<nb_col;i++)
+//  if(cc[i]) delete []cc[i];
+//  delete []cc;
+//  for(i=0;i<nb_col;i++)
+//  if(string_level[i]) delete []string_level[i];
+  
   return results;
   
   
@@ -1314,17 +1343,19 @@ LogicalVector contribution_supp, LogicalVector typicality_supp, LogicalVector Ve
   
   
   //return(R_NilValue);
-  
-  char **cc=new char*[nb_col];
-  char **cl=new char*[nb_col];
+  vector<string> cc(nb_col);
+  vector<string> cl(nb_col);
+  //char **cc=new char*[nb_col];
+  //char **cl=new char*[nb_col];
   vector<int> significant_nodes(nb_col);
-  char **string_level = new char*[nb_col];
+  vector<string> string_level(nb_col);
+  //char **string_level = new char*[nb_col];
   for(i=0;i<nb_col;i++) 
   {
-    cc[i]=0;
-    cl[i]=0;
-    significant_nodes[i]=0;
-    string_level[i]=0;
+//    cc[i]=0;
+//    cl[i]=0;
+//    significant_nodes[i]=0;
+//    string_level[i]=0;
   }
   
   
@@ -1332,12 +1363,14 @@ LogicalVector contribution_supp, LogicalVector typicality_supp, LogicalVector Ve
   {
     classes_associated_with[i][1]=i;
     size_class[i]=1;
-    int length=strlen(variables[i]);
-    cc[i]=new char[10];  //it is only to have the number of the variable
-    cl[i]=new char[length+1];
-    sprintf(cc[i],"%i",i+1);
+    //int length=strlen(variables[i]);
+    //cc[i]=new char[10];  //it is only to have the number of the variable
+    //cl[i]=new char[length+1];
+    //sprintf(cc[i],"%i",i+1);
+    cc[i]=to_string(i+1);
     string v=variables[i];
-    sprintf(cl[i],"%s", (char*)v.c_str());
+    //sprintf(cl[i],"%s", (char*)v.c_str());
+    cl[i]=v.c_str();
   }
   
   int r=nb_col;
@@ -1346,13 +1379,13 @@ LogicalVector contribution_supp, LogicalVector typicality_supp, LogicalVector Ve
   
   
   
-  int *AlreadyInClasse = new int[nb_col];
+  vector<int> AlreadyInClasse(nb_col);
   for(i=0;i<nb_col;i++) AlreadyInClasse[i]=-999999;
   
-  int  *GenPairX = new int[nb_col];
-  int  *GenPairY = new int[nb_col];
+  vector<int> GenPairX(nb_col);
+  vector<int> GenPairY(nb_col);
   
-  int	*Terminal = new int[nb_col];
+  vector<int>	Terminal(nb_col);
   for(i=0;i<nb_col;i++) Terminal[i]=1;
   
   
@@ -1481,23 +1514,30 @@ LogicalVector contribution_supp, LogicalVector typicality_supp, LogicalVector Ve
           
           level[u]=f;
           size_class[x]=size_class[x]+size_class[u];
-          char * new_s = new char[strlen(cc[x])+2+strlen(cc[u])];
-          strcpy(new_s,cc[x]);
-          strcat(new_s," ");    //espace entre les 2 chaines
-          strcat(new_s,cc[u]);
-          delete []cc[u];
-          cc[u]=0;
-          delete []cc[x];
-          cc[x]=new_s;
-          char * new_s2 = new char[strlen(cl[x])+2+strlen(cl[u])];
-          strcpy(new_s2,cl[x]);
-          strcat(new_s2," ");    //espace entre les 2 chaines
-          strcat(new_s2,cl[u]);
-          delete []cl[u];
-          cl[u]=NULL;
-          delete []cl[x];
-          cl[x]=new_s2;
-          
+//          char * new_s = new char[strlen(cc[x])+2+strlen(cc[u])];
+//          strcpy(new_s,cc[x]);
+//          strcat(new_s," ");    //espace entre les 2 chaines
+//          strcat(new_s,cc[u]);
+//          delete []cc[u];
+//          cc[u]=0;
+//          delete []cc[x];
+//          cc[x]=new_s;
+//          char * new_s2 = new char[strlen(cl[x])+2+strlen(cl[u])];
+//          strcpy(new_s2,cl[x]);
+//          strcat(new_s2," ");    //espace entre les 2 chaines
+//          strcat(new_s2,cl[u]);
+//          delete []cl[u];
+//          cl[u]=NULL;
+//          delete []cl[x];
+//          cl[x]=new_s2;
+          ostringstream stringStream;
+          stringStream << cc[x]<<" "<<cc[u];
+          cc[x] = stringStream.str();
+          cc[u]="";
+          ostringstream stringStream2;
+          stringStream2 << cl[x]<<" "<<cl[u];
+          cl[x] = stringStream2.str();
+          cl[u]="";
           r--;
           for (k=j+1;k<=j+size_class[u] ;k++) {
             classes_associated_with[x][k]=classes_associated_with[u][k-j];
@@ -1512,25 +1552,33 @@ LogicalVector contribution_supp, LogicalVector typicality_supp, LogicalVector Ve
       Rprintf("Level %d variable_left %d variable_right %d\n",f,variable_left[f],variable_right[f]);
       size_classe[f]=size_class[x];			
       
-      char *new_s=new char[strlen(cc[x])+3];  //3 a cause des ()
-      char *new_s2=new char[strlen(cl[x])+3];
+//      char *new_s=new char[strlen(cc[x])+3];  //3 a cause des ()
+//      char *new_s2=new char[strlen(cl[x])+3];
       
-      sprintf(new_s,"(%s)",cc[x]);         //on met la classe formée entre ()
-      //attention wsprintf est limite a 1024 caractere
-      strcpy(new_s,"(");
-      strcat(new_s,cc[x]);    //espace entre les 2 chaines
-      strcat(new_s,")");
-      delete []cc[x];
-      cc[x]=new_s;
-      strcpy(new_s2,"(");
-      strcat(new_s2,cl[x]);    //espace entre les 2 chaines
-      strcat(new_s2,")");
-      delete []cl[x];
-      cl[x]=new_s2;
-      Rprintf("Classification %d : %s similarity %f\n",f+1,cl[x],max);
-      string_level[f]=new char[strlen(cl[x])+3];
-      strcpy(string_level[f],cl[x]);
-      
+//      sprintf(new_s,"(%s)",cc[x]);         //on met la classe formée entre ()
+//      //attention wsprintf est limite a 1024 caractere
+//      strcpy(new_s,"(");
+//      strcat(new_s,cc[x]);    //espace entre les 2 chaines
+//      strcat(new_s,")");
+//      delete []cc[x];
+//      cc[x]=new_s;
+//      strcpy(new_s2,"(");
+//      strcat(new_s2,cl[x]);    //espace entre les 2 chaines
+//      strcat(new_s2,")");
+//      delete []cl[x];
+//      cl[x]=new_s2;
+      ostringstream stringStream;
+      stringStream << "(" << cc[x] << ")";
+      cc[x] = stringStream.str();
+      ostringstream stringStream2;
+      stringStream2 << "(" << cl[x] << ")";
+      cl[x] = stringStream2.str();
+
+      //Rprintf("Classification %d : %s similarity %f\n",f+1,cl[x],max);
+      cout<<"Classification "<<f+1<<" : "<<cl[x]<<" Cohesion "<<max<<endl;
+      //string_level[f]=new char[strlen(cl[x])+3];
+      //strcpy(string_level[f],cl[x]);
+      string_level[f]=cl[x];
       f++;
       
       
@@ -1544,31 +1592,37 @@ LogicalVector contribution_supp, LogicalVector typicality_supp, LogicalVector Ve
   
   j=0;
   k=0;
-  for(i=0;i<nb_col;i++)
-  {
-    if(cc[i]) j+=strlen(cc[i])+1;
-  }
-  for(i=0;i<nb_col;i++)
-  {
-    if(cc[i]) k+=strlen(cl[i])+1;
-  }
+//  for(i=0;i<nb_col;i++)
+//  {
+//    if(cc[i]) j+=strlen(cc[i])+1;
+//  }
+//  for(i=0;i<nb_col;i++)
+//  {
+//    if(cc[i]) k+=strlen(cl[i])+1;
+//  }
   
-  char *chc=new char[j+1];
-  chc[0]='\0';
-  char *chl=new char[k+1];
-  chl[0]='\0';
+//  char *chc=new char[j+1];
+//  chc[0]='\0';
+//  char *chl=new char[k+1];
+//  chl[0]='\0';
+
+  ostringstream stringStream;
+  ostringstream stringStream2;
   for(i=0;i<nb_col;i++)
   {
     //classes not selected are suppressed
     if(size_class[i] && AlreadyInClasse[i]>=0)
     {
-      strcat(chc,cc[i]);
-      strcat(chc," ");
-      strcat(chl,cl[i]);
-      strcat(chl," ");
-      
+//      strcat(chc,cc[i]);
+//      strcat(chc," ");
+//      strcat(chl,cl[i]);
+//      strcat(chl," ");
+        stringStream << cc[i]<<" ";
+        stringStream2 << cl[i]<<" ";
     }
   }
+  string chc = stringStream.str(); 
+  string chl = stringStream2.str(); 
   
   
   SignificantLevel(Index_simi, nb_col, Occurrences_variables,f,variable_left,variable_right,size_classe,classes_associated_with,significant_nodes,verbose);
@@ -1616,28 +1670,24 @@ LogicalVector contribution_supp, LogicalVector typicality_supp, LogicalVector Ve
   
   
   
-  delete []AlreadyInClasse;
-  delete []Terminal;
   
   
   
-  for(i=0;i<nb_col;i++)
-  if(cl[i]) delete []cl[i];
-  delete []cl;
-  for(i=0;i<nb_col;i++)
-  if(cc[i]) delete []cc[i];
-  for(i=0;i<nb_col;i++) {
-    if(string_level[i]) 
-    delete []string_level[i];
-  }
-  delete []string_level;
-  
-  
-  
-  
-  delete []cc;
-  delete []GenPairX;
-  delete []GenPairY;
+//  for(i=0;i<nb_col;i++)
+//  if(cl[i]) delete []cl[i];
+//  delete []cl;
+//  for(i=0;i<nb_col;i++)
+//  if(cc[i]) delete []cc[i];
+//  for(i=0;i<nb_col;i++) {
+//    if(string_level[i]) 
+//    delete []string_level[i];
+//  }
+//  delete []string_level;
+//  
+//  
+//  
+//  
+//  delete []cc;
   
   
   return results;
