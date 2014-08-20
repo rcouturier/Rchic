@@ -3,7 +3,11 @@
 
 
 #include <iostream>
+#if defined __GNUC__ || defined __APPLE__
+#include <ext/hash_map>
+#else
 #include <hash_map>
+#endif
 #include <stdio.h>
 #include <math.h>
 
