@@ -157,13 +157,11 @@ toolbarGraph <- function (frame,callPlot,updatePlot) {
   
   tkfocus(frame)
   
-  ##################################################
   
   Affiche.but <- tkbutton(frame,text="Confidence",command=OnAffiche)
   tkgrid(Affiche.but)
   
   tkfocus(frame)
-  ##################################################
   
   
   

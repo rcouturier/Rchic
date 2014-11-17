@@ -10,7 +10,6 @@
 implicativeGraph <-function(list.variables) {
   
   
-  
   visibleWidth<<-1200
   visibleHeight<<-800
   
@@ -408,7 +407,7 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
     }
   }
   
-  #once you click on the left mouse button on a line, the confidence will be displayed
+  #Once you click on the left mouse button on a line, the confidence will be displayed
   line_pressed <- function(i)
   {
       force(i)   
@@ -418,7 +417,7 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
                 
         machaine="conf"
         
-        tkcreate(canvas, "text", x, y, text=paste(machaine,conf3, sep=":"), fill="brown",tags="text1")
+        tkcreate(canvas, "text", x, y, text=paste(machaine,i, sep=":"), fill="brown",tags="text1")
         
 
       }
@@ -445,7 +444,7 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
   }
   
   
- #########################################################################
+
   
   #mouse release on the line
   line_released <- function(i){
@@ -736,12 +735,12 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
         Xm=(X4+X1)/2
         Ym=(Y4+Y1)/2
                 
-        machaine<-"conf"
+        #machaine<-"conf"
         
         if(affiche ==1)
         {
           
-        tkcreate(canvas, "text", Xm, Ym, text=paste(machaine,conf3, sep=":"), fill="brown",tags="text")
+        tkcreate(canvas, "text", Xm, Ym, text=conf3, fill="brown",tags="text")
         }
         
         tkitembind ( canvas , sp,"<1>" , line_pressed(conf3) )

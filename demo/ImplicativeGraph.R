@@ -15,7 +15,7 @@ if (!nchar(fileName)) {
   setwd(initDirectory)
 } else {
   
-
+# to display confidence
   affiche="FALSE"
  
   #transform possible interval variables
