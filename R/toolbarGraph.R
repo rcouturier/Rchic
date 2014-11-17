@@ -135,10 +135,35 @@ toolbarGraph <- function (frame,callPlot,updatePlot) {
     
     updatePlot()
   }
+  
+  
+#is used to display the confidence  
+  OnAffiche <- function()
+  {
+    tmp1=as.numeric(tclvalue(myaffiche))
+   res1=1-tmp1
+   tclvalue(myaffiche) <-  res1 
+      
+    affiche <<- "TRUE"
+    callPlot()
+    
+  }
+  
+  
+  
+  
   Edit.but <- tkbutton(frame,text="Edit",command=OnEdit)
   tkgrid(Edit.but)
+  
   tkfocus(frame)
   
+  ##################################################
+  
+  Affiche.but <- tkbutton(frame,text="Confidence",command=OnAffiche)
+  tkgrid(Affiche.but)
+  
+  tkfocus(frame)
+  ##################################################
   
   
   

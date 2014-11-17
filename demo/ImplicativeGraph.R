@@ -15,7 +15,8 @@ if (!nchar(fileName)) {
   setwd(initDirectory)
 } else {
   
-  
+
+  affiche="FALSE"
  
   #transform possible interval variables
   result = readAndAnalyzeData(dataCSV)
