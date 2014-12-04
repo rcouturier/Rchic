@@ -31,6 +31,13 @@ implicativeGraph <-function(list.variables) {
   
   #list that'll contain the values of confidence
   conf<<-list()
+  fromconf<<- list()
+  toconf<<- list()
+  confconf1<<- list()
+  
+  #list that'll contain the the coordinates where drawing confidence
+  coordx1<<- list()
+  coordx2<<- list()
   
   canvas <<- tkcanvas(tt, relief="raised", width=visibleWidth, height=visibleHeight,
                       xscrollcommand=function(...)tkset(xscr,...), 
@@ -86,7 +93,7 @@ implicativeGraph <-function(list.variables) {
 
 callPlotImplicativeGraph <- function() {
   
-  #need to check these parameters here
+  # Need to check these parameters here
   thres=100
   for(i in 1:4) {
     check <- as.numeric(tclvalue(mycbvalue[[i]]))
@@ -97,18 +104,18 @@ callPlotImplicativeGraph <- function() {
       thres=val
   }
   edit=as.numeric(tclvalue(myedit))
-  affiche=as.numeric(tclvalue(myaffiche))
-  
+ # affiche=as.numeric(tclvalue(myaffiche))
   list.selected.item=lapply(list.tcl,function(i) tclvalue(i))
   #print(list.selected.item)
-  computeImplicativeGraph(thres,sapply(myvalue,tclvalue),sapply(mycbvalue,tclvalue),mycolor,list.selected.item, conf) 
-  plotImplicativeGraph(thres,sapply(myvalue,tclvalue),sapply(mycbvalue,tclvalue),mycolor,list.selected.item,edit=edit,first=TRUE,affiche=affiche) 
+  computeImplicativeGraph(thres,sapply(myvalue,tclvalue),sapply(mycbvalue,tclvalue),mycolor,list.selected.item, confconf1) 
+  plotImplicativeGraph(thres,sapply(myvalue,tclvalue),sapply(mycbvalue,tclvalue),mycolor,list.selected.item,edit=edit,first=TRUE) 
 }
 
 
 updatePlotImplicativeGraph <- function() {
   
   #need to check these parameters here
+  
   thres=100
   for(i in 1:4) {
     check <- as.numeric(tclvalue(mycbvalue[[i]]))
@@ -119,10 +126,10 @@ updatePlotImplicativeGraph <- function() {
       thres=val
   }
   edit=as.numeric(tclvalue(myedit))
-  affiche=as.numeric(tclvalue(myaffiche))
-  
+#  affiche=as.numeric(tclvalue(myaffiche))
+
   list.selected.item=lapply(list.tcl,function(i) tclvalue(i))
-  plotImplicativeGraph(thres,sapply(myvalue,tclvalue),sapply(mycbvalue,tclvalue),mycolor,list.selected.item,edit=edit,first=FALSE,affiche=affiche) 
+  plotImplicativeGraph(thres,sapply(myvalue,tclvalue),sapply(mycbvalue,tclvalue),mycolor,list.selected.item,edit=edit,first=FALSE) 
 }
 
 
@@ -130,8 +137,7 @@ updatePlotImplicativeGraph <- function() {
 
 
 
-computeImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item,conf) {
-  
+computeImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item,confconf1) {
   
   
   rules<-read.table(file='transaction.out',header=TRUE,row.names=1,sep=',',stringsAsFactors = FALSE)
@@ -154,6 +160,17 @@ computeImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.i
   }
   lNodes=unique(lNodes)
   
+  
+  
+  listNode <<- list()
+  
+  for(i in 1:length(lNodes)) {
+
+  listNode[i]<<-lNodes[i]
+  
+ }
+  
+ 
   #create the graph with the nodes
   g1 <- new("graphNEL", nodes = lNodes,edgemode = "directed")
   
@@ -161,26 +178,47 @@ computeImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.i
   
   compte<-1
   
+ 
+  
   for(i in 1:n) {
     rule=strsplit(row.names(rules)[i],split=' -> ')
     from=rule[[1]][1]
     to=rule[[1]][2]
+    
     if(rules[i,5]>thres &  rules[i,1]<rules[i,2] & 
          as.numeric(list.selected.item[[which(list.variables==from)]]) & as.numeric(list.selected.item[[which(list.variables==to)]])) {
       g1 <- addEdge(from,to,g1)
     
+      conf1=rules[i,4]
       
-      conf1<-rules[i,4]
+      
       
       # rounding confidence to two digits after the decimal point
-      conf[compte] <<-round(conf1,2)
+      
+      
+      
+      conf2=round(conf1,2)
+      
+
+      
+      
+      fromconf[compte]<<-from
+      toconf[compte]<<-to
+      confconf1[compte]<<-conf2
+      
+      
+      print(paste("put ",fromconf[compte],"->",toconf[compte],confconf1[compte]))
       
       compte=compte+1
       
-      #print(paste("put ",from,"->",to))
-    }
+      
+    }    
+
+    
   }
   
+
+
   
 
   #no need to plot thegraph
@@ -303,17 +341,10 @@ computeImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.i
         to=which(list.name==head(edge))
         #this list contains information on all the splines
         list.spline = c(list.spline,list(list(spline=nb.spline,coord=lCoord,from=from,to=to,arrow=arrow,col=col,num.spline=j,endspline=numSplines(edge))))
-        list.spline1 = c(list.spline1,list(list(spline=nb.spline,coord=lCoord,from=from,to=to,arrow=arrow,col=col,num.spline=j,endspline=numSplines(edge))))        
         nb.spline1=nb.spline+1
         
       }
-      
-      
-      ############################# Rendre les arcs sensible a la souris ###############################"
      
-      
-      
-      
     }
   }
   
@@ -326,10 +357,8 @@ computeImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.i
   list.node<<-list.node
   list.spline<<-list.spline
   
-  list.spline1<<-list.spline1
+  list.spline1<<-list.spline1  
   
-  #print("iiiiiiiiiiiiiiiiiiiiiiiii")
-  #print(length(list.spline))
 }
 
 
@@ -344,7 +373,7 @@ computeImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.i
 
 
 
-plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item,edit=FALSE,first=TRUE, affiche=FALSE) {
+plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item,edit=FALSE,first=TRUE) {
   
   
   #print("edit")
@@ -354,6 +383,8 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
   #print(first)
   
   tkdelete(canvas, "text")
+  tkdelete(canvas, "text1")
+  
   if(first) {
     tkdelete(canvas, "control")
     
@@ -408,20 +439,20 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
   }
   
   #Once you click on the left mouse button on a line, the confidence will be displayed
-  line_pressed <- function(i)
-  {
-      force(i)   
+ # line_pressed <- function(i)
+ # {
+    #  force(i)   
       
-      function(x,y){
+    #  function(x,y){
         
                 
-        machaine="conf"
+    #    machaine="conf"
         
-        tkcreate(canvas, "text", x, y, text=paste(machaine,i, sep=":"), fill="brown",tags="text1")
+    #    tkcreate(canvas, "text", x, y, text=paste(machaine,i, sep=":"), fill="brown",tags="text1")
         
 
-      }
-  }
+    #  }
+  #}
   
   
   
@@ -447,15 +478,15 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
 
   
   #mouse release on the line
-  line_released <- function(i){
-      force(i)
-      function(x,y) {
+ # line_released <- function(i){
+ #     force(i)
+ #     function(x,y) {
        
-        tkdelete(canvas, "text1")
+  #      tkdelete(canvas, "text1")
         
       
-        }
-    }
+  #      }
+ #   }
   
   
   
@@ -506,7 +537,6 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
           sp$coord[[7]]=sp$coord[[7]]+as.numeric(x)
           sp$coord[[8]]=sp$coord[[8]]+as.numeric(y)#-15
           
-          ########################################################################################################
           sp1$coord[[7]]=sp1$coord[[7]]+as.numeric(x)
           sp1$coord[[8]]=sp1$coord[[8]]+as.numeric(y)#-15
           
@@ -571,6 +601,8 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
         first=TRUE
         for(s in spline) {
           sp=list.spline.object[[s]]
+          
+
           sp1=list.spline1.object[[s]]
           
           #update of the second control point of the spline
@@ -632,15 +664,13 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
     if(edit) {
       
       sp=list.spline.object[[spline[1]]]
-      sp1=list.spline1.object[[spline[1]]]
       
       
       x=sp$coord[[2*pos-1]]
       y=sp$coord[[2*pos]]
       
       
-      x1=sp1$coord[[2*pos-1]]
-      y1=sp1$coord[[2*pos]]
+
       
       p <- tkcreate ( canvas , "oval" , x - r , y - r , x + r , y + r ,
                       width = 1 , outline = "black" , fill = "blue",tags="control" )
@@ -675,7 +705,6 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
       #create texts for all the nodes
       for (i in 1:length(list.node)) {
         #get current node
-        
         node=list.node[[i]]
         #get coordinate of current node
         coord=node[[2]]
@@ -698,55 +727,115 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
       #     #get the list of the edges
       #     edges = AgEdge(graph1)
       #     #for all edges
+      
+ 
+     
+      
+
+      num=1
+
+  var2<<-list()
+        
       for (i in 1:length(list.spline)) {
         sp=list.spline[[i]]
+        sp=list.spline[[i]]
         
-        coord=sp[['coord']]
+        
         
         
         from=sp[['from']]
         to=sp[['to']]
+       
+       from1 <-listNode[from]
+        to1 <-listNode[to]
+        
+
+     
         num.spline.edge=sp[['num.spline']]
         endspline=sp[['endspline']]
         
+       
+       
         
+
         
-        listz<- sp[['coord']]
+        coord=sp[['coord']]
         
-        #calculates the coordinates where we will display the confidence        
-        X1<-listz[[1]]
-        Y1<-listz[[2]]
-        
-        X2<-listz[[3]]
-        Y2<-listz[[4]]
-        
-        X3<-listz[[5]]
-        Y3<-listz[[6]]
-        
-        X4<-listz[[7]]
-        Y4<-listz[[8]]
-        
-        
-        conf3<-conf[[i]]
-        
-        sp <- tkcreate(canvas, "line", sp[['coord']],width=2,arrow=sp[['arrow']],smooth='bezier',splinesteps=6,tags="draw",fill=sp[['col']])
-        
-        
-        Xm=(X4+X1)/2
-        Ym=(Y4+Y1)/2
-                
-        #machaine<-"conf"
-        
-        if(affiche ==1)
+        if(num.spline.edge==1)
         {
           
-        tkcreate(canvas, "text", Xm, Ym, text=conf3, fill="brown",tags="text")
+        
+          coord1=sp[['coord']]
+          
+          
+          #calculates the coordinates where we will display the confidence        
+          X1<-coord1[[1]]
+          Y1<-coord1[[2]]
+          
+
+          
+          
+          X2<-coord1[3]
+          Y2<-coord1[4]
+          
+          X3<-coord1[5]
+          Y3<-coord1[6]
+          
+          X4<-coord1[7]
+          Y4<-coord1[8]
+          
+          
+
+
+          
+          # verify the position where we display confidence corresponds to the arc
+          for (k in 1:length(confconf1)) {
+            chai1=fromconf[k]
+            chai2=toconf[k]
+            
+            
+            if(grepl(chai1, from1) & grepl(chai2,to1))
+            {
+              var2[num] <<- confconf1[[k]]
+              
+              #  if the arc is not right
+              if(endspline!=1)
+              {
+                list.from[[from]]<<-c(list.from[[from]],i)
+                
+                
+                pos=2
+                
+                Xm=sp$coord[[2*pos-1]]
+                Ym=sp$coord[[2*pos]]
+                
+              }
+              else     # if the arc is right
+                
+              {
+                Xm=(X4+X1)/2
+                Ym=(Y4+Y1)/2
+              }
+              coordx1[num]<<-Xm
+              coordx2[num]<<-Ym
+
+            
+
+          
+              
+            }
+           
+
+           
+         }
+          
+          num=num+1
+          
         }
         
-        tkitembind ( canvas , sp,"<1>" , line_pressed(conf3) )
         
-        tkitembind ( canvas , sp,"<ButtonRelease-1>" , line_released(conf3) )
         
+        sp <- tkcreate(canvas, "line", sp[['coord']],width=2,arrow=sp[['arrow']],smooth='bezier',splinesteps=6,tags="draw",fill=sp[['col']])
         
         
         list.spline.object <<- c(list.spline.object,list(list(spline=sp,coord=coord,from=from,to=to)))
@@ -803,9 +892,10 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
           
         }
         
-        
-        
       }
+      
+
+      
     }
   }
   else {
@@ -835,9 +925,10 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
     }
    
     
-    
-    
+
   }
+  
+
   
   #write the current postscript image in the current directory
   tkpostscript(canvas, file="graph.ps",height=workingHeight,width=workingWidth)

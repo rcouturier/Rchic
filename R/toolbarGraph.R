@@ -115,6 +115,10 @@ toolbarGraph <- function (frame,callPlot,updatePlot) {
   OnOK <- function()
   {
     callPlot()
+    
+     
+     Afficheconf1()
+  
   }
   OK.but <- tkbutton(frame,text="OK",command=OnOK)
   tkgrid(OK.but)
@@ -134,22 +138,69 @@ toolbarGraph <- function (frame,callPlot,updatePlot) {
         
     
     updatePlot()
-  }
-  
-  
-#is used to display the confidence  
-  OnAffiche <- function()
-  {
-    tmp1=as.numeric(tclvalue(myaffiche))
-   res1=1-tmp1
-   tclvalue(myaffiche) <-  res1 
-      
-    affiche <<- "TRUE"
-    callPlot()
+    Afficheconf1()
     
   }
   
+  Afficheconf<- function(){
+    
+    indaff<<-indaff+1
+    if(indaff==1)
+    {
+    affiche <<- TRUE
+    }
+    else
+    {
+      if(indaff==2)
+      {
+        affiche <<- FALSE
+        indaff<<-0
+      }
+    }
+    for (i in 1:length(coordx1)) {
+      
+    Xm=coordx1[[i]]
+    Ym=coordx2[[i]]
+    var=var2[[i]]
+    
+    if(grepl(affiche, TRUE))
+    {
+      tkcreate(canvas, "text", Xm, Ym, text=var, fill="black",tags="text1")
+    }
+    else
+    {
+      tkdelete(canvas, "text1")
+      
+    }
+
+    }
+
+  }
   
+  Afficheconf1<- function(){
+    
+
+    for (i in 1:length(coordx1)) {
+      
+      Xm=coordx1[[i]]
+      Ym=coordx2[[i]]
+      var=var2[[i]]
+      
+      if(grepl(affiche, TRUE))
+      {
+        tkcreate(canvas, "text", Xm, Ym, text=var, fill="black",tags="text1")
+      }
+      else
+      {
+        tkdelete(canvas, "text1")
+        
+      }
+      
+    }
+
+  }
+  
+#is used to display the confidence 
   
   
   Edit.but <- tkbutton(frame,text="Edit",command=OnEdit)
@@ -158,7 +209,7 @@ toolbarGraph <- function (frame,callPlot,updatePlot) {
   tkfocus(frame)
   
   
-  Affiche.but <- tkbutton(frame,text="Confidence",command=OnAffiche)
+  Affiche.but <- tkbutton(frame,text="Confidence",command=Afficheconf)
   tkgrid(Affiche.but)
   
   tkfocus(frame)

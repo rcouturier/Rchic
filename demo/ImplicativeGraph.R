@@ -16,7 +16,8 @@ if (!nchar(fileName)) {
 } else {
   
 # to display confidence
-  affiche="FALSE"
+  affiche<<-FALSE
+  indaff <<- 0
  
   #transform possible interval variables
   result = readAndAnalyzeData(dataCSV)
