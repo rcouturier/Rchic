@@ -142,6 +142,38 @@ toolbarGraph <- function (frame,callPlot,updatePlot) {
     
   }
   
+  text_pressed1 <- function(i) {
+    
+    function(x,y){
+      x <- as.numeric(x)
+      y <- as.numeric(y)
+      tkdtag(canvas, "selected")
+      tkaddtag(canvas, "selected", "withtag", "current")
+      tkitemraise(canvas,"current")
+      lastX <<- x
+      lastY <<- y
+      initX <<- x
+      initY <<- y
+    }
+    
+  }
+  
+  text_move1 <- function(i)
+  {
+    
+    
+    force(i)   
+    function(x,y){
+      x <- as.numeric(x)
+      y <- as.numeric(y)
+      
+      tkmove(canvas, "selected", x-lastX,y-lastY)
+      lastX <<- x
+      lastY <<- y
+    }
+    
+  }
+  
   Afficheconf<- function(){
     
     indaff<<-indaff+1
@@ -165,7 +197,10 @@ toolbarGraph <- function (frame,callPlot,updatePlot) {
     
     if(grepl(affiche, TRUE))
     {
-      tkcreate(canvas, "text", Xm, Ym, text=var, fill="black",tags="text1")
+      p1 <- tkcreate(canvas, "text", Xm, Ym, text=var, fill="black",tags="text1")
+      
+      tkitembind(canvas, p1, "<1>", text_pressed1(i))
+      tkitembind(canvas, p1,"<B1-Motion>", text_move1(i))
     }
     else
     {
@@ -188,7 +223,10 @@ toolbarGraph <- function (frame,callPlot,updatePlot) {
       
       if(grepl(affiche, TRUE))
       {
-        tkcreate(canvas, "text", Xm, Ym, text=var, fill="black",tags="text1")
+        p1 <<- tkcreate(canvas, "text", Xm, Ym, text=var, fill="black",tags="text1")
+        tkitembind(canvas, p1, "<1>", text_pressed1(i))
+        tkitembind(canvas, p1,"<B1-Motion>", text_move1(i))
+        
       }
       else
       {

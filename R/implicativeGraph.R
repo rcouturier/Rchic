@@ -507,25 +507,20 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
         #for all edges from this node
         for(e in list.from[[i]]) {
           sp=list.spline.object[[e]]
-          sp1=list.spline1.object[[e]]
           
           sp$coord[[1]]=sp$coord[[1]]+as.numeric(x)
           sp$coord[[2]]=sp$coord[[2]]+as.numeric(y)
           
           
-          sp1$coord[[1]]=sp1$coord[[1]]+as.numeric(x)
-          sp1$coord[[2]]=sp1$coord[[2]]+as.numeric(y)
-          
+
           #update the spline in the list
           
           list.spline.object[[e]]<<-sp 
           
-          list.spline1.object[[e]]<<-sp1 
           
           #update the spline on the canvas
           tkcoords(canvas,sp$spline,sp$coord)
           
-          tkcoords(canvas,sp1$spline,sp1$coord)
           
         }
         
@@ -603,7 +598,6 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
           sp=list.spline.object[[s]]
           
 
-          sp1=list.spline1.object[[s]]
           
           #update of the second control point of the spline
           if(pos==2) {
@@ -611,8 +605,7 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
             sp$coord[[4]]=sp$coord[[4]]+y
             
             
-            sp1$coord[[3]]=sp1$coord[[3]]+x
-            sp1$coord[[4]]=sp1$coord[[4]]+y
+
             
           }
           #update of the third control point of the spline
@@ -620,8 +613,6 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
             sp$coord[[5]]=sp$coord[[5]]+x
             sp$coord[[6]]=sp$coord[[6]]+y
             
-            sp1$coord[[5]]=sp1$coord[[5]]+x
-            sp1$coord[[6]]=sp1$coord[[6]]+y
             
           }
           #update of the fourth control point of the spline
@@ -629,8 +620,7 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
             sp$coord[[7]]=sp$coord[[7]]+x
             sp$coord[[8]]=sp$coord[[8]]+y
             
-            sp1$coord[[7]]=sp1$coord[[7]]+x
-            sp1$coord[[8]]=sp1$coord[[8]]+y
+           
             
             first=FALSE
           }
@@ -641,16 +631,13 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
               sp$coord[[1]]=sp$coord[[1]]+x
               sp$coord[[2]]=sp$coord[[2]]+y
               
-              sp1$coord[[1]]=sp1$coord[[1]]+x
-              sp1$coord[[2]]=sp1$coord[[2]]+y
+              
             }
           #update the spline in the list
           list.spline.object[[s]]<<-sp
-          list.spline1.object[[s]]<<-sp1
           
           #update the spline on the canvas
           tkcoords(canvas,sp$spline,sp$coord)
-          tkcoords(canvas,sp1$spline,sp1$coord)
           
         }
       }
@@ -678,7 +665,15 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
       #functions to track the mouse
       tkitembind ( canvas , p , "<1>" , control_point_pressed(nb) )
       tkitembind ( canvas , p,"<B1-Motion>" , control_point_move(nb) )
+     #if(affiche==TRUE)
+     # {
+      #  tkitembind ( canvas , p1,"<B1-Motion>" , control_point_move(nb) )
+                
+      #}
       tkitembind ( canvas , p, "<ButtonRelease-1>" , control_point_released(spline,pos))
+      
+
+      
     }
     if(first) {
       list.control<<-c(list.control,list(list(nb,x,y,spline,pos)))
@@ -718,6 +713,8 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
         tkitembind(canvas, p, "<1>", text_pressed(i))
         tkitembind(canvas, p,"<B1-Motion>", text_move(i))
         tkitembind(canvas, p, "<ButtonRelease-1>",text_released(i))
+        
+        
         #add the name in the list
         #list.node=c(list.node,name)
         
