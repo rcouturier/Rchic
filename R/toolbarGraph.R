@@ -155,13 +155,11 @@ toolbarGraph <- function (frame,callPlot,updatePlot) {
       initX <<- x
       initY <<- y
     }
-    
   }
   
   text_move1 <- function(i)
   {
-    
-    
+        
     force(i)   
     function(x,y){
       x <- as.numeric(x)

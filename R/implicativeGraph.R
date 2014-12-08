@@ -461,7 +461,6 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
   text_move <- function(i)
   {
     
-    
     if(edit==TRUE) {
       force(i)   
       function(x,y){
