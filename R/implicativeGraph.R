@@ -574,6 +574,12 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
         pos <- as.numeric ( c ( x , y ) )
         tkmove ( canvas , "selected" , pos [ 1 ] - last_pos [ 1 ] ,
                  pos [ 2 ] - last_pos [ 2 ] )
+        
+        
+        print("pos[2] dans move")
+        
+        print(pos[2])
+        
         last_pos <<- pos
       }
     }
@@ -586,7 +592,7 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
   #mouse released ono control point
   control_point_released <- function ( spline,pos) {
     if(edit==TRUE) {
-      force(spline)
+      force(spline) 
       function(x,y){
         #x and y contain the delta move from the button pressed
         x=as.numeric(x)-initX
@@ -731,18 +737,18 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
       num=1
 
   var2<<-list()
-        
+
       for (i in 1:length(list.spline)) {
         sp=list.spline[[i]]
         sp=list.spline[[i]]
         
-        
+      
         
         
         from=sp[['from']]
         to=sp[['to']]
        
-       from1 <-listNode[from]
+        from1 <-listNode[from]
         to1 <-listNode[to]
         
 
@@ -750,125 +756,79 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
         num.spline.edge=sp[['num.spline']]
         endspline=sp[['endspline']]
         
-       
-       
-        
-
-        
+                
         coord=sp[['coord']]
         
-        if(num.spline.edge==1)
-        {
-          
-        
-          coord1=sp[['coord']]
-          
-          
-          #calculates the coordinates where we will display the confidence        
-          X1<-coord1[[1]]
-          Y1<-coord1[[2]]
-          
-
-          
-          
-          X2<-coord1[3]
-          Y2<-coord1[4]
-          
-          X3<-coord1[5]
-          Y3<-coord1[6]
-          
-          X4<-coord1[7]
-          Y4<-coord1[8]
-          
-          
-
-
-          
-          # verify the position where we display confidence corresponds to the arc
-          for (k in 1:length(confconf1)) {
-            chai1=fromconf[k]
-            chai2=toconf[k]
-            
-            
-            if(grepl(chai1, from1) & grepl(chai2,to1))
-            {
-              var2[num] <<- confconf1[[k]]
-              
-              #  if the arc is not right
-              if(endspline!=1)
-              {
-                list.from[[from]]<<-c(list.from[[from]],i)
-                
-                
-                pos=2
-                
-                Xm=sp$coord[[2*pos-1]]
-                Ym=sp$coord[[2*pos]]
-                
-              }
-              else     # if the arc is right
-                
-              {
-                Xm=(X4+X1)/2
-                Ym=(Y4+Y1)/2
-              }
-              coordx1[num]<<-Xm
-              coordx2[num]<<-Ym
-
-            
-
-          
-              
-            }
-           
-
-           
-         }
-          
-          num=num+1
-          
-        }
+        coord1=sp[['coord']]
         
         
+         
         
         sp <- tkcreate(canvas, "line", sp[['coord']],width=2,arrow=sp[['arrow']],smooth='bezier',splinesteps=6,tags="draw",fill=sp[['col']])
         
         
         list.spline.object <<- c(list.spline.object,list(list(spline=sp,coord=coord,from=from,to=to)))
       
-        list.spline1.object <<- c(list.spline1.object,list(list(spline=sp,coord=coord,from=from,to=to)))
         
         #if this is the first spline of the edge
+            
+              
         if(num.spline.edge==1) {            
           #add the current spline to the list from for this node
           list.from[[from]]<<-c(list.from[[from]],i)
           #create control points
           #control point 2
+          
           createPoint(nb=nb.control_point,x=coord[3],y=coord[4],r=r,spline=c(i),pos=2)
           nb.control_point=nb.control_point+1
           #control point 3
+          
+          
           createPoint(nb=nb.control_point,x=coord[5],y=coord[6],r=r,spline=c(i),pos=3)
+          
           nb.control_point=nb.control_point+1
+          
+       
+                     
+          
+          
+          
           #if there is another spline
           if(endspline!=1) {
+           
+            
             #control point 4 and 1 for the next spline
             #warning the field spline is a vector with the current and the next spline
+            
+            
             createPoint(nb=nb.control_point,x=coord[7],y=coord[8],r=r,spline=c(i,i+1),pos=4)
+            
+            
             nb.control_point=nb.control_point+1
           }
         }
+         
         
         #if this is the last spline of the edge
-        if(num.spline.edge==endspline){ 
+        if(num.spline.edge==endspline){
+          
+          
           #add the current spline to the list to for this node
           list.to[[to]]<<-c(list.to[[to]],i)
           #if this spline is not the first one
           if(num.spline.edge!=1) {
             #control point 2
+            
             createPoint(nb=nb.control_point,x=coord[3],y=coord[4],r=r,spline=c(i),pos=2)
+            
+            
+
+            
             nb.control_point=nb.control_point+1
             #control point 3
+            
             createPoint(nb=nb.control_point,x=coord[5],y=coord[6],r=r,spline=c(i),pos=3)
+            
             nb.control_point=nb.control_point+1
           }
         }
@@ -877,17 +837,93 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
         #if the spline is neither the first nor the last one
         if(num.spline.edge!=1 && num.spline.edge!=endspline) {
           #control point 2
+          
           createPoint(nb=nb.control_point,x=coord[3],y=coord[4],r=r,spline=c(i),pos=2)
+          
           nb.control_point=nb.control_point+1
           #control point 3
+          
           createPoint(nb=nb.control_point,x=coord[5],y=coord[6],r=r,spline=c(i),pos=3)
+          
           nb.control_point=nb.control_point+1
           #control point 4 and 1 (see spline 1)
+          
+          
           createPoint(nb=nb.control_point,x=coord[7],y=coord[8],r=r,spline=c(i,i+1),pos=4)
+          
           nb.control_point=nb.control_point+1
           
+          
+        
         }
         
+        #calculates the coordinates where we will display the confidence        
+        
+        for (k in 1:length(confconf1)) {
+          chai1=fromconf[k]
+          chai2=toconf[k]
+          
+          if(grepl(chai1, from1) & grepl(chai2,to1))
+          {
+            var2[num] <<- confconf1[[k]]
+            
+            # if the arc is not right
+            sp=list.spline[[i]]
+            sp=list.spline[[i]]
+            
+            list.from[[from]]<<-c(list.from[[from]],i)
+            
+            if((num.spline.edge==1) && (endspline==1)) {
+              
+          
+            Xm= (sp$coord[[5]]+sp$coord[[3]])/2
+            
+            Ym=(sp$coord[[6]]+sp$coord[[4]])/2
+            coordx1[num]<<-Xm
+            coordx2[num]<<-Ym
+            
+            
+            
+            }else {
+             
+              if((num.spline.edge==2) && (endspline==2)) {
+
+
+                Xm= sp$coord[[1]]
+                 Ym=sp$coord[[2]]
+                
+                coordx1[num]<<-Xm
+                coordx2[num]<<-Ym
+                
+                
+              }else
+              {
+                if((num.spline.edge==2) && (endspline==3)) {
+
+                
+                  Xm= (sp$coord[[5]]+sp$coord[[3]])/2                
+                  Ym=(sp$coord[[6]]+sp$coord[[4]])/2
+                  coordx1[num]<<-Xm
+                  coordx2[num]<<-Ym
+                  
+                }
+
+                  
+              } 
+            }
+            
+            
+          }     
+        }
+        if(num.spline.edge==endspline) 
+        {  
+           num=num+1   
+        }
+
+
+
+        
+              
       }
       
 
