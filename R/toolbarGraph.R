@@ -115,9 +115,7 @@ toolbarGraph <- function (frame,callPlot,updatePlot) {
   OnOK <- function()
   {
     callPlot()
-    
-     
-     Afficheconf1()
+    Afficheconf1()
   
   }
   OK.but <- tkbutton(frame,text="OK",command=OnOK)
@@ -143,7 +141,7 @@ toolbarGraph <- function (frame,callPlot,updatePlot) {
   }
   
 
-  
+#used to display confidence   
   Afficheconf<- function(){
     
     indaff<<-indaff+1
@@ -161,6 +159,8 @@ toolbarGraph <- function (frame,callPlot,updatePlot) {
     }
     for (i in 1:length(coordx1)) {
       
+    # retrieve coordinate of confidence
+      
     Xm=coordx1[[i]]
     Ym=coordx2[[i]]
     var=var2[[i]]
@@ -168,8 +168,7 @@ toolbarGraph <- function (frame,callPlot,updatePlot) {
     if(grepl(affiche, TRUE))
     {
       p1 <- tkcreate(canvas, "text", Xm, Ym, text=var, fill="black",tags="text1")
-      
-     
+   
     }
     else
     {
@@ -180,7 +179,8 @@ toolbarGraph <- function (frame,callPlot,updatePlot) {
     }
 
   }
-  
+ 
+  #  is to maintain the confidence by changing settings or switching to edit mode
   Afficheconf1<- function(){
     
 

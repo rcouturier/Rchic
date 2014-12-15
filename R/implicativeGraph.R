@@ -161,6 +161,7 @@ computeImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.i
   lNodes=unique(lNodes)
   
   
+  # listNode will be used to search for the names of the corresponding node number 1 2 3 
   
   listNode <<- list()
   
@@ -177,9 +178,7 @@ computeImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.i
   #add the edge of the graph
   
   compte<-1
-  
- 
-  
+    
   for(i in 1:n) {
     rule=strsplit(row.names(rules)[i],split=' -> ')
     from=rule[[1]][1]
@@ -189,25 +188,21 @@ computeImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.i
          as.numeric(list.selected.item[[which(list.variables==from)]]) & as.numeric(list.selected.item[[which(list.variables==to)]])) {
       g1 <- addEdge(from,to,g1)
     
+      # retrieve the confidence value
       conf1=rules[i,4]
       
-      
-      
       # rounding confidence to two digits after the decimal point
-      
-      
-      
+
       conf2=round(conf1,2)
       
 
       
-      
+      #we keep the from and to value and confidence in tables (global variable) to display later confidence values without recalculating all the graph      
+     
       fromconf[compte]<<-from
       toconf[compte]<<-to
       confconf1[compte]<<-conf2
       
-      
-      print(paste("put ",fromconf[compte],"->",toconf[compte],confconf1[compte]))
       
       compte=compte+1
       
@@ -253,7 +248,6 @@ computeImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.i
   initY=0
   
   list.spline <- list()
-  list.spline1 <- list()
   
   list.node <- list()
   list.name <- list()
@@ -357,7 +351,6 @@ computeImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.i
   list.node<<-list.node
   list.spline<<-list.spline
   
-  list.spline1<<-list.spline1  
   
 }
 
@@ -412,7 +405,6 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
   if(first) {
     
     list.spline.object <<- list()
-    list.spline1.object <<- list()
     
     list.control <<- list()
     #last position for control point
@@ -424,7 +416,7 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
     if(edit==TRUE) {
       
       function(x,y){
-        print("je suis dans pressed")
+        
         x <- as.numeric(x)
         y <- as.numeric(y)
         tkdtag(canvas, "selected")
@@ -438,28 +430,10 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
     }
   }
   
-  #Once you click on the left mouse button on a line, the confidence will be displayed
- # line_pressed <- function(i)
- # {
-    #  force(i)   
-      
-    #  function(x,y){
-        
-                
-    #    machaine="conf"
-        
-    #    tkcreate(canvas, "text", x, y, text=paste(machaine,i, sep=":"), fill="brown",tags="text1")
-        
-
-    #  }
-  #}
-  
-  
-  
-  
   #mouse move on the text
   text_move <- function(i)
   {
+    
     
     if(edit==TRUE) {
       force(i)   
@@ -473,23 +447,6 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
     }
   }
   
-  
-
-  
-  #mouse release on the line
- # line_released <- function(i){
- #     force(i)
- #     function(x,y) {
-       
-  #      tkdelete(canvas, "text1")
-        
-      
-  #      }
- #   }
-  
-  
-  
-
   #mouse release on the text
   text_released <- function(i){
     if(edit==TRUE) {
@@ -506,48 +463,28 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
         #for all edges from this node
         for(e in list.from[[i]]) {
           sp=list.spline.object[[e]]
-          
           sp$coord[[1]]=sp$coord[[1]]+as.numeric(x)
           sp$coord[[2]]=sp$coord[[2]]+as.numeric(y)
-          
-          
-
           #update the spline in the list
-          
-          list.spline.object[[e]]<<-sp 
-          
-          
+          list.spline.object[[e]]<<-sp
           #update the spline on the canvas
           tkcoords(canvas,sp$spline,sp$coord)
-          
-          
         }
         
         #for all edges to this node
         for(e in list.to[[i]]) {
           sp=list.spline.object[[e]]
-          sp1=list.spline1.object[[e]]
-          
           sp$coord[[7]]=sp$coord[[7]]+as.numeric(x)
           sp$coord[[8]]=sp$coord[[8]]+as.numeric(y)#-15
-          
-          sp1$coord[[7]]=sp1$coord[[7]]+as.numeric(x)
-          sp1$coord[[8]]=sp1$coord[[8]]+as.numeric(y)#-15
-          
-          
           #update the spline in the list
           list.spline.object[[e]]<<-sp
-          list.spline1.object[[e]]<<-sp1
-          
           #update the spline on the canvas
           tkcoords(canvas,sp$spline,sp$coord)
-          tkcoords(canvas,sp1$spline,sp1$coord)
-          
-          
         }
       }
     }
   }
+  
   
   #mouse pressed on control point
   control_point_pressed <- function (i) {
@@ -556,6 +493,7 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
       force(i)
       
       function(x,y){
+          
         tkdtag(canvas, "selected")
         tkaddtag(canvas, "selected", "withtag", "current")
         tkitemraise(canvas,"current")
@@ -574,11 +512,6 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
         pos <- as.numeric ( c ( x , y ) )
         tkmove ( canvas , "selected" , pos [ 1 ] - last_pos [ 1 ] ,
                  pos [ 2 ] - last_pos [ 2 ] )
-        
-        
-        print("pos[2] dans move")
-        
-        print(pos[2])
         
         last_pos <<- pos
       }
@@ -670,11 +603,6 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
       #functions to track the mouse
       tkitembind ( canvas , p , "<1>" , control_point_pressed(nb) )
       tkitembind ( canvas , p,"<B1-Motion>" , control_point_move(nb) )
-     #if(affiche==TRUE)
-     # {
-      #  tkitembind ( canvas , p1,"<B1-Motion>" , control_point_move(nb) )
-                
-      #}
       tkitembind ( canvas , p, "<ButtonRelease-1>" , control_point_released(spline,pos))
       
 
@@ -736,18 +664,19 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
 
       num=1
 
-  var2<<-list()
+      var2<<-list()
 
       for (i in 1:length(list.spline)) {
+        
+        
         sp=list.spline[[i]]
         sp=list.spline[[i]]
-        
-      
-        
-        
+              
         from=sp[['from']]
         to=sp[['to']]
        
+        # Retrieve the corresponding names of nodes
+        
         from1 <-listNode[from]
         to1 <-listNode[to]
         
@@ -760,8 +689,7 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
         coord=sp[['coord']]
         
         coord1=sp[['coord']]
-        
-        
+              
          
         
         sp <- tkcreate(canvas, "line", sp[['coord']],width=2,arrow=sp[['arrow']],smooth='bezier',splinesteps=6,tags="draw",fill=sp[['col']])
@@ -857,9 +785,16 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
         
         }
         
+        
+        sp=list.spline[[i]]
+        sp=list.spline[[i]]
+        
+        
         #calculates the coordinates where we will display the confidence        
         
         for (k in 1:length(confconf1)) {
+          
+          # Search the confidence value that corresponds to each pair (from to) in the order          
           chai1=fromconf[k]
           chai2=toconf[k]
           
@@ -867,63 +802,58 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
           {
             var2[num] <<- confconf1[[k]]
             
-            # if the arc is not right
-            sp=list.spline[[i]]
-            sp=list.spline[[i]]
-            
-            list.from[[from]]<<-c(list.from[[from]],i)
-            
+          
+            # one spline: then we have 3 segments, the display will be in the middle of the 2nd segment            if((num.spline.edge==1) && (endspline==1)) {
+
             if((num.spline.edge==1) && (endspline==1)) {
               
-          
-            Xm= (sp$coord[[5]]+sp$coord[[3]])/2
-            
-            Ym=(sp$coord[[6]]+sp$coord[[4]])/2
-            coordx1[num]<<-Xm
-            coordx2[num]<<-Ym
-            
-            
-            
-            }else {
-             
-              if((num.spline.edge==2) && (endspline==2)) {
+              
+              Xm= (sp$coord[[5]]+sp$coord[[3]])/2
+              
+              Ym=(sp$coord[[6]]+sp$coord[[4]])/2
+              coordx1[num]<<-Xm
+              coordx2[num]<<-Ym
+              
+              
+              
+            }else {# two splines: then we have 6 segments, the display will be in the middle of the 3rd segment            if((num.spline.edge==1) && (endspline==1)) {
 
-
-                Xm= sp$coord[[1]]
-                 Ym=sp$coord[[2]]
+              
+              if((num.spline.edge==1) && (endspline==2)) {
+                
+                
+                Xm= (sp$coord[[5]]+sp$coord[[7]])/2
+                
+                Ym=(sp$coord[[6]]+sp$coord[[8]])/2
                 
                 coordx1[num]<<-Xm
                 coordx2[num]<<-Ym
                 
                 
-              }else
+              }else # Tree splines: then we have 9 segments, the display will be in the middle of the 5th segment
               {
                 if((num.spline.edge==2) && (endspline==3)) {
-
-                
+                  
+                  
                   Xm= (sp$coord[[5]]+sp$coord[[3]])/2                
                   Ym=(sp$coord[[6]]+sp$coord[[4]])/2
                   coordx1[num]<<-Xm
                   coordx2[num]<<-Ym
                   
                 }
-
-                  
+                
+                
               } 
-            }
-            
+            } 
             
           }     
         }
         if(num.spline.edge==endspline) 
         {  
-           num=num+1   
-        }
-
-
-
+          num=num+1   
+        }    
         
-              
+     
       }
       
 
