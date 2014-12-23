@@ -157,7 +157,9 @@ toolbarGraph <- function (frame,callPlot,updatePlot) {
         indaff<<-0
       }
     }
-    for (i in 1:length(coordx1)) {
+    
+   
+    for (i in 1:length(var2)) {
       
     # retrieve coordinate of confidence
       
@@ -183,8 +185,8 @@ toolbarGraph <- function (frame,callPlot,updatePlot) {
   #  is to maintain the confidence by changing settings or switching to edit mode
   Afficheconf1<- function(){
     
-
-    for (i in 1:length(coordx1)) {
+    
+    for (i in 1:length(var2)) {
       
       Xm=coordx1[[i]]
       Ym=coordx2[[i]]

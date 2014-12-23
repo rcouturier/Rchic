@@ -366,7 +366,7 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
     # delete the old value of confidence
     tkdelete(canvas, "text1")
     
-    for (i in 1:length(coordx1)) {
+    for (i in 1:length(var2)) {
       
       Xm=coordx1[[i]]
       Ym=coordx2[[i]]
@@ -487,6 +487,7 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
     if(first) {
       list.control<<-c(list.control,list(list(nb,x,y,spline,pos)))
     }
+    
   }
   if(first) {
     #number of control points
@@ -537,17 +538,20 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
        
         
          #calculates the coordinates where we will display the confidence
-        for (k in 1:length(confconf1)) {
-          # Search the confidence value that corresponds to each pair (from to) in the order
-          chai1=fromconf[k]
-          chai2=toconf[k]
-          if(grepl(chai1, from1) & grepl(chai2,to1))
-          {
-            var2[num] <<- confconf1[[k]]
-            confidence=var2[num]
+          for (k in 1:length(confconf1)) {
+              # Search the confidence value that corresponds to each pair (from to) in the order
+              chai1=fromconf[k]
+              chai2=toconf[k]
+              if(grepl(chai1, from1) & grepl(chai2,to1))
+               {
+                  var2[num] <<- confconf1[[k]]
+                  confidence=var2[num]
             
-            list.spline.object <<- c(list.spline.object,list(list(spline=sp,coord=coord,from=from,to=to,endspline=endspline,num=num,conf=confidence)))
       
+               }
+            }
+            list.spline.object <<- c(list.spline.object,list(list(spline=sp,coord=coord,from=from,to=to,endspline=endspline,num=num,conf=confidence)))
+        
             #if this is the first spline of the edge
              if(num.spline.edge==1) {
               #add the current spline to the list from for this node
@@ -620,15 +624,16 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
                 }
               }
             }
-          }
-        }
+
         if(num.spline.edge==endspline)
         {
           num=num+1
         }
       }
-    }
+
+    }  
   }
+
   else {
     for (i in 1:length(list.control)) {
       element=list.control[[i]]
