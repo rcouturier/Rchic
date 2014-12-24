@@ -4,6 +4,7 @@
 
 
 #include <fstream>
+#include <string>
 
 #include <cstring>
 #include <math.h>
@@ -15,7 +16,6 @@
 // list::sort
 #include <vector>
 #include <list>
-#include <string>
 #include <cctype>
 
 #include <array> 
@@ -925,7 +925,10 @@ LogicalVector contribution_supp, LogicalVector typicality_supp, LogicalVector Ve
     //cc[i]=new char[10];  //it is only to have the number of the variable
     //cl[i]=new char[length+1];
     //sprintf(cc[i],"%i",i+1);
-    cc[i]= to_string(i+1);
+    std::ostringstream ss;
+    long num = i+1;
+    ss << num;
+    cc[i]= ss.str();//std::to_string(i+1);
     string v=variables[i];
     //sprintf(cl[i],"%s", (char*)v.c_str());
     cl[i]=v.c_str();
@@ -1367,7 +1370,11 @@ LogicalVector contribution_supp, LogicalVector typicality_supp, LogicalVector Ve
     //cc[i]=new char[10];  //it is only to have the number of the variable
     //cl[i]=new char[length+1];
     //sprintf(cc[i],"%i",i+1);
-    cc[i]=to_string(i+1);
+    std::ostringstream ss;
+    long num = i+1;
+    ss << num;
+    
+    cc[i]=ss.str();//std::to_string(i+1);
     string v=variables[i];
     //sprintf(cl[i],"%s", (char*)v.c_str());
     cl[i]=v.c_str();
