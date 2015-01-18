@@ -26,6 +26,8 @@ implicativeGraph <-function(list.variables) {
   #list that'll contain the the coordinates where drawing confidence
   coordx1<<- list()
   coordx2<<- list()
+  var2<<-list()
+  
   canvas <<- tkcanvas(tt, relief="raised", width=visibleWidth, height=visibleHeight,
                       xscrollcommand=function(...)tkset(xscr,...),
                       yscrollcommand=function(...)tkset(yscr,...),
@@ -246,6 +248,9 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
   #print(first)
   tkdelete(canvas, "text")
   tkdelete(canvas, "text1")
+  
+  
+ 
   if(first) {
     tkdelete(canvas, "control")
     tkdelete(canvas, "draw")
@@ -362,11 +367,11 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
  # displays the values of confidence when moving the control points 
   
   Afficheconf1<- function(){
-    
+      
     # delete the old value of confidence
     tkdelete(canvas, "text1")
     
-    for (i in 1:length(var2)) {
+    for (i in 1:(num-1)) {
       
       Xm=coordx1[[i]]
       Ym=coordx2[[i]]
@@ -396,7 +401,8 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
           endspline=sp$endspline
           num1=sp$num
           confidence=sp$conf
-               
+          num.spline=sp$num.spline.edge
+          
           #update of the second control point of the spline
           if(pos==2) {
             sp$coord[[3]]=sp$coord[[3]]+x
@@ -404,7 +410,7 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
             
             # update confidence coordinates when the control points move
             
-            if((endspline==1)||(endspline==3))
+            if((endspline==1)||((endspline==3)&&(num.spline==2)))
             {
               Xm=(sp$coord[[3]]+sp$coord[[5]])/2
               Ym=(sp$coord[[4]]+sp$coord[[6]])/2
@@ -413,6 +419,18 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
               
               Afficheconf1()
             }
+           
+              if((endspline>4)&&(num.spline==3)){
+                Xm=(sp$coord[[3]]+sp$coord[[5]])/2
+                Ym=(sp$coord[[4]]+sp$coord[[6]])/2
+                coordx1[num1]<<-Xm
+                coordx2[num1]<<-Ym
+                
+                Afficheconf1()
+                
+              }
+              
+            
             
           }
           #update of the third control point of the spline
@@ -420,7 +438,8 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
             sp$coord[[5]]=sp$coord[[5]]+x
             sp$coord[[6]]=sp$coord[[6]]+y
             
-            if((endspline==1)||(endspline==3))
+              
+            if((endspline==1)||((endspline==3)&&(num.spline==2)))
             {
               Xm=(sp$coord[[3]]+sp$coord[[5]])/2
               Ym=(sp$coord[[4]]+sp$coord[[6]])/2
@@ -430,7 +449,7 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
               Afficheconf1()
             }
             
-            if(endspline==2)
+            if((endspline==2)&&(num.spline==1))
             {
               Xm=(sp$coord[[5]]+sp$coord[[7]])/2
               Ym=(sp$coord[[6]]+sp$coord[[8]])/2
@@ -440,13 +459,7 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
               Afficheconf1()
             }
             
-          }
-          #update of the fourth control point of the spline
-          if(pos==4 & first==TRUE) {
-            sp$coord[[7]]=sp$coord[[7]]+x
-            sp$coord[[8]]=sp$coord[[8]]+y
-            first=FALSE
-            if(endspline==2)
+            if((endspline==4)&&(num.spline==2))
             {
               Xm=(sp$coord[[5]]+sp$coord[[7]])/2
               Ym=(sp$coord[[6]]+sp$coord[[8]])/2
@@ -454,6 +467,41 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
               coordx2[num1]<<-Ym
               
               Afficheconf1()
+              
+            }
+            if((endspline>4)&&(num.spline==3)){
+              Xm=(sp$coord[[3]]+sp$coord[[5]])/2
+              Ym=(sp$coord[[4]]+sp$coord[[6]])/2
+              coordx1[num1]<<-Xm
+              coordx2[num1]<<-Ym
+              
+              Afficheconf1()
+              
+            }
+          }
+          #update of the fourth control point of the spline
+          if(pos==4 & first==TRUE) {
+            sp$coord[[7]]=sp$coord[[7]]+x
+            sp$coord[[8]]=sp$coord[[8]]+y
+            first=FALSE
+            if((endspline==2)&&(num.spline==1))
+            {
+              Xm=(sp$coord[[5]]+sp$coord[[7]])/2
+              Ym=(sp$coord[[6]]+sp$coord[[8]])/2
+              coordx1[num1]<<-Xm
+              coordx2[num1]<<-Ym
+              
+              Afficheconf1()
+            }
+            if((endspline==4)&&(num.spline==2))
+            {
+              Xm=(sp$coord[[5]]+sp$coord[[7]])/2
+              Ym=(sp$coord[[6]]+sp$coord[[8]])/2
+              coordx1[num1]<<-Xm
+              coordx2[num1]<<-Ym
+              
+              Afficheconf1()
+              
             }
           }
           else
@@ -462,7 +510,12 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
             if(pos==4 & first==FALSE) {
               sp$coord[[1]]=sp$coord[[1]]+x
               sp$coord[[2]]=sp$coord[[2]]+y
+              
+              
+                            
             }
+          
+          
           #update the spline in the list
           list.spline.object[[s]]<<-sp
           #update the spline on the canvas
@@ -490,6 +543,7 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
     
   }
   if(first) {
+    
     #number of control points
     nb.control_point=1
     #we need 2 lists: one for the edges from the node and the other one for the edges to the node
@@ -519,9 +573,9 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
       # #get the list of the edges
       # edges = AgEdge(graph1)
       # #for all edges
-      num=1
-      var2<<-list()
+      num <<-1
       for (i in 1:length(list.spline)) {
+        
         sp=list.spline[[i]]
         sp=list.spline[[i]]
         from=sp[['from']]
@@ -544,13 +598,14 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
               chai2=toconf[k]
               if(grepl(chai1, from1) & grepl(chai2,to1))
                {
+                
+                
                   var2[num] <<- confconf1[[k]]
                   confidence=var2[num]
-            
       
                }
             }
-            list.spline.object <<- c(list.spline.object,list(list(spline=sp,coord=coord,from=from,to=to,endspline=endspline,num=num,conf=confidence)))
+            list.spline.object <<- c(list.spline.object,list(list(spline=sp,coord=coord,from=from,to=to,endspline=endspline,num=num,conf=confidence,num.spline.edge=num.spline.edge)))
         
             #if this is the first spline of the edge
              if(num.spline.edge==1) {
@@ -604,6 +659,8 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
             
             # one spline: then we have 3 segments, the display will be in the middle of the 2nd segment if((num.spline.edge==1) && (endspline==1)) {
             if((num.spline.edge==1) && (endspline==1)) {
+              
+              
               Xm= (sp$coord[[5]]+sp$coord[[3]])/2
               Ym=(sp$coord[[6]]+sp$coord[[4]])/2
               coordx1[num]<<-Xm
@@ -622,12 +679,33 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
                   coordx1[num]<<-Xm
                   coordx2[num]<<-Ym
                 }
+                else
+                {
+                  if((num.spline.edge==2) && (endspline==4)) {
+                    
+                    Xm= (sp$coord[[7]]+sp$coord[[5]])/2
+                    Ym=(sp$coord[[8]]+sp$coord[[6]])/2
+                    coordx1[num]<<-Xm
+                    coordx2[num]<<-Ym
+                  }
+                  else 
+                  {
+                    if((num.spline.edge==3) && (endspline >4)) {                      
+                    Xm= (sp$coord[[5]]+sp$coord[[3]])/2
+                    Ym=(sp$coord[[6]]+sp$coord[[4]])/2
+                    coordx1[num]<<-Xm
+                    coordx2[num]<<-Ym
+                    }
+                  }
+                 }
+                    
+                  
               }
             }
 
         if(num.spline.edge==endspline)
         {
-          num=num+1
+          num<<-num+1
         }
       }
 

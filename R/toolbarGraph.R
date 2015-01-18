@@ -144,6 +144,7 @@ toolbarGraph <- function (frame,callPlot,updatePlot) {
 #used to display confidence   
   Afficheconf<- function(){
     
+      
     indaff<<-indaff+1
     if(indaff==1)
     {
@@ -159,7 +160,9 @@ toolbarGraph <- function (frame,callPlot,updatePlot) {
     }
     
    
-    for (i in 1:length(var2)) {
+    #for (i in 1:length(var2)) {
+      for (i in 1:(num-1)) {
+        
       
     # retrieve coordinate of confidence
       
@@ -185,16 +188,19 @@ toolbarGraph <- function (frame,callPlot,updatePlot) {
   #  is to maintain the confidence by changing settings or switching to edit mode
   Afficheconf1<- function(){
     
-    
-    for (i in 1:length(var2)) {
-      
+   
+     
+    for (i in 1:(num-1)) {
+        
       Xm=coordx1[[i]]
       Ym=coordx2[[i]]
       var=var2[[i]]
       
       if(grepl(affiche, TRUE))
       {
+               
         p1 <<- tkcreate(canvas, "text", Xm, Ym, text=var, fill="black",tags="text1")
+       # p1 <<- tkcreate(canvas, "text", Xm, Ym, text=var, fill="black",tags="text1")
         
         
       }
