@@ -210,7 +210,7 @@ computeImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.i
         }
         #get the value of this rule
         val=rules[paste(tail(edge),"->",head(edge)),5]
-        col="black"
+        col=color[[1]]
         #compute the color of the edge according to the value of the rule
         if(cbvalue[[1]]==1 && value[[1]]<val)
           col=color[[1]]
