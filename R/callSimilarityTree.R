@@ -12,9 +12,9 @@
 
 
 callSimilarityTree <- function(filename,contribution.supp=FALSE,typicality.supp=FALSE,verbose=FALSE) {
-    
+
   #transform possible interval variables
-  result = readAndAnalyzeData(filename=filename)
+  result = readAndAnalyzeData(fileName=filename)
   dataCSV=result[[1]]
   supplementary.variables=result[[2]]
   

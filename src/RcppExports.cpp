@@ -9,11 +9,9 @@ using namespace Rcpp;
 void write_transactions(NumericMatrix data);
 RcppExport SEXP rchic_write_transactions(SEXP dataSEXP) {
 BEGIN_RCPP
-    {
-        Rcpp::RNGScope __rngScope;
-        Rcpp::traits::input_parameter< NumericMatrix >::type data(dataSEXP );
-        write_transactions(data);
-    }
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< NumericMatrix >::type data(dataSEXP);
+    write_transactions(data);
     return R_NilValue;
 END_RCPP
 }
@@ -21,57 +19,45 @@ END_RCPP
 IntegerVector dynamic_cloud(NumericVector data, IntegerVector number_partition);
 RcppExport SEXP rchic_dynamic_cloud(SEXP dataSEXP, SEXP number_partitionSEXP) {
 BEGIN_RCPP
-    SEXP __sexp_result;
-    {
-        Rcpp::RNGScope __rngScope;
-        Rcpp::traits::input_parameter< NumericVector >::type data(dataSEXP );
-        Rcpp::traits::input_parameter< IntegerVector >::type number_partition(number_partitionSEXP );
-        IntegerVector __result = dynamic_cloud(data, number_partition);
-        PROTECT(__sexp_result = Rcpp::wrap(__result));
-    }
-    UNPROTECT(1);
-    return __sexp_result;
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< NumericVector >::type data(dataSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type number_partition(number_partitionSEXP);
+    __result = Rcpp::wrap(dynamic_cloud(data, number_partition));
+    return __result;
 END_RCPP
 }
 // hierarchy
 List hierarchy(NumericMatrix cohesion_matrix, NumericVector list_occurrences_variables, NumericMatrix supplementary_variables, NumericMatrix matrix_values, LogicalVector contribution_supp, LogicalVector typicality_supp, LogicalVector Verbose);
 RcppExport SEXP rchic_hierarchy(SEXP cohesion_matrixSEXP, SEXP list_occurrences_variablesSEXP, SEXP supplementary_variablesSEXP, SEXP matrix_valuesSEXP, SEXP contribution_suppSEXP, SEXP typicality_suppSEXP, SEXP VerboseSEXP) {
 BEGIN_RCPP
-    SEXP __sexp_result;
-    {
-        Rcpp::RNGScope __rngScope;
-        Rcpp::traits::input_parameter< NumericMatrix >::type cohesion_matrix(cohesion_matrixSEXP );
-        Rcpp::traits::input_parameter< NumericVector >::type list_occurrences_variables(list_occurrences_variablesSEXP );
-        Rcpp::traits::input_parameter< NumericMatrix >::type supplementary_variables(supplementary_variablesSEXP );
-        Rcpp::traits::input_parameter< NumericMatrix >::type matrix_values(matrix_valuesSEXP );
-        Rcpp::traits::input_parameter< LogicalVector >::type contribution_supp(contribution_suppSEXP );
-        Rcpp::traits::input_parameter< LogicalVector >::type typicality_supp(typicality_suppSEXP );
-        Rcpp::traits::input_parameter< LogicalVector >::type Verbose(VerboseSEXP );
-        List __result = hierarchy(cohesion_matrix, list_occurrences_variables, supplementary_variables, matrix_values, contribution_supp, typicality_supp, Verbose);
-        PROTECT(__sexp_result = Rcpp::wrap(__result));
-    }
-    UNPROTECT(1);
-    return __sexp_result;
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< NumericMatrix >::type cohesion_matrix(cohesion_matrixSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type list_occurrences_variables(list_occurrences_variablesSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type supplementary_variables(supplementary_variablesSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type matrix_values(matrix_valuesSEXP);
+    Rcpp::traits::input_parameter< LogicalVector >::type contribution_supp(contribution_suppSEXP);
+    Rcpp::traits::input_parameter< LogicalVector >::type typicality_supp(typicality_suppSEXP);
+    Rcpp::traits::input_parameter< LogicalVector >::type Verbose(VerboseSEXP);
+    __result = Rcpp::wrap(hierarchy(cohesion_matrix, list_occurrences_variables, supplementary_variables, matrix_values, contribution_supp, typicality_supp, Verbose));
+    return __result;
 END_RCPP
 }
 // similarity
 List similarity(NumericMatrix similarity_matrix, NumericVector list_occurrences_variables, NumericMatrix supplementary_variables, NumericMatrix matrix_values, LogicalVector contribution_supp, LogicalVector typicality_supp, LogicalVector Verbose);
 RcppExport SEXP rchic_similarity(SEXP similarity_matrixSEXP, SEXP list_occurrences_variablesSEXP, SEXP supplementary_variablesSEXP, SEXP matrix_valuesSEXP, SEXP contribution_suppSEXP, SEXP typicality_suppSEXP, SEXP VerboseSEXP) {
 BEGIN_RCPP
-    SEXP __sexp_result;
-    {
-        Rcpp::RNGScope __rngScope;
-        Rcpp::traits::input_parameter< NumericMatrix >::type similarity_matrix(similarity_matrixSEXP );
-        Rcpp::traits::input_parameter< NumericVector >::type list_occurrences_variables(list_occurrences_variablesSEXP );
-        Rcpp::traits::input_parameter< NumericMatrix >::type supplementary_variables(supplementary_variablesSEXP );
-        Rcpp::traits::input_parameter< NumericMatrix >::type matrix_values(matrix_valuesSEXP );
-        Rcpp::traits::input_parameter< LogicalVector >::type contribution_supp(contribution_suppSEXP );
-        Rcpp::traits::input_parameter< LogicalVector >::type typicality_supp(typicality_suppSEXP );
-        Rcpp::traits::input_parameter< LogicalVector >::type Verbose(VerboseSEXP );
-        List __result = similarity(similarity_matrix, list_occurrences_variables, supplementary_variables, matrix_values, contribution_supp, typicality_supp, Verbose);
-        PROTECT(__sexp_result = Rcpp::wrap(__result));
-    }
-    UNPROTECT(1);
-    return __sexp_result;
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< NumericMatrix >::type similarity_matrix(similarity_matrixSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type list_occurrences_variables(list_occurrences_variablesSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type supplementary_variables(supplementary_variablesSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type matrix_values(matrix_valuesSEXP);
+    Rcpp::traits::input_parameter< LogicalVector >::type contribution_supp(contribution_suppSEXP);
+    Rcpp::traits::input_parameter< LogicalVector >::type typicality_supp(typicality_suppSEXP);
+    Rcpp::traits::input_parameter< LogicalVector >::type Verbose(VerboseSEXP);
+    __result = Rcpp::wrap(similarity(similarity_matrix, list_occurrences_variables, supplementary_variables, matrix_values, contribution_supp, typicality_supp, Verbose));
+    return __result;
 END_RCPP
 }

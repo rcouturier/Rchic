@@ -15,7 +15,7 @@ if (!nchar(fileName)) {
 } else{
   
   
-  callHierarchyTree(filename=fileName,contribution.supp=TRUE,typicality.supp=FALSE,verbose=FALSE)
+  callHierarchyTree(fileName=fileName,contribution.supp=TRUE,typicality.supp=FALSE,verbose=FALSE)
 }
 
 

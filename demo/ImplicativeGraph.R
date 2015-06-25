@@ -19,7 +19,7 @@ if (!nchar(fileName)) {
   indaff <<- 0
  
   #transform possible interval variables
-  result = readAndAnalyzeData(dataCSV)
+  result = readAndAnalyzeData(fileName = fileName)
   dataCSV=result[[1]]
   supplementary.variable=result[[2]]
   #prepare data for apriori

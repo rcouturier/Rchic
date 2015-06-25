@@ -2,8 +2,8 @@
 #'
 #' @description Partitions data that require that
 #' 
-#' @param   dataCSV   dataframe of the initial data
-#' @param   ask.value.partitionning  if true, user can choose the number of partition for interval variables 
+#' @param   fileName                    name of the file containing data
+#' @param   ask.value.partitionning     if true, user can choose the number of partition for interval variables 
 #' (otherwise it is fixed to 3 by default)
 #' 
 #' @author Rapha\"{e}l Couturier \email{raphael.couturier@@univ-fcomte.fr}
@@ -11,7 +11,7 @@
 
 
 
-readAndAnalyzeData <- function (filename, ask.value.partitionning=FALSE) {
+readAndAnalyzeData <- function (fileName, ask.value.partitionning=FALSE) {
   
   
   
