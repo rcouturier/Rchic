@@ -2,7 +2,7 @@
 #'
 #' @description Reads the data, prepare the data and call similarityTree.
 #' 
-#' @param   filename             name of the file containing data
+#' @param   fileName             name of the file containing data
 #' @param   contribution.supp    boolean to compute the contribution of supplementary variables
 #' @param   typicality.supp      boolean to compute the typicality of supplementary variables
 #' @param   verbose              boolean to give many details.
@@ -11,10 +11,10 @@
 #' @export
 
 
-callSimilarityTree <- function(filename,contribution.supp=FALSE,typicality.supp=FALSE,verbose=FALSE) {
+callSimilarityTree <- function(fileName,contribution.supp=FALSE,typicality.supp=FALSE,verbose=FALSE) {
 
   #transform possible interval variables
-  result = readAndAnalyzeData(fileName=filename)
+  result = readAndAnalyzeData(fileName=fileName)
   dataCSV=result[[1]]
   supplementary.variables=result[[2]]
   
