@@ -7,6 +7,8 @@
 #' @author Rapha\"{e}l Couturier \email{raphael.couturier@@univ-fcomte.fr}
 #' @export
 implicativeGraph <-function(list.variables) {
+  
+  confidence<<-0
   visibleWidth<<-1200
   visibleHeight<<-800
   workingWidth<<-1200
@@ -108,7 +110,8 @@ computeImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.i
   for(i in 1:n) {
     from=listNodes[[i]][1]
     to=listNodes[[i]][2]
-    if(rules[i,5]>thres & rules[i,1]<rules[i,2] & as.numeric(list.selected.item[[which(list.variables==from)]]) & as.numeric(list.selected.item[[which(list.variables==to)]])) {
+    if(rules[i,5]>thres & rules[i,1]<rules[i,2] & as.numeric(list.selected.item[[which(list.variables==from)]]) & as.numeric(list.selected.item[[which(list.variables==to)]])& rules[i,4]>confidence) {
+    # if(rules[i,5]>thres & rules[i,1]<rules[i,2] & as.numeric(list.selected.item[[which(list.variables==from)]]) & as.numeric(list.selected.item[[which(list.variables==to)]])) {
       lNodes=c(lNodes,from,to)
     }
   }
@@ -126,8 +129,16 @@ computeImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.i
     rule=strsplit(row.names(rules)[i],split=' -> ')
     from=rule[[1]][1]
     to=rule[[1]][2]
+   
+     
+    
     if(rules[i,5]>thres & rules[i,1]<rules[i,2] &
-         as.numeric(list.selected.item[[which(list.variables==from)]]) & as.numeric(list.selected.item[[which(list.variables==to)]])) {
+        as.numeric(list.selected.item[[which(list.variables==from)]]) & as.numeric(list.selected.item[[which(list.variables==to)]]) & rules[i,4]>confidence) {
+  
+      
+     # if(rules[i,5]>thres & rules[i,1]<rules[i,2] &
+      #   as.numeric(list.selected.item[[which(list.variables==from)]]) & as.numeric(list.selected.item[[which(list.variables==to)]])) {
+        
       g1 <- addEdge(from,to,g1)
       # retrieve the confidence value
       conf1=rules[i,4]
