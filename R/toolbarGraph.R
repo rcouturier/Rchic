@@ -17,8 +17,12 @@
 #mycolor
 
 
+
+
 toolbarGraph <- function (frame,callPlot,updatePlot) {
   
+  
+  un <<-0
   spin=list()
   cb=list()
   tmp.val=array(0,4)
@@ -112,10 +116,50 @@ toolbarGraph <- function (frame,callPlot,updatePlot) {
   spin=list(spin1,spin2,spin3,spin4)
   cb=list(cb1,cb2,cb3,cb4)
   
-  OnOK <- function()
+  
+  
+  OnOK1 <- function()
   {
+  
+    confidence <<- as.numeric(tclvalue(myvalue1[[1]]))
     callPlot()
     Afficheconf1()
+    
+    
+  }
+  dialoguebox <- function () {
+    if(un >0 )
+   {
+      print("je supprime")
+      tkdestroy(top1)
+
+   }
+   un <<- un+1
+    top1 <<- tktoplevel()
+    tktitle(top1)<-" confidence"
+    myvalue1<<-list(tclVar(80))
+    
+    
+    label.text <- tclVar('choose the confidence value')
+    label <- tklabel(top1, text = tclvalue(label.text))
+    tkconfigure(label, textvariable = label.text)
+    tkgrid(label)
+    
+    listederoulante<-tkwidget(top1,"spinbox", from=0, to=100, increment=5,width=3, textvariable=myvalue1[[1]])
+    bouton1 <- tkbutton(top1,text="OK",command=OnOK1)
+    #bouton2 <- tkbutton(top,text="cancel",command=OnOK1)
+    tkpack(label,listederoulante,bouton1)
+    
+    
+    #listederoulante<-tkwidget(top,"spinbox", from=50, to=100, increment=5,width=3, textvariable=myvalue[[1]])
+  } 
+  OnOK <- function()
+  {
+  
+    dialoguebox()
+
+   # callPlot()
+    #Afficheconf1()
   
   }
   OK.but <- tkbutton(frame,text="OK",command=OnOK)
@@ -232,6 +276,9 @@ toolbarGraph <- function (frame,callPlot,updatePlot) {
   
   
   changeSpinBox <- function(spin.nb)  {
+   
+    
+    
     #print(spin.nb)
     for(i in 1:4) {
       tmp.val[i]=as.numeric(tclvalue(myvalue[[i]]))
