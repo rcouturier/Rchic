@@ -14,6 +14,6 @@ if (!nchar(fileName)) {
 } else {
   
   
-  callSimilarityTree(filename=fileName,contribution.supp=TRUE,typicality.supp=FALSE,verbose=FALSE)
+  callSimilarityTree(fileName=fileName,contribution.supp=TRUE,typicality.supp=FALSE,verbose=FALSE)
   
 }

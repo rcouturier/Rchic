@@ -10,7 +10,7 @@
 #' @author Rapha\"{e}l Couturier \email{raphael.couturier@@univ-fcomte.fr}
 #' @export
 
-
+ 
 callSimilarityTree <- function(fileName,contribution.supp=FALSE,typicality.supp=FALSE,verbose=FALSE) {
 
   #transform possible interval variables

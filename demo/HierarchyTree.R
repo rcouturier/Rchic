@@ -13,8 +13,6 @@ if (!nchar(fileName)) {
   tkmessageBox(message = "No file was selected!")
   setwd(initDirectory)
 } else{
-  
-  
   callHierarchyTree(fileName=fileName,contribution.supp=TRUE,typicality.supp=FALSE,verbose=FALSE)
 }
 
