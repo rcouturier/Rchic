@@ -38,6 +38,7 @@ tkadd(fileMenu, "command", label = "Hierarchy tree", command = function(){
 })
 tkadd(fileMenu, "command", label = "Implicative graph", command = function(){
   
+  
   #select file
   fileName <- tclvalue(tkgetOpenFile())
   

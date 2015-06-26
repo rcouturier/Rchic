@@ -7,7 +7,6 @@
 #' @author Rapha\"{e}l Couturier \email{raphael.couturier@@univ-fcomte.fr}
 #' @export
 implicativeGraph <-function(list.variables) {
-  
   confidence<<-0
   visibleWidth<<-1200
   visibleHeight<<-800
@@ -46,6 +45,7 @@ implicativeGraph <-function(list.variables) {
   mythreshold<<-tclVar(99)
   myedit<<-tclVar(0)
   myaffiche<<-tclVar(0)
+  list.variables<<-list.variables
   #currently we consider that all items are selected
   list.selected.item=rep_len(T,length(list.variables))
   list.tcl<<-lapply(list.selected.item,function(i) tclVar(i))
@@ -63,6 +63,8 @@ implicativeGraph <-function(list.variables) {
 }
 
 callPlotImplicativeGraph <- function() {
+  print("IIIIIIIIIIII")
+  print(list.variables)
   # Need to check these parameters here
   thres=100
   for(i in 1:4) {
