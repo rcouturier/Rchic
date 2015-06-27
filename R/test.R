@@ -3,11 +3,72 @@ require(stringr) || stop("stringr support is absent")
 require(tcltk2) || stop("tcltk2 support is absent")
 
 
+
+
+
+
+modalDialog <- function(title, question, entryInit, implicationType,entryWidth = 20,
+                        returnValOnCancel = "ID_CANCEL") {
+  dlg <- tktoplevel()
+  tkwm.deiconify(dlg)
+  tkgrab.set(dlg)
+  tkfocus(dlg)
+  tkwm.title(dlg, title)
+  textEntryVarTcl <- tclVar(paste(entryInit))
+  textEntryWidget <- tkentry(dlg, width = paste(entryWidth),
+                             textvariable = textEntryVarTcl)
+  tkgrid(tklabel(dlg, text = "       "))
+  tkgrid(tklabel(dlg, text = question), textEntryWidget)
+  tkgrid(tklabel(dlg, text = "       "))
+  
+  
+  rb1 <- tkradiobutton(dlg)
+  rb2 <- tkradiobutton(dlg)
+  rbValueTcl <- tclVar(paste(implicationType))
+  tkconfigure(rb1,variable=rbValueTcl,value="Classic")
+  tkconfigure(rb2,variable=rbValueTcl,value="Implifiance")
+  
+  tkgrid(tklabel(dlg,text="Classic "),rb1)
+  tkgrid(tklabel(dlg,text="Implifiance "),rb2)
+  
+  
+  ReturnVal <- returnValOnCancel
+  
+  onOK <- function() {
+    ReturnVal <<- paste(tclvalue(textEntryVarTcl),tclvalue(rbValueTcl))
+    tkgrab.release(dlg)
+    tkdestroy(dlg)
+    tkfocus(ttMain)
+  }
+  onCancel <- function() {
+    ReturnVal <<- returnValOnCancel
+    tkgrab.release(dlg)
+    tkdestroy(dlg)
+    tkfocus(ttMain)
+  }
+  OK.but <- tkbutton(dlg, text = "   OK   ", command = onOK)
+  Cancel.but <- tkbutton(dlg, text = " Cancel ", command = onCancel)
+  tkgrid(OK.but, Cancel.but)
+  tkgrid(tklabel(dlg, text = "    "))
+  
+  tkfocus(dlg)
+  tkbind(dlg, "<Destroy>", function() {tkgrab.release(dlg); tkfocus(ttMain)})
+  tkbind(textEntryWidget, "<Return>", onOK)
+  tkwait.window(dlg)
+  
+  return(ReturnVal)
+}
+
+
+
  
 tt <- tktoplevel()
 topMenu <- tkmenu(tt)
+tkwm.title( tt , " RCHIC " )
 tkconfigure(tt, menu = topMenu)
 fileMenu <- tkmenu(topMenu, tearoff = FALSE)
+optionMenu <- tkmenu(topMenu, tearoff = FALSE)
+
 tkadd(fileMenu, "command", label = "Similarity tree", command = function() {
   #select file
   fileName <- tclvalue(tkgetOpenFile())
@@ -71,4 +132,31 @@ tkadd(fileMenu, "command", label = "Implicative graph", command = function(){
 })
 
 tkadd(topMenu, "cascade", label = "Rchic", menu = fileMenu)
+
+tkadd(optionMenu, "command", label = "Option", command = function() {
+  optionFile="option.csv"
+  if (file.exists(optionFile)){
+    my.option = read.table(file=optionFile,head=FALSE,sep=",",stringsAsFactors=F)
+    print(my.option)
+  }
+  else {
+    fields=c("computation","other")
+    values=c("Classic","other2")
+    my.option=data.frame(fields,values,stringsAsFactors=FALSE)
+    
+  }
+  
+  ReturnVal <- modalDialog("First Name Entry", "Enter Your First Name", "toto", my.option[1,2])
+  if (ReturnVal == "ID_CANCEL") return()
+  #tkmessageBox(title = "Greeting",
+  #             message = paste("Hello, ", ReturnVal, sep = ""))
+  print(my.option)
+  val=strsplit(ReturnVal, " ")[[1]]
+  print(val[2])
+  
+  my.option[1,2]=val[2]
+  write.table(my.option,"option.csv",col.names = FALSE,row.names = FALSE,sep=",")
+})
+
+tkadd(topMenu, "cascade", label = "Option", menu = optionMenu)
 tkfocus(tt)
