@@ -780,7 +780,9 @@ int ist_rule (ISTREE *ist, int *rule,
 		*impli=sqrt(*phi*ii);
 */
 
-		if (t <= alpha/2.0)
+
+//  entropic version
+/*		if (t <= alpha/2.0)
 			h1 =0.5*(1+xl2xb(0.5-t/alpha) + xl2xb(0.5+t/alpha));
 		else if( t<=alpha)
 			h1 =0.5*(1-xl2xb(t/alpha-0.5) - xl2xb(1.5-t/alpha));
@@ -794,8 +796,20 @@ int ist_rule (ISTREE *ist, int *rule,
 		else h2=1.;
 		ii = sqrt((1.-h1)*(1.-h2));
 		*impli=(1.-1./(2.*sqrt(occ_n)))*ii;
+*/
 
 
+
+  //implifiance
+  double occ_nonanonb=occ_n-(occ_b+occ_abb);
+  double C1=occ_ab/occ_a;
+  double C2=occ_nonanonb/(occ_n-occ_b);
+  *impli=*phi*pow(C1*C2,0.25);
+
+
+
+
+  //normal similarity
 		double c=(occ_a*occ_b)/occ_n;
 		*normal_simi=Normal((occ_ab-c)/sqrt(c));
 

@@ -118,7 +118,7 @@ toolbarGraph <- function (frame,callPlot,updatePlot) {
   
   
   
-  OnOK1 <- function()
+  OnOK <- function()
   {
   
     confidence <<- as.numeric(tclvalue(myvalue1[[1]]))
@@ -127,7 +127,7 @@ toolbarGraph <- function (frame,callPlot,updatePlot) {
     
     
   }
-  dialoguebox <- function () {
+  confidenceBox <- function () {
     if(un >0 )
    {
       print("je supprime")
@@ -146,23 +146,30 @@ toolbarGraph <- function (frame,callPlot,updatePlot) {
     tkgrid(label)
     
     listederoulante<-tkwidget(top1,"spinbox", from=0, to=100, increment=5,width=3, textvariable=myvalue1[[1]])
-    bouton1 <- tkbutton(top1,text="OK",command=OnOK1)
+    bouton1 <- tkbutton(top1,text="OK",command=OnOK)
     #bouton2 <- tkbutton(top,text="cancel",command=OnOK1)
     tkpack(label,listederoulante,bouton1)
     
     
     #listederoulante<-tkwidget(top,"spinbox", from=50, to=100, increment=5,width=3, textvariable=myvalue[[1]])
   } 
-  OnOK <- function()
+  OnOKconfidence <- function()
   {
-  
-    dialoguebox()
+    print("IIIIIIIIIIIIIIII")
+    print(computing.mode)
+    #only the computing mode==2 displays the confidence dialog
+      confidenceBox()
 
    # callPlot()
     #Afficheconf1()
   
   }
-  OK.but <- tkbutton(frame,text="OK",command=OnOK)
+  if(computing.mode==2) {
+    OK.but <- tkbutton(frame,text="OK",command=OnOKconfidence)
+  }
+  else {
+    OK.but <- tkbutton(frame,text="OK",command=OnOK)
+  }
   tkgrid(OK.but)
   tkfocus(frame)
   

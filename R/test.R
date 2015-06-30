@@ -120,12 +120,25 @@ tkadd(fileMenu, "command", label = "Implicative graph", command = function(){
     supplementary.variable=result[[2]]
     #prepare data for apriori
     data2transac(dataCSV)
+    
     #call apriori
     callAsirules()
     list.variables=names(dataCSV)
     list.variables=list.variables[-1]
+    
+    #retrieve option
+    my.option=getMyOption()
+    #compute the computing mode
+    computing.mode=1
+    if(my.option[1,2]=="Classic+Confidence")
+      computing.mode=2
+    if(my.option[1,2]=="Implifiance")
+      computing.mode=3
+    print("computing mode")
+    print(computing.mode)
+    
     #list of variables is needed to keep the same order in the variable when the cohesion matrix is built
-    implicativeGraph(list.variables)
+    implicativeGraph(list.variables,computing.mode)
     
     
   }
@@ -138,7 +151,7 @@ tkadd(topMenu, "cascade", label = "Rchic", menu = fileMenu)
 tkadd(optionMenu, "command", label = "Option", command = function() {
   
   
-  my.option=getOption()
+  my.option=getMyOption()
   
   ReturnVal <- modalDialog("First Name Entry", "Enter Your First Name", "toto", my.option[1,2])
   if (ReturnVal == "ID_CANCEL") return()

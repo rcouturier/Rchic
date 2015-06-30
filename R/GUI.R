@@ -7,7 +7,7 @@
 
 
 
-getOption <- function() {
+getMyOption <- function() {
   optionFile="option.csv"
   if (file.exists(optionFile)){
     my.option = read.table(file=optionFile,head=FALSE,sep=",",stringsAsFactors=F)

@@ -2,18 +2,18 @@
 #'
 #' @description Reads the ASI rules, selects the rules according to the toolbar and calls rgraphviz before displaying the rules.
 #'
-#' @param list.variables list containing all the variables used in the computation
-#'
+#' @param list.variables   list containing all the variables used in the computation
+#' @param computing.mode   controls the computing mode: 1=classic implication, 2=classic implication+ confidence, 3=implifiance
 #' @author Rapha\"{e}l Couturier \email{raphael.couturier@@univ-fcomte.fr}
 #' @export
-implicativeGraph <-function(list.variables) {
+implicativeGraph <-function(list.variables,computing.mode=1) {
   confidence<<-0
   visibleWidth<<-1200
   visibleHeight<<-800
   workingWidth<<-1200
   workingHeight<<-800
   top <- tktoplevel()
-  tkwm.title( top , " Simple dialog " )
+  tkwm.title( top , " Implicative graph " )
   tt <- ttkframe ( top )#, padding = 0)
   toolbar <- ttkframe ( top )#, padding = 0 )
   tkgrid(toolbar,row = 0 , column = 0, sticky = "news")
@@ -46,6 +46,7 @@ implicativeGraph <-function(list.variables) {
   myedit<<-tclVar(0)
   myaffiche<<-tclVar(0)
   list.variables<<-list.variables
+  computing.mode<<-computing.mode
   #currently we consider that all items are selected
   list.selected.item=rep_len(T,length(list.variables))
   list.tcl<<-lapply(list.selected.item,function(i) tclVar(i))
@@ -63,8 +64,6 @@ implicativeGraph <-function(list.variables) {
 }
 
 callPlotImplicativeGraph <- function() {
-  print("IIIIIIIIIIII")
-  print(list.variables)
   # Need to check these parameters here
   thres=100
   for(i in 1:4) {
@@ -107,14 +106,31 @@ computeImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.i
   row.names(rules)=row
   n=dim(rules)[1]
   listNodes=strsplit(row.names(rules),split=' -> ')
+  
+  
+  #according to computing.mode, the location of the index is not the same
+  if(computing.mode==1 | computing.mode==2)
+    index.imp=5    #it corresponds to the classical index
+  if(computing.mode==3)
+    index.imp=6    #it corresponds to the implifiance
+  
+    
   #determine the list of visible nodes
   lNodes=character(0)
   for(i in 1:n) {
     from=listNodes[[i]][1]
     to=listNodes[[i]][2]
-    if(rules[i,5]>thres & rules[i,1]<rules[i,2] & as.numeric(list.selected.item[[which(list.variables==from)]]) & as.numeric(list.selected.item[[which(list.variables==to)]])& rules[i,4]>confidence) {
-    # if(rules[i,5]>thres & rules[i,1]<rules[i,2] & as.numeric(list.selected.item[[which(list.variables==from)]]) & as.numeric(list.selected.item[[which(list.variables==to)]])) {
-      lNodes=c(lNodes,from,to)
+    if(computing.mode==2) {
+      if(rules[i,index.imp]>thres & rules[i,1]<rules[i,2] & as.numeric(list.selected.item[[which(list.variables==from)]]) 
+         & as.numeric(list.selected.item[[which(list.variables==to)]])& computing.mode==2 & rules[i,4]>confidence) {
+        lNodes=c(lNodes,from,to)
+      }
+    }
+    else {
+      if(rules[i,index.imp]>thres & rules[i,1]<rules[i,2] & as.numeric(list.selected.item[[which(list.variables==from)]]) 
+         & as.numeric(list.selected.item[[which(list.variables==to)]])) {
+        lNodes=c(lNodes,from,to)
+      }
     }
   }
   lNodes=unique(lNodes)
@@ -133,24 +149,38 @@ computeImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.i
     to=rule[[1]][2]
    
      
-    
-    if(rules[i,5]>thres & rules[i,1]<rules[i,2] &
-        as.numeric(list.selected.item[[which(list.variables==from)]]) & as.numeric(list.selected.item[[which(list.variables==to)]]) & rules[i,4]>confidence) {
-  
-      
-     # if(rules[i,5]>thres & rules[i,1]<rules[i,2] &
-      #   as.numeric(list.selected.item[[which(list.variables==from)]]) & as.numeric(list.selected.item[[which(list.variables==to)]])) {
+    if(computing.mode==2) {
+      if(rules[i,index.imp]>thres & rules[i,1]<rules[i,2] &
+         as.numeric(list.selected.item[[which(list.variables==from)]]) & 
+         as.numeric(list.selected.item[[which(list.variables==to)]]) & (computing.mode==2 & rules[i,4]>confidence)) {
+        g1 <- addEdge(from,to,g1)
+        # retrieve the confidence value
+        conf1=rules[i,4]
+        # rounding confidence to two digits after the decimal point
+        conf2=round(conf1,2)
+        #we keep the from and to value and confidence in tables (global variable) to display later confidence values without recalculating all the graph
+        fromconf[compte]<<-from
+        toconf[compte]<<-to
+        confconf1[compte]<<-conf2
         
-      g1 <- addEdge(from,to,g1)
-      # retrieve the confidence value
-      conf1=rules[i,4]
-      # rounding confidence to two digits after the decimal point
-      conf2=round(conf1,2)
-      #we keep the from and to value and confidence in tables (global variable) to display later confidence values without recalculating all the graph
-      fromconf[compte]<<-from
-      toconf[compte]<<-to
-      confconf1[compte]<<-conf2
-      compte=compte+1
+        compte=compte+1
+      }
+    }
+    else {
+      if(rules[i,index.imp]>thres & rules[i,1]<rules[i,2] &
+         as.numeric(list.selected.item[[which(list.variables==from)]]) & 
+         as.numeric(list.selected.item[[which(list.variables==to)]])) {
+        g1 <- addEdge(from,to,g1)
+        # retrieve the confidence value
+        conf1=rules[i,4]
+        # rounding confidence to two digits after the decimal point
+        conf2=round(conf1,2)
+        #we keep the from and to value and confidence in tables (global variable) to display later confidence values without recalculating all the graph
+        fromconf[compte]<<-from
+        toconf[compte]<<-to
+        confconf1[compte]<<-conf2
+        compte=compte+1
+      }
     }
   }
   #no need to plot thegraph
@@ -259,11 +289,6 @@ computeImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.i
 }
 
 plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item,edit=FALSE,first=TRUE) {
-  #print("edit")
-  #print(edit)
-  #print(edit==TRUE)
-  #print("first")
-  #print(first)
   tkdelete(canvas, "text")
   tkdelete(canvas, "text1")
   
