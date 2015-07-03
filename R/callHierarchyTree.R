@@ -7,7 +7,7 @@
 #' @param   typicality.supp      boolean to compute the typicality of supplementary variables
 #' @param   verbose              boolean to give many details.
 #'
-#' @author Rapha\"{e}l Couturier \email{raphael.couturier@@univ-fcomte.fr}
+#' @author Raphaël Couturier \email{raphael.couturier@@univ-fcomte.fr}
 #' @export
 
  

@@ -8,6 +8,6 @@
 Spanish dataset of animals.
 }
 \author{
-Rapha\"{e}l Couturier \email{raphael.couturier@univ-fcomte.fr}
+Raphaël Couturier \email{raphael.couturier@univ-fcomte.fr}
 }
 

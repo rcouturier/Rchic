@@ -1,9 +1,9 @@
 Package: rchic
 Title: Statistical implicative analysis
-Version: 0.15
+Version: 0.16
 Date: 2015
-Author: Rapha\"{e}l Couturier
-Maintainer: Rapha\"{e}l Couturier <raphael.couturier@univ-fcomte.fr>
+Author: Raphaël Couturier
+Maintainer: Raphaël Couturier <raphael.couturier@univ-fcomte.fr>
 Description: This package is intented to implement all the features of
     Statistical Implicative Analysis. This theory aims at building association
     rules of the form : if an object has the property A it also tends to have

@@ -1,0 +1,2 @@
+To make the manual, we need to make Document in rstudio. Build the source package. Then in the parent directory, we need to execute R CMD check rchic_X.XX.tar.gz.
+It produces a directory named rchic.Rcheck containing the manual

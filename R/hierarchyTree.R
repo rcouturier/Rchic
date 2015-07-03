@@ -9,7 +9,7 @@
 #' @param   typicality.supp      boolean to compute the typicality of supplementary variables
 #' @param   verbose         give many details.
 #'
-#' @author Rapha\"{e}l Couturier \email{raphael.couturier@@univ-fcomte.fr}
+#' @author Raphaël Couturier \email{raphael.couturier@@univ-fcomte.fr}
 #' @export
 
 hierarchyTree <-function(list.variables, supplementary.variables, matrix.values, contribution.supp, typicality.supp, verbose=FALSE) {

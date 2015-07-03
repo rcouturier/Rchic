@@ -4,7 +4,7 @@
 #'
 #' @name animales
 #' @docType data
-#' @author Rapha\"{e}l Couturier \email{raphael.couturier@@univ-fcomte.fr}
+#' @author Raphaël Couturier \email{raphael.couturier@@univ-fcomte.fr}
 NULL
 
 #' @title Animals dataset (french).
@@ -13,7 +13,7 @@ NULL
 #'
 #' @name animaux
 #' @docType data
-#' @author Rapha\"{e}l Couturier \email{raphael.couturier@@univ-fcomte.fr}
+#' @author Raphaël Couturier \email{raphael.couturier@@univ-fcomte.fr}
 NULL
 
 #' @title Small animals dataset (spanish).
@@ -22,5 +22,5 @@ NULL
 #'
 #' @name animalesSmall
 #' @docType data
-#' @author Rapha\"{e}l Couturier \email{raphael.couturier@@univ-fcomte.fr}
+#' @author Raphaël Couturier \email{raphael.couturier@@univ-fcomte.fr}
 NULL

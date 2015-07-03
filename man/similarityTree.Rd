@@ -24,6 +24,6 @@ similarityTree(list.variables, supplementary.variables, matrix.values,
 (Reads the ASI rules) Computes the similarities and displays the Similarity Tree.
 }
 \author{
-Rapha\"{e}l Couturier \email{raphael.couturier@univ-fcomte.fr}
+Raphaël Couturier \email{raphael.couturier@univ-fcomte.fr}
 }
 

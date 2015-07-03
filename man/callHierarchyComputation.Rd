@@ -27,6 +27,6 @@ callHierarchyComputation(cohesion_matrix, list.occurrences.variables,
 Interface to call the the C++ hierarchy computation.
 }
 \author{
-Rapha\"{e}l Couturier \email{raphael.couturier@univ-fcomte.fr}
+Raphaël Couturier \email{raphael.couturier@univ-fcomte.fr}
 }
 
