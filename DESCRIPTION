@@ -1,5 +1,4 @@
 Package: rchic
-Type: Package
 Title: Statistical implicative analysis
 Version: 0.15
 Date: 2015
@@ -15,13 +14,31 @@ Description: This package is intented to implement all the features of
     sizes (than A and B). With Rchic you can build a similirity tree (using
     similarity analysis), an implicative graph and a hierarchical tree.
 Depends:
-    R (>= 2.14.0),
+    R (>= 3.0.2)
+Imports:
     tcltk2,
     Rgraphviz,
-    stringr
-LinkingTo: Rcpp
+    stringr,
+    Rcpp
 License: GPL
+LinkingTo: Rcpp
 URL: https://github.com/rchic/Rchic/
 VignetteBuilder: knitr
 Suggests:
     knitr
+Collate:
+    'callCFunctions.R'
+    'data.R'
+    'rchic.R'
+    'test.R'
+    'callHierarchyTree.R'
+    'GUI.R'
+    'RcppExports.R'
+    'toolbarGraph.R'
+    'callSimilarityTree.R'
+    'hierarchyTree.R'
+    'readAndAnalyzeData.R'
+    'toolbarItem.R'
+    'data2transac.R'
+    'implicativeGraph.R'
+    'similarityTree.R'
