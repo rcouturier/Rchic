@@ -27,6 +27,6 @@ callSimilarityComputation(similarity_matrix, list.occurrences.variables,
 Interface to call the the C++ similarity computation.
 }
 \author{
-Raphaël Couturier \email{raphael.couturier@univ-fcomte.fr}
+Raphael Couturier
 }
 

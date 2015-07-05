@@ -6,7 +6,7 @@
 #' @param   ask.value.partitionning     if true, user can choose the number of partition for interval variables 
 #' (otherwise it is fixed to 3 by default)
 #' 
-#' @author Raphaël Couturier \email{raphael.couturier@@univ-fcomte.fr}
+#' @author Raphael Couturier 
 #' @export
 
 

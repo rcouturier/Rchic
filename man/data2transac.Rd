@@ -13,6 +13,6 @@ data2transac(data)
 Saves the data to a transaction file.
 }
 \author{
-Raphaël Couturier \email{raphael.couturier@univ-fcomte.fr}
+Raphael Couturier
 }
 

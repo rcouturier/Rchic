@@ -4,7 +4,7 @@
 #' 
 #' @param 	data 	Matrix of data.
 #' 
-#' @author Raphaël Couturier \email{raphael.couturier@@univ-fcomte.fr}
+#' @author Raphael Couturier
 #' @export
 
 data2transac <- function(data) {

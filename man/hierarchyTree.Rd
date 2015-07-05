@@ -24,6 +24,6 @@ hierarchyTree(list.variables, supplementary.variables, matrix.values,
 Reads the ASI rules, computes the hierarchy tree and displays it.
 }
 \author{
-Raphaël Couturier \email{raphael.couturier@univ-fcomte.fr}
+Raphael Couturier
 }
 

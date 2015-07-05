@@ -1,7 +1,7 @@
 #' @title Contains many routines for GUI
 #'
 #' 
-#' @author Raphaël Couturier \email{raphael.couturier@@univ-fcomte.fr}
+#' @author Raphael Couturier 
 #' @export
 
 

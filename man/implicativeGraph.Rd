@@ -15,6 +15,6 @@ implicativeGraph(list.variables, computing.mode = 1)
 Reads the ASI rules, selects the rules according to the toolbar and calls rgraphviz before displaying the rules.
 }
 \author{
-Raphaël Couturier \email{raphael.couturier@univ-fcomte.fr}
+Raphael Couturier
 }
 

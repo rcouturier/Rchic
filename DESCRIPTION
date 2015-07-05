@@ -2,8 +2,8 @@ Package: rchic
 Title: Statistical implicative analysis
 Version: 0.16
 Date: 2015
-Author: Raphaël Couturier
-Maintainer: Raphaël Couturier <raphael.couturier@univ-fcomte.fr>
+Author: Raphael Couturier
+Maintainer: Raphael Couturier <raphael.couturier@univ-fcomte.fr>
 Description: This package is intented to implement all the features of
     Statistical Implicative Analysis. This theory aims at building association
     rules of the form : if an object has the property A it also tends to have
@@ -28,9 +28,7 @@ Suggests:
     knitr
 Collate:
     'callCFunctions.R'
-    'data.R'
     'rchic.R'
-    'test.R'
     'callHierarchyTree.R'
     'GUI.R'
     'RcppExports.R'

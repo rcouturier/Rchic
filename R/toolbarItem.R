@@ -8,7 +8,7 @@
 #' @param   list.tcl           list of the selected items in the tcl format
 #' @param   mycallPlot         routine to call to update the graph or the tree
 #' 
-#' @author Raphaël Couturier \email{raphael.couturier@@univ-fcomte.fr}
+#' @author Raphael Couturier 
 #' @export
 
 

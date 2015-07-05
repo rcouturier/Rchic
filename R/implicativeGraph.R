@@ -4,7 +4,7 @@
 #'
 #' @param list.variables   list containing all the variables used in the computation
 #' @param computing.mode   controls the computing mode: 1=classic implication, 2=classic implication+ confidence, 3=implifiance
-#' @author Raphaël Couturier \email{raphael.couturier@@univ-fcomte.fr}
+#' @author Raphael Couturier 
 #' @export
 implicativeGraph <-function(list.variables,computing.mode=1) {
   confidence<<-0

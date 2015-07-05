@@ -7,7 +7,7 @@
 #' @param   callPlot      routine to compute the graph
 #' @param   updatePlot      routine to update the graph
 #' 
-#' @author Raphaël Couturier \email{raphael.couturier@@univ-fcomte.fr}
+#' @author Raphael Couturier 
 #' @export
 
 

@@ -2,7 +2,7 @@
 #'
 #' @description Interface to call the ASI rules processor.
 #' 
-#' @author Raphaël Couturier \email{raphael.couturier@@univ-fcomte.fr}
+#' @author Raphael Couturier 
 #' @export
 #' 
 #' @importFrom Rcpp evalCpp
@@ -29,7 +29,7 @@ callAsirules <- function(){
 
 #' @param verbose                 gives more details
 #'
-#' @author Raphaël Couturier \email{raphael.couturier@@univ-fcomte.fr}
+#' @author Raphael Couturier 
 #' @export
 #' @useDynLib rchic
 
@@ -54,7 +54,7 @@ callSimilarityComputation <- function(similarity_matrix,list.occurrences.variabl
 #' @param   typicality.supp      boolean to compute the typicality of supplementary variables
 #' @param verbose                 gives more details
 #' 
-#' @author Raphaël Couturier \email{raphael.couturier@@univ-fcomte.fr}
+#' @author Raphael Couturier 
 #' @export
 #' @useDynLib rchic
 
@@ -73,7 +73,7 @@ callHierarchyComputation <- function(cohesion_matrix,list.occurrences.variables,
 #' @param  vector				          vector representing the data to split
 #' @param	nb.partitions 			    number of partitions
 #' 
-#' @author Raphaël Couturier \email{raphael.couturier@@univ-fcomte.fr}
+#' @author Raphael Couturier 
 #' @export
 #' @useDynLib rchic
 
@@ -90,7 +90,7 @@ callDynamicCloud <- function(vector, nb.partitions)  {
 #'
 #' @param  data  			          dataframe representing all the data
 #' 
-#' @author Raphaël Couturier \email{raphael.couturier@@univ-fcomte.fr}
+#' @author Raphael Couturier 
 #' @export
 #' @useDynLib rchic
 
