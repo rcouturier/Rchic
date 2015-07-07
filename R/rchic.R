@@ -1,7 +1,8 @@
 #' @title Runs the rchic 
 #'
-#' @description Runs the rchic GUI to be able to select all the options and all the computation
-#' 
+#' @description Runs the rchic GUI (see the following figure) to be able to select all the options and all the computation
+#' \if{html}{\figure{rchic.png}}
+#' \if{latex}{\figure{rchic.png}{options: width=5cm}}
 #' 
 #' @author Raphael Couturier 
 #' @export
