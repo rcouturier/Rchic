@@ -141,6 +141,7 @@ computeImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.i
   }
   #create the graph with the nodes
   g1 <- new("graphNEL", nodes = lNodes,edgemode = "directed")
+  #g1 <- graphNEL( nodes = lNodes,edgemode = "directed")
   #add the edge of the graph
   compte<-1
   for(i in 1:n) {

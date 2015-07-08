@@ -4,7 +4,8 @@
 
 require(stringr) || stop("stringr support is absent")
 require(tcltk2) || stop("tcltk2 support is absent")
-#require(FactoClass) || stop("FactoClass package is absent")
+require(Rgraphviz) || stop("Rgraphviz support is absent")
+
 
 #select file
 fileName <- tclvalue(tkgetOpenFile())
