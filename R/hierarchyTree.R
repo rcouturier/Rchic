@@ -7,12 +7,13 @@
 #' @param   matrix.values       matrix with values of individuals (used to compute the contributions and typicalities).
 #' @param   contribution.supp    boolean to compute the contribution of supplementary variables
 #' @param   typicality.supp      boolean to compute the typicality of supplementary variables
+#' @param   computing.mode    controls the computing mode: 1=classic implication, 2=classic implication+ confidence, 3=implifiance
 #' @param   verbose         give many details.
 #'
 #' @author Raphael Couturier 
 #' @export
 
-hierarchyTree <-function(list.variables, supplementary.variables, matrix.values, contribution.supp, typicality.supp, verbose=FALSE) {
+hierarchyTree <-function(list.variables, supplementary.variables, matrix.values, contribution.supp, typicality.supp, computing.mode=1, verbose=FALSE) {
   
   if(length(supplementary.variables)==0) {
     contribution.supp=FALSE
@@ -44,11 +45,20 @@ hierarchyTree <-function(list.variables, supplementary.variables, matrix.values,
   #list of the occurrences of the variables
   list.occurrences.variables<<-vector()
   
+  
+  #according to computing.mode, the location of the index is not the same
+  if(computing.mode==1 | computing.mode==2)
+    index.imp=5    #it corresponds to the classical index
+  if(computing.mode==3)
+    index.imp=6    #it corresponds to the implifiance
+  
+  
+  
   for(i in 1:n) {
     rule=strsplit(row.names(rules)[i],split=' -> ')
     from=rule[[1]][1]
     to=rule[[1]][2]
-    val=rules[i,5]
+    val=rules[i,index.imp]
     cohesion_matrix[from,to]=val
     
     list.occurrences.variables[from]<<-rules[i,1]

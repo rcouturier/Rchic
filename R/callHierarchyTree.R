@@ -5,13 +5,14 @@
 #' @param   fileName             name of the file containing data
 #' @param   contribution.supp    boolean to compute the contribution of supplementary variables
 #' @param   typicality.supp      boolean to compute the typicality of supplementary variables
+#' @param   computing.mode       controls the computing mode: 1=classic implication, 2=classic implication+ confidence, 3=implifiance
 #' @param   verbose              boolean to give many details.
 #'
 #' @author Raphael Couturier 
 #' @export
 
  
-callHierarchyTree <- function(fileName,contribution.supp=FALSE,typicality.supp=FALSE,verbose=FALSE) {
+callHierarchyTree <- function(fileName,contribution.supp=FALSE,typicality.supp=FALSE,computing.mode=1,verbose=FALSE) {
   #transform possible interval variables
   result = readAndAnalyzeData(fileName=fileName)
   dataCSV=result[[1]]
@@ -38,6 +39,6 @@ callHierarchyTree <- function(fileName,contribution.supp=FALSE,typicality.supp=F
     row.names(supplementary.variables)=row.names(dataCSV)
     storage.mode(supplementary.variables)<-"numeric"
   }
-  hierarchyTree(list.variables,supplementary.variables,matrix.values,contribution.supp, typicality.supp,verbose=verbose)
+  hierarchyTree(list.variables,supplementary.variables,matrix.values,contribution.supp, typicality.supp,computing.mode=computing.mode,verbose=verbose)
   
 }

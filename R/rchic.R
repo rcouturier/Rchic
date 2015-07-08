@@ -110,8 +110,18 @@ rchic <-function() {
       setwd(initDirectory)
     } else{
       
+      #retrieve option
+      my.option=getMyOption()
+      #compute the computing mode
+      computing.mode=1
+      if(my.option[1,2]=="Classic+Confidence")
+        computing.mode=2
+      if(my.option[1,2]=="Implifiance")
+        computing.mode=3
+      print("computing mode")
+      print(computing.mode)
       
-      callHierarchyTree(fileName=fileName,contribution.supp=TRUE,typicality.supp=FALSE,verbose=FALSE)
+      callHierarchyTree(fileName=fileName,contribution.supp=TRUE,typicality.supp=FALSE,computing.mode=computing.mode,verbose=FALSE)
     }
   })
   tkadd(fileMenu, "command", label = "Implicative graph", command = function(){
@@ -153,7 +163,7 @@ rchic <-function() {
       print(computing.mode)
       
       #list of variables is needed to keep the same order in the variable when the cohesion matrix is built
-      implicativeGraph(list.variables,computing.mode)
+      implicativeGraph(list.variables,computing.mode=computing.mode)
       
       
     }
