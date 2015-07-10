@@ -141,6 +141,7 @@ rchic <-function() {
       
       #transform possible interval variables
       result = readAndAnalyzeData(fileName = fileName)
+      
       dataCSV=result[[1]]
       supplementary.variable=result[[2]]
       #prepare data for apriori

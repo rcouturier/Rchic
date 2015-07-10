@@ -103,7 +103,7 @@ toolbarGraph <- function (frame,callPlot,updatePlot) {
   
   changeColor <- function(W,i) {
     mycolor <- tcl ( "tk_chooseColor" , parent = W ,
-                   title = "Set box color" )
+                     title = "Set box color" )
     mycolor <- tclvalue ( color )
     print ( mycolor )
     if ( nchar ( mycolor ) )
@@ -120,8 +120,8 @@ toolbarGraph <- function (frame,callPlot,updatePlot) {
   
   OnOK <- function()
   {
-  
-    confidence <<- as.numeric(tclvalue(myvalue1[[1]]))
+    
+    #confidence <<- as.numeric(tclvalue(myvalue1[[1]]))
     callPlot()
     Afficheconf1()
     
@@ -129,12 +129,12 @@ toolbarGraph <- function (frame,callPlot,updatePlot) {
   }
   confidenceBox <- function () {
     if(un >0 )
-   {
+    {
       print("je supprime")
       tkdestroy(top1)
-
-   }
-   un <<- un+1
+      
+    }
+    un <<- un+1
     top1 <<- tktoplevel()
     tktitle(top1)<-" confidence"
     myvalue1<<-list(tclVar(80))
@@ -158,11 +158,11 @@ toolbarGraph <- function (frame,callPlot,updatePlot) {
     print("IIIIIIIIIIIIIIII")
     print(computing.mode)
     #only the computing mode==2 displays the confidence dialog
-      confidenceBox()
-
-   # callPlot()
+    confidenceBox()
+    
+    # callPlot()
     #Afficheconf1()
-  
+    
   }
   if(computing.mode==2) {
     OK.but <- tkbutton(frame,text="OK",command=OnOKconfidence)
@@ -176,7 +176,7 @@ toolbarGraph <- function (frame,callPlot,updatePlot) {
   
   OnEdit <- function()
   {
-
+    
     tmp=as.numeric(tclvalue(myedit))
     print("IIIIIIIIIIIIIIIIII")
     print(tmp)
@@ -184,22 +184,22 @@ toolbarGraph <- function (frame,callPlot,updatePlot) {
     print(res)
     tclvalue(myedit) <-  res 
     
-        
+    
     
     updatePlot()
     Afficheconf1()
     
   }
   
-
-#used to display confidence   
+  
+  #used to display confidence   
   Afficheconf<- function(){
     
-      
+    
     indaff<<-indaff+1
     if(indaff==1)
     {
-    affiche <<- TRUE
+      affiche <<- TRUE
     }
     else
     {
@@ -210,48 +210,48 @@ toolbarGraph <- function (frame,callPlot,updatePlot) {
       }
     }
     
-   
+    
     #for (i in 1:length(var2)) {
-      for (i in 1:(num-1)) {
-        
-      
-    # retrieve coordinate of confidence
-      
-    Xm=coordx1[[i]]
-    Ym=coordx2[[i]]
-    var=var2[[i]]
-    
-    if(grepl(affiche, TRUE))
-    {
-      p1 <- tkcreate(canvas, "text", Xm, Ym, text=var, fill="black",tags="text1")
-   
-    }
-    else
-    {
-      tkdelete(canvas, "text1")
-      
-    }
-
-    }
-
-  }
- 
-  #  is to maintain the confidence by changing settings or switching to edit mode
-  Afficheconf1<- function(){
-    
-   
-     
     for (i in 1:(num-1)) {
-        
+      
+      
+      # retrieve coordinate of confidence
+      
       Xm=coordx1[[i]]
       Ym=coordx2[[i]]
       var=var2[[i]]
       
       if(grepl(affiche, TRUE))
       {
-               
+        p1 <- tkcreate(canvas, "text", Xm, Ym, text=var, fill="black",tags="text1")
+        
+      }
+      else
+      {
+        tkdelete(canvas, "text1")
+        
+      }
+      
+    }
+    
+  }
+  
+  #  is to maintain the confidence by changing settings or switching to edit mode
+  Afficheconf1<- function(){
+    
+    
+    
+    for (i in 1:(num-1)) {
+      
+      Xm=coordx1[[i]]
+      Ym=coordx2[[i]]
+      var=var2[[i]]
+      
+      if(grepl(affiche, TRUE))
+      {
+        
         p1 <<- tkcreate(canvas, "text", Xm, Ym, text=var, fill="black",tags="text1")
-       # p1 <<- tkcreate(canvas, "text", Xm, Ym, text=var, fill="black",tags="text1")
+        # p1 <<- tkcreate(canvas, "text", Xm, Ym, text=var, fill="black",tags="text1")
         
         
       }
@@ -262,10 +262,10 @@ toolbarGraph <- function (frame,callPlot,updatePlot) {
       }
       
     }
-
+    
   }
   
-#is used to display the confidence 
+  #is used to display the confidence 
   
   
   Edit.but <- tkbutton(frame,text="Edit",command=OnEdit)
@@ -283,7 +283,7 @@ toolbarGraph <- function (frame,callPlot,updatePlot) {
   
   
   changeSpinBox <- function(spin.nb)  {
-   
+    
     
     
     #print(spin.nb)
