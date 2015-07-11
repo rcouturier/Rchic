@@ -1,6 +1,18 @@
 #' @title callSimilarityTree
 #'
 #' @description Reads the data, prepare the data and call similarityTree.
+#' @details 
+#' This function allows you to compute the similarity tree. The similarity measure is symetric. At the end of the computation we obtain the similarity tree, 
+#' as follows. In this tree, couple of variables are gathered according to their similarity measure. Significant levels
+#' are highlighted in red. A significant level means that the considered level is more significant than the previous level
+#' and than the next one. In the following figure and in all the cases, an expert must choose according to his knowledge
+#' what is the threshold in the similarity tree after which the similarity measure is not significant for the data considered.
+#' In general the last classes in the similarity tree are not significant. On this figure, we can remark that the strongest 
+#' class is: strong powerful. In this case, this two variables are very similar. The 
+#' second strongest class is: large heavy.
+#' \if{html}{\figure{similarity.png}}
+#' \if{latex}{\figure{similarity.png}{options: width=15cm}}
+
 #' 
 #' @param   fileName             name of the file containing data
 #' @param   contribution.supp    boolean to compute the contribution of supplementary variables

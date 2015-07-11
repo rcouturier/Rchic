@@ -5,7 +5,7 @@
 \title{Computes and Displays the Hierarchy Tree.}
 \usage{
 hierarchyTree(list.variables, supplementary.variables, matrix.values,
-  contribution.supp, typicality.supp, verbose = FALSE)
+  contribution.supp, typicality.supp, computing.mode = 1, verbose = FALSE)
 }
 \arguments{
 \item{list.variables}{list of variables to compute the similarity tree from.}
@@ -17,6 +17,8 @@ hierarchyTree(list.variables, supplementary.variables, matrix.values,
 \item{contribution.supp}{boolean to compute the contribution of supplementary variables}
 
 \item{typicality.supp}{boolean to compute the typicality of supplementary variables}
+
+\item{computing.mode}{controls the computing mode: 1=classic implication, 2=classic implication+ confidence, 3=implifiance}
 
 \item{verbose}{give many details.}
 }

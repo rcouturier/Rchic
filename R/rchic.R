@@ -1,11 +1,29 @@
 #' @title Runs the rchic 
 #'
-#' @description Runs the rchic GUI (see the following figure) to be able to select all the options and all the computation
+#' @description Runs the rchic GUI (see the following figure) to be able to select all the options and all the computation.
+#' 
+#'
+#' @details With this GUI, one can select the three main types of computation of rchic: 
+#' \itemize{
+#'    \item{the similarity tree}
+#'    \item{the hierarchy tree}
+#'    \item{the implicative graph }
+#' }
 #' \if{html}{\figure{rchic.png}}
 #' \if{latex}{\figure{rchic.png}{options: width=5cm}}
 #' 
+#' In the option submenu, you can select the option of rchic. Currently you can select the type of the implication between:
+#' \itemize{
+#'    \item{the classical implication}
+#'    \item{the classical implication plus the condifence}
+#'    \item{the new computation for large dataset: the implifiance}
+#' }
+#' 
 #' @author Raphael Couturier 
 #' @export
+#' @docType package
+#' @name Rchic
+
 
 
 
