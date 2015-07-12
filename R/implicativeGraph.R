@@ -140,7 +140,7 @@ computeImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.i
   if(computing.mode==3)
     index.imp=6    #it corresponds to the implifiance
   
-    
+  
   #determine the list of visible nodes
   lNodes=character(0)
   for(i in 1:n) {
@@ -174,8 +174,8 @@ computeImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.i
     rule=strsplit(row.names(rules)[i],split=' -> ')
     from=rule[[1]][1]
     to=rule[[1]][2]
-   
-     
+    
+    
     if(computing.mode==2) {
       if(rules[i,index.imp]>thres & rules[i,1]<rules[i,2] &
          as.numeric(list.selected.item[[which(list.variables==from)]]) & 
@@ -286,19 +286,23 @@ computeImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.i
         val=rules[paste(tail(edge),"->",head(edge)),5]
         col=color[[1]]
         #compute the color of the edge according to the value of the rule
-        if(cbvalue[[1]]==1 && value[[1]]<val)
+        if(cbvalue[[1]]==1 && value[[1]]<val){ 
           col=color[[1]]
-        else
+        }
+        else {
           if(cbvalue[[2]]==1 && value[[2]]<val)
             col=color[[2]]
-        else
-          if(cbvalue[[3]]==1 && value[[3]]<val)
-            col=color[[3]]
-        else
-          if(cbvalue[[4]]==1 && value[[4]]<val)
-            col=color[[4]]
+          else {
+            if(cbvalue[[3]]==1 && value[[3]]<val)
+              col=color[[3]]
+            else {
+              if(cbvalue[[4]]==1 && value[[4]]<val)
+                col=color[[4]]
+            }
+          }
+        }
         #draw the spline
-        #sp=tkcreate(canvas, "line", lCoord,width=2,arrow=arrow,smooth='bezier',splinesteps=6,tags="draw",fill=col)
+        
         #compute the number of the node from and to
         from=which(list.name==tail(edge))
         to=which(list.name==head(edge))
@@ -320,7 +324,7 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
   tkdelete(canvas, "text1")
   
   
- 
+  
   if(first) {
     tkdelete(canvas, "control")
     tkdelete(canvas, "draw")
@@ -434,26 +438,25 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
     }
   }
   
- # displays the values of confidence when moving the control points 
   
-  Afficheconf1<- function(){
-      
+  # displays the values of confidence when moving the control points 
+  displayConfidence<- function(){
     # delete the old value of confidence
     tkdelete(canvas, "text1")
-    
-    for (i in 1:(num-1)) {
+    if(boolDisplayConfidence==T)
+    {
       
-      Xm=coordx1[[i]]
-      Ym=coordx2[[i]]
-      var=var2[[i]]
-      
-      # displays the new values
-      if(grepl(affiche, TRUE))
-      {  
+      for (i in 1:(num-1)) {
+        
+        Xm=coordx1[[i]]
+        Ym=coordx2[[i]]
+        var=var2[[i]]
+        
+        # displays the new values
         p1 <<- tkcreate(canvas, "text", Xm, Ym, text=var, fill="black",tags="text1")      
-      }     
+        
+      }
     }
-    
   }
   
   #mouse released ono control point
@@ -486,21 +489,14 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
               Ym=(sp$coord[[4]]+sp$coord[[6]])/2
               coordx1[num1]<<-Xm
               coordx2[num1]<<-Ym
-              
-              Afficheconf1()
             }
-           
-              if((endspline>4)&&(num.spline==3)){
-                Xm=(sp$coord[[3]]+sp$coord[[5]])/2
-                Ym=(sp$coord[[4]]+sp$coord[[6]])/2
-                coordx1[num1]<<-Xm
-                coordx2[num1]<<-Ym
-                
-                Afficheconf1()
-                
-              }
-              
             
+            if((endspline>4)&&(num.spline==3)){
+              Xm=(sp$coord[[3]]+sp$coord[[5]])/2
+              Ym=(sp$coord[[4]]+sp$coord[[6]])/2
+              coordx1[num1]<<-Xm
+              coordx2[num1]<<-Ym
+            }
             
           }
           #update of the third control point of the spline
@@ -508,15 +504,13 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
             sp$coord[[5]]=sp$coord[[5]]+x
             sp$coord[[6]]=sp$coord[[6]]+y
             
-              
+            
             if((endspline==1)||((endspline==3)&&(num.spline==2)))
             {
               Xm=(sp$coord[[3]]+sp$coord[[5]])/2
               Ym=(sp$coord[[4]]+sp$coord[[6]])/2
               coordx1[num1]<<-Xm
               coordx2[num1]<<-Ym
-              
-              Afficheconf1()
             }
             
             if((endspline==2)&&(num.spline==1))
@@ -525,8 +519,6 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
               Ym=(sp$coord[[6]]+sp$coord[[8]])/2
               coordx1[num1]<<-Xm
               coordx2[num1]<<-Ym
-              
-              Afficheconf1()
             }
             
             if((endspline==4)&&(num.spline==2))
@@ -535,18 +527,12 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
               Ym=(sp$coord[[6]]+sp$coord[[8]])/2
               coordx1[num1]<<-Xm
               coordx2[num1]<<-Ym
-              
-              Afficheconf1()
-              
             }
             if((endspline>4)&&(num.spline==3)){
               Xm=(sp$coord[[3]]+sp$coord[[5]])/2
               Ym=(sp$coord[[4]]+sp$coord[[6]])/2
               coordx1[num1]<<-Xm
               coordx2[num1]<<-Ym
-              
-              Afficheconf1()
-              
             }
           }
           #update of the fourth control point of the spline
@@ -560,8 +546,6 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
               Ym=(sp$coord[[6]]+sp$coord[[8]])/2
               coordx1[num1]<<-Xm
               coordx2[num1]<<-Ym
-              
-              Afficheconf1()
             }
             if((endspline==4)&&(num.spline==2))
             {
@@ -569,9 +553,6 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
               Ym=(sp$coord[[6]]+sp$coord[[8]])/2
               coordx1[num1]<<-Xm
               coordx2[num1]<<-Ym
-              
-              Afficheconf1()
-              
             }
           }
           else
@@ -582,7 +563,7 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
               sp$coord[[2]]=sp$coord[[2]]+y
               
               
-                            
+              
             }
           
           
@@ -591,6 +572,7 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
           #update the spline on the canvas
           tkcoords(canvas,sp$spline,sp$coord)
         }
+        displayConfidence()
       }
     }
   }
@@ -659,129 +641,129 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
         coord1=sp[['coord']]
         
         sp <- tkcreate(canvas, "line", sp[['coord']],width=2,arrow=sp[['arrow']],smooth='bezier',splinesteps=6,tags="draw",fill=sp[['col']])
-       
         
-         #calculates the coordinates where we will display the confidence
-          for (k in 1:length(confconf1)) {
-              # Search the confidence value that corresponds to each pair (from to) in the order
-              chai1=fromconf[k]
-              chai2=toconf[k]
-              if(grepl(chai1, from1) & grepl(chai2,to1))
-               {
-                
-                
-                  var2[num] <<- confconf1[[k]]
-                  confidence=var2[num]
-      
-               }
-            }
-            list.spline.object <<- c(list.spline.object,list(list(spline=sp,coord=coord,from=from,to=to,endspline=endspline,num=num,conf=confidence,num.spline.edge=num.spline.edge)))
         
-            #if this is the first spline of the edge
-             if(num.spline.edge==1) {
-              #add the current spline to the list from for this node
-              list.from[[from]]<<-c(list.from[[from]],i)
-              #create control points
-              #control point 2
-               createPoint(nb=nb.control_point,x=coord[3],y=coord[4],r=r,spline=c(i),pos=2)
-              nb.control_point=nb.control_point+1
-              #control point 3
-              createPoint(nb=nb.control_point,x=coord[5],y=coord[6],r=r,spline=c(i),pos=3)
-              nb.control_point=nb.control_point+1
-               #if there is another spline
-              if(endspline!=1) {
-               #control point 4 and 1 for the next spline
-                #warning the field spline is a vector with the current and the next spline
-               createPoint(nb=nb.control_point,x=coord[7],y=coord[8],r=r,spline=c(i,i+1),pos=4)
-               nb.control_point=nb.control_point+1
-              }
-            }
-            #if this is the last spline of the edge
-            if(num.spline.edge==endspline){
-              #add the current spline to the list to for this node
-              list.to[[to]]<<-c(list.to[[to]],i)
-              #if this spline is not the first one
-              if(num.spline.edge!=1) {
-                 #control point 2
-                 createPoint(nb=nb.control_point,x=coord[3],y=coord[4],r=r,spline=c(i),pos=2)
-                nb.control_point=nb.control_point+1
-                #control point 3
-                createPoint(nb=nb.control_point,x=coord[5],y=coord[6],r=r,spline=c(i),pos=3)
-                nb.control_point=nb.control_point+1
-               }
-             }
-             #if the spline is neither the first nor the last one
-            if(num.spline.edge!=1 && num.spline.edge!=endspline) {
+        #calculates the coordinates where we will display the confidence
+        for (k in 1:length(confconf1)) {
+          # Search the confidence value that corresponds to each pair (from to) in the order
+          chai1=fromconf[k]
+          chai2=toconf[k]
+          if(grepl(chai1, from1) & grepl(chai2,to1))
+          {
+            
+            
+            var2[num] <<- confconf1[[k]]
+            confidence=var2[num]
+            
+          }
+        }
+        list.spline.object <<- c(list.spline.object,list(list(spline=sp,coord=coord,from=from,to=to,endspline=endspline,num=num,conf=confidence,num.spline.edge=num.spline.edge)))
+        
+        #if this is the first spline of the edge
+        if(num.spline.edge==1) {
+          #add the current spline to the list from for this node
+          list.from[[from]]<<-c(list.from[[from]],i)
+          #create control points
+          #control point 2
+          createPoint(nb=nb.control_point,x=coord[3],y=coord[4],r=r,spline=c(i),pos=2)
+          nb.control_point=nb.control_point+1
+          #control point 3
+          createPoint(nb=nb.control_point,x=coord[5],y=coord[6],r=r,spline=c(i),pos=3)
+          nb.control_point=nb.control_point+1
+          #if there is another spline
+          if(endspline!=1) {
+            #control point 4 and 1 for the next spline
+            #warning the field spline is a vector with the current and the next spline
+            createPoint(nb=nb.control_point,x=coord[7],y=coord[8],r=r,spline=c(i,i+1),pos=4)
+            nb.control_point=nb.control_point+1
+          }
+        }
+        #if this is the last spline of the edge
+        if(num.spline.edge==endspline){
+          #add the current spline to the list to for this node
+          list.to[[to]]<<-c(list.to[[to]],i)
+          #if this spline is not the first one
+          if(num.spline.edge!=1) {
             #control point 2
             createPoint(nb=nb.control_point,x=coord[3],y=coord[4],r=r,spline=c(i),pos=2)
             nb.control_point=nb.control_point+1
             #control point 3
             createPoint(nb=nb.control_point,x=coord[5],y=coord[6],r=r,spline=c(i),pos=3)
             nb.control_point=nb.control_point+1
-            #control point 4 and 1 (see spline 1)
-            createPoint(nb=nb.control_point,x=coord[7],y=coord[8],r=r,spline=c(i,i+1),pos=4)
-            nb.control_point=nb.control_point+1
-           }
-            
-            
-            sp=list.spline[[i]]
-            sp=list.spline[[i]]
-            
-            # one spline: then we have 3 segments, the display will be in the middle of the 2nd segment if((num.spline.edge==1) && (endspline==1)) {
-            if((num.spline.edge==1) && (endspline==1)) {
-              
-              
+          }
+        }
+        #if the spline is neither the first nor the last one
+        if(num.spline.edge!=1 && num.spline.edge!=endspline) {
+          #control point 2
+          createPoint(nb=nb.control_point,x=coord[3],y=coord[4],r=r,spline=c(i),pos=2)
+          nb.control_point=nb.control_point+1
+          #control point 3
+          createPoint(nb=nb.control_point,x=coord[5],y=coord[6],r=r,spline=c(i),pos=3)
+          nb.control_point=nb.control_point+1
+          #control point 4 and 1 (see spline 1)
+          createPoint(nb=nb.control_point,x=coord[7],y=coord[8],r=r,spline=c(i,i+1),pos=4)
+          nb.control_point=nb.control_point+1
+        }
+        
+        
+        sp=list.spline[[i]]
+        sp=list.spline[[i]]
+        
+        # one spline: then we have 3 segments, the display will be in the middle of the 2nd segment if((num.spline.edge==1) && (endspline==1)) {
+        if((num.spline.edge==1) && (endspline==1)) {
+          
+          
+          Xm= (sp$coord[[5]]+sp$coord[[3]])/2
+          Ym=(sp$coord[[6]]+sp$coord[[4]])/2
+          coordx1[num]<<-Xm
+          coordx2[num]<<-Ym
+        }else {# two splines: then we have 6 segments, the display will be in the middle of the 3rd segment if((num.spline.edge==1) && (endspline==1)) {
+          if((num.spline.edge==1) && (endspline==2)) {
+            Xm= (sp$coord[[5]]+sp$coord[[7]])/2
+            Ym=(sp$coord[[6]]+sp$coord[[8]])/2
+            coordx1[num]<<-Xm
+            coordx2[num]<<-Ym
+          }else # Tree splines: then we have 9 segments, the display will be in the middle of the 5th segment
+          {
+            if((num.spline.edge==2) && (endspline==3)) {
               Xm= (sp$coord[[5]]+sp$coord[[3]])/2
               Ym=(sp$coord[[6]]+sp$coord[[4]])/2
               coordx1[num]<<-Xm
               coordx2[num]<<-Ym
-            }else {# two splines: then we have 6 segments, the display will be in the middle of the 3rd segment if((num.spline.edge==1) && (endspline==1)) {
-              if((num.spline.edge==1) && (endspline==2)) {
-                Xm= (sp$coord[[5]]+sp$coord[[7]])/2
-                Ym=(sp$coord[[6]]+sp$coord[[8]])/2
+            }
+            else
+            {
+              if((num.spline.edge==2) && (endspline==4)) {
+                
+                Xm= (sp$coord[[7]]+sp$coord[[5]])/2
+                Ym=(sp$coord[[8]]+sp$coord[[6]])/2
                 coordx1[num]<<-Xm
                 coordx2[num]<<-Ym
-              }else # Tree splines: then we have 9 segments, the display will be in the middle of the 5th segment
+              }
+              else 
               {
-                if((num.spline.edge==2) && (endspline==3)) {
+                if((num.spline.edge==3) && (endspline >4)) {                      
                   Xm= (sp$coord[[5]]+sp$coord[[3]])/2
                   Ym=(sp$coord[[6]]+sp$coord[[4]])/2
                   coordx1[num]<<-Xm
                   coordx2[num]<<-Ym
                 }
-                else
-                {
-                  if((num.spline.edge==2) && (endspline==4)) {
-                    
-                    Xm= (sp$coord[[7]]+sp$coord[[5]])/2
-                    Ym=(sp$coord[[8]]+sp$coord[[6]])/2
-                    coordx1[num]<<-Xm
-                    coordx2[num]<<-Ym
-                  }
-                  else 
-                  {
-                    if((num.spline.edge==3) && (endspline >4)) {                      
-                    Xm= (sp$coord[[5]]+sp$coord[[3]])/2
-                    Ym=(sp$coord[[6]]+sp$coord[[4]])/2
-                    coordx1[num]<<-Xm
-                    coordx2[num]<<-Ym
-                    }
-                  }
-                 }
-                    
-                  
               }
             }
-
+            
+            
+          }
+        }
+        
         if(num.spline.edge==endspline)
         {
           num<<-num+1
         }
       }
-
+      
     }  
   }
-
+  
   else {
     for (i in 1:length(list.control)) {
       element=list.control[[i]]

@@ -14,14 +14,16 @@
 #WARNING  shared variables
 #myvalue
 #mycbvalue
+#myconf
 #mycolor
+#confidence
 
 
 
 
 toolbarGraph <- function (frame,callPlot,updatePlot) {
   
-  
+  boolDisplayConfidence<<-0
   un <<-0
   spin=list()
   cb=list()
@@ -120,14 +122,23 @@ toolbarGraph <- function (frame,callPlot,updatePlot) {
   
   OnOK <- function()
   {
-    
-    #confidence <<- as.numeric(tclvalue(myvalue1[[1]]))
-    callPlot()
-    Afficheconf1()
+    print("OnOK")
+    #if computing mode==2 we display the confidenceDialogBox
+    if(computing.mode==2) {
+      confidenceDialogBox()
+    }
+    else 
+    {
+      callPlot()
+      #Afficheconf()  
+    }
     
     
   }
-  confidenceBox <- function () {
+  
+  #displays the confidence dialog box
+  confidenceDialogBox <- function () {
+    print("confidence box")
     if(un >0 )
     {
       print("je supprime")
@@ -137,7 +148,7 @@ toolbarGraph <- function (frame,callPlot,updatePlot) {
     un <<- un+1
     top1 <<- tktoplevel()
     tktitle(top1)<-" confidence"
-    myvalue1<<-list(tclVar(80))
+    myconf<<-list(tclVar(80))
     
     
     label.text <- tclVar('choose the confidence value')
@@ -145,31 +156,55 @@ toolbarGraph <- function (frame,callPlot,updatePlot) {
     tkconfigure(label, textvariable = label.text)
     tkgrid(label)
     
-    listederoulante<-tkwidget(top1,"spinbox", from=0, to=100, increment=5,width=3, textvariable=myvalue1[[1]])
-    bouton1 <- tkbutton(top1,text="OK",command=OnOK)
+    listederoulante<-tkwidget(top1,"spinbox", from=0, to=100, increment=5,width=3, textvariable=myconf[[1]])
+    bouton1 <- tkbutton(top1,text="OK",command=OnOKconfidence)
     #bouton2 <- tkbutton(top,text="cancel",command=OnOK1)
     tkpack(label,listederoulante,bouton1)
     
     
     #listederoulante<-tkwidget(top,"spinbox", from=50, to=100, increment=5,width=3, textvariable=myvalue[[1]])
   } 
+  
+  
+  
+  #Ok button in the confidence selection dialog
   OnOKconfidence <- function()
   {
-    print("IIIIIIIIIIIIIIII")
-    print(computing.mode)
-    #only the computing mode==2 displays the confidence dialog
-    confidenceBox()
-    
-    # callPlot()
-    #Afficheconf1()
-    
+    #get the value of the confidence  
+    confidence <<- as.numeric(tclvalue(myconf[[1]]))
+    #display the implicative graph
+    callPlot()
+    #display the confidence values
+    Afficheconf(redisplay=TRUE)
   }
-  if(computing.mode==2) {
-    OK.but <- tkbutton(frame,text="OK",command=OnOKconfidence)
-  }
-  else {
-    OK.but <- tkbutton(frame,text="OK",command=OnOK)
-  }
+  
+  
+  #   OnOKconfidence <- function()
+  #   {
+  #     print("OnOkconfidence")
+  #     print(computing.mode)
+  #     #only the computing mode==2 displays the confidence dialog
+  #     if(computing.mode==2) {
+  #       confidenceBox()
+  #       confidence <<- as.numeric(tclvalue(myvalue1[[1]]))
+  #     }
+  #     
+  #     
+  #     
+  #     callPlot()
+  #     #Afficheconf1()
+  #     
+  #   }
+  
+  #   if(computing.mode==2) {
+  #     OK.but <- tkbutton(frame,text="OK",command=OnOKconfidence)
+  #   }
+  #   else {
+  #     OK.but <- tkbutton(frame,text="OK",command=OnOK)
+  #   }
+  
+  OK.but <- tkbutton(frame,text="OK",command=OnOK)
+  
   tkgrid(OK.but)
   tkfocus(frame)
   
@@ -178,7 +213,7 @@ toolbarGraph <- function (frame,callPlot,updatePlot) {
   {
     
     tmp=as.numeric(tclvalue(myedit))
-    print("IIIIIIIIIIIIIIIIII")
+    print("OnEdit")
     print(tmp)
     res=1-tmp
     print(res)
@@ -187,29 +222,23 @@ toolbarGraph <- function (frame,callPlot,updatePlot) {
     
     
     updatePlot()
-    Afficheconf1()
+    Afficheconf(redisplay = TRUE)
     
   }
   
   
   #used to display confidence   
-  Afficheconf<- function(){
+  Afficheconf<- function(redisplay){
     
+    print("affiche conf")
     
-    indaff<<-indaff+1
-    if(indaff==1)
-    {
-      affiche <<- TRUE
+    if(redisplay==FALSE) {
+      
+      #we inverse the value of boolDisplayCondidence
+      boolDisplayConfidence <<- 1-boolDisplayConfidence
+      print("ind aff")
+      print(indaff)
     }
-    else
-    {
-      if(indaff==2)
-      {
-        affiche <<- FALSE
-        indaff<<-0
-      }
-    }
-    
     
     #for (i in 1:length(var2)) {
     for (i in 1:(num-1)) {
@@ -221,10 +250,9 @@ toolbarGraph <- function (frame,callPlot,updatePlot) {
       Ym=coordx2[[i]]
       var=var2[[i]]
       
-      if(grepl(affiche, TRUE))
+      if(boolDisplayConfidence==T)
       {
         p1 <- tkcreate(canvas, "text", Xm, Ym, text=var, fill="black",tags="text1")
-        
       }
       else
       {
@@ -235,37 +263,32 @@ toolbarGraph <- function (frame,callPlot,updatePlot) {
     }
     
   }
+  #   
+  #   #  is to maintain the confidence by changing settings or switching to edit mode
+  #   Afficheconf1<- function(){
+  #     
+  #     for (i in 1:(num-1)) {
+  #       
+  #       Xm=coordx1[[i]]
+  #       Ym=coordx2[[i]]
+  #       var=var2[[i]]
+  #       
+  #       if(grepl(affiche, TRUE))
+  #       {
+  #         
+  #         p1 <<- tkcreate(canvas, "text", Xm, Ym, text=var, fill="black",tags="text1")
+  #       }
+  #       else
+  #       {
+  #         tkdelete(canvas, "text1")
+  #         
+  #       }
+  #       
+  #     }
+  #     
+  #   }
   
-  #  is to maintain the confidence by changing settings or switching to edit mode
-  Afficheconf1<- function(){
-    
-    
-    
-    for (i in 1:(num-1)) {
-      
-      Xm=coordx1[[i]]
-      Ym=coordx2[[i]]
-      var=var2[[i]]
-      
-      if(grepl(affiche, TRUE))
-      {
-        
-        p1 <<- tkcreate(canvas, "text", Xm, Ym, text=var, fill="black",tags="text1")
-        # p1 <<- tkcreate(canvas, "text", Xm, Ym, text=var, fill="black",tags="text1")
-        
-        
-      }
-      else
-      {
-        tkdelete(canvas, "text1")
-        
-      }
-      
-    }
-    
-  }
   
-  #is used to display the confidence 
   
   
   Edit.but <- tkbutton(frame,text="Edit",command=OnEdit)
@@ -274,14 +297,14 @@ toolbarGraph <- function (frame,callPlot,updatePlot) {
   tkfocus(frame)
   
   
-  Affiche.but <- tkbutton(frame,text="Confidence",command=Afficheconf)
-  tkgrid(Affiche.but)
+  Confidence.but <- tkbutton(frame,text="Confidence",command=function() Afficheconf(redisplay = F))
+  tkgrid(Confidence.but)
   
   tkfocus(frame)
   
   
   
-  
+  #change the value of the spinbox
   changeSpinBox <- function(spin.nb)  {
     
     
