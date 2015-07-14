@@ -283,7 +283,7 @@ computeImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.i
           lCoord[2*k]=workingHeight+0-slot(cPoints(coord)[[k]],'y')*scalingFactorY
         }
         #get the value of this rule
-        val=rules[paste(tail(edge),"->",head(edge)),5]
+        val=rules[paste(tail(edge),"->",head(edge)),index.imp]
         col=color[[1]]
         #compute the color of the edge according to the value of the rule
         if(cbvalue[[1]]==1 && value[[1]]<val){ 
