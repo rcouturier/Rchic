@@ -187,10 +187,10 @@ IntegerVector dynamic_cloud(NumericVector data, IntegerVector number_partition) 
   sort (data.begin(), data.end());
   
   i=0;
-  for (NumericVector::iterator it=data.begin(); it!=data.end(); ++it){
+  /*for (NumericVector::iterator it=data.begin(); it!=data.end(); ++it){
     cout<<*it<<endl;
     //v_data[i++]=*it;
-  }
+  }*/
   
   
   int start[nb_partition];
@@ -248,7 +248,7 @@ IntegerVector dynamic_cloud(NumericVector data, IntegerVector number_partition) 
         old_index=index;
       }
     }
-    cout<<"W "<<W<<endl;
+    //cout<<"W "<<W<<endl;
   }
   
   cout<<endl<<"Optimal Parameters"<<endl;

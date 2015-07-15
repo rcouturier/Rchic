@@ -35,6 +35,9 @@ by 100 in rchic for comodity reason). These implications are: craftiness implies
 If one change the threshold parameters, the graph is automatically displayed again as in the next figure.
 \if{html}{\figure{implicative2.png}}
 \if{latex}{\figure{implicative2.png}{options: width=15cm}}
+
+In this figure, the number of implications is greater. According to the color of the implication, a user can quickly see
+what the the interesting implications.
 }
 \author{
 Raphael Couturier
