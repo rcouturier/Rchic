@@ -15,7 +15,7 @@
 #' \if{html}{\figure{hierarchy.png}}
 #' \if{latex}{\figure{hierarchy.png}{options: width=15cm}}
 #' 
-#' @param   fileName             name of the file containing data
+#' @param   fileName             name of the file containing the data
 #' @param   contribution.supp    boolean to compute the contribution of supplementary variables
 #' @param   typicality.supp      boolean to compute the typicality of supplementary variables
 #' @param   computing.mode       controls the computing mode: 1=classic implication, 2=classic implication+ confidence, 3=implifiance
@@ -52,6 +52,6 @@ callHierarchyTree <- function(fileName,contribution.supp=FALSE,typicality.supp=F
     row.names(supplementary.variables)=row.names(dataCSV)
     storage.mode(supplementary.variables)<-"numeric"
   }
-  hierarchyTree(list.variables,supplementary.variables,matrix.values,contribution.supp, typicality.supp,computing.mode=computing.mode,verbose=verbose)
+  hierarchyTree(fileName,list.variables,supplementary.variables,matrix.values,contribution.supp, typicality.supp,computing.mode=computing.mode,verbose=verbose)
   
 }

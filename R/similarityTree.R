@@ -1,7 +1,8 @@
 #' @title Computes and Displays the Similarity Tree.
 #'
 #' @description (Reads the ASI rules) Computes the similarities and displays the Similarity Tree.
-#' 
+#'
+#' @param   fileName        name of the file containing data
 #' @param   list.variables  list of variables to compute the similarity tree from.
 #' @param   supplementary.variables  list of supplementary variables.
 #' @param   matrix.values       matrix with values of individuals (used to compute the contributions and typicalities).
@@ -13,7 +14,7 @@
 #' @export
 
 
-similarityTree <-function(list.variables, supplementary.variables, matrix.values, contribution.supp, typicality.supp, verbose=FALSE) {
+similarityTree <-function(fileName,list.variables, supplementary.variables, matrix.values, contribution.supp, typicality.supp, verbose=FALSE) {
   
   if(length(supplementary.variables)==0) {
     contribution.supp=FALSE
@@ -83,7 +84,10 @@ similarityTree <-function(list.variables, supplementary.variables, matrix.values
   workingWidth=1200
   workingHeight=800
   
+  #create the window
   tt <- tktoplevel()
+  #put the name of the window
+  tkwm.title( tt , paste("Similarity tree",fileName) )
   xscr <<- tkscrollbar(tt, orient="horizontal",
                       command=function(...)tkyview(canvas,...))
   

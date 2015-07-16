@@ -14,7 +14,7 @@
 #' \if{latex}{\figure{similarity.png}{options: width=15cm}}
 
 #' 
-#' @param   fileName             name of the file containing data
+#' @param   fileName             name of the file containing the data
 #' @param   contribution.supp    boolean to compute the contribution of supplementary variables
 #' @param   typicality.supp      boolean to compute the typicality of supplementary variables
 #' @param   verbose              boolean to give many details.
@@ -57,5 +57,5 @@ callSimilarityTree <- function(fileName,contribution.supp=FALSE,typicality.supp=
   
   
   
-  similarityTree(list.variables, supplementary.variables,matrix.values, contribution.supp, typicality.supp, verbose=verbose)
+  similarityTree(fileName,list.variables, supplementary.variables,matrix.values, contribution.supp, typicality.supp, verbose=verbose)
 }

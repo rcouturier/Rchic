@@ -2,6 +2,8 @@
 #'
 #' @description Reads the ASI rules, computes the hierarchy tree and displays it.
 #' 
+#' 
+#' @param   fileName        name of the file containing data
 #' @param   list.variables  list of variables to compute the similarity tree from.
 #' @param   supplementary.variables  list of supplementary variables.
 #' @param   matrix.values       matrix with values of individuals (used to compute the contributions and typicalities).
@@ -13,7 +15,7 @@
 #' @author Raphael Couturier 
 #' @export
 
-hierarchyTree <-function(list.variables, supplementary.variables, matrix.values, contribution.supp, typicality.supp, computing.mode=1, verbose=FALSE) {
+hierarchyTree <-function(fileName, list.variables, supplementary.variables, matrix.values, contribution.supp, typicality.supp, computing.mode=1, verbose=FALSE) {
   
   if(length(supplementary.variables)==0) {
     contribution.supp=FALSE
@@ -103,7 +105,11 @@ hierarchyTree <-function(list.variables, supplementary.variables, matrix.values,
   workingWidth=1200
   workingHeight=800
   
+  #create the window
   tt <- tktoplevel()
+  #put the name of the window
+  tkwm.title( tt , paste("Hierarchy tree",fileName) )
+  
   xscr <<- tkscrollbar(tt, orient="horizontal",
                       command=function(...)tkyview(canvas,...))
   

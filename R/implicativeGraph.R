@@ -27,19 +27,23 @@
 #' In this figure, the number of implications is greater. According to the color of the implication, a user can quickly see
 #' what the the interesting implications.
 #' 
-#' 
+#' @param   fileName      name of the file containing the data
 #' @param list.variables   list containing all the variables used in the computation
 #' @param computing.mode   controls the computing mode: 1=classic implication, 2=classic implication+ confidence, 3=implifiance
 #' @author Raphael Couturier 
 #' @export
-implicativeGraph <-function(list.variables,computing.mode=1) {
+implicativeGraph <-function(fileName,list.variables,computing.mode=1) {
   confidence<<-0
   visibleWidth<<-1200
   visibleHeight<<-800
   workingWidth<<-1200
   workingHeight<<-800
+  
+  #create the window
   top <- tktoplevel()
-  tkwm.title( top , " Implicative graph " )
+  #put the name of the window
+  tkwm.title( top , paste("Implicative graph",fileName) )
+  
   tt <- ttkframe ( top )#, padding = 0)
   toolbar <- ttkframe ( top )#, padding = 0 )
   tkgrid(toolbar,row = 0 , column = 0, sticky = "news")
