@@ -852,11 +852,11 @@ LogicalVector contribution_supp, LogicalVector typicality_supp, LogicalVector Ve
   List list_names2=matrix_values.attr("dimnames");
   List variables=list_names[0];
   
-  cout<<" list "<<list_names2.size()<<endl;
+  //cout<<" list "<<list_names2.size()<<endl;
   List individuals=list_names2[0];
-  cout<<" list2 "<<individuals.size()<<endl;
+  //cout<<" list2 "<<individuals.size()<<endl;
   
-  for(int i=0;i<variables.size();i++) {
+  /*for(int i=0;i<variables.size();i++) {
     string v=variables[i];
     cout<<v<<endl;
   }
@@ -864,7 +864,7 @@ LogicalVector contribution_supp, LogicalVector typicality_supp, LogicalVector Ve
   for(int i=0;i<individuals.size();i++) {
     string v=individuals[i];
     cout<<v<<endl;
-  }
+  }*/
   
   
   
