@@ -4,10 +4,12 @@
 \alias{similarityTree}
 \title{Computes and Displays the Similarity Tree.}
 \usage{
-similarityTree(list.variables, supplementary.variables, matrix.values,
+similarityTree(fileName, list.variables, supplementary.variables, matrix.values,
   contribution.supp, typicality.supp, verbose = FALSE)
 }
 \arguments{
+\item{fileName}{name of the file containing data}
+
 \item{list.variables}{list of variables to compute the similarity tree from.}
 
 \item{supplementary.variables}{list of supplementary variables.}

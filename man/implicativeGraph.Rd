@@ -4,9 +4,11 @@
 \alias{implicativeGraph}
 \title{Displays the Implicative Graph.}
 \usage{
-implicativeGraph(list.variables, computing.mode = 1)
+implicativeGraph(fileName, list.variables, computing.mode = 1)
 }
 \arguments{
+\item{fileName}{name of the file containing the data}
+
 \item{list.variables}{list containing all the variables used in the computation}
 
 \item{computing.mode}{controls the computing mode: 1=classic implication, 2=classic implication+ confidence, 3=implifiance}

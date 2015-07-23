@@ -1582,7 +1582,7 @@ LogicalVector contribution_supp, LogicalVector typicality_supp, LogicalVector Ve
       cl[x] = stringStream2.str();
 
       //Rprintf("Classification %d : %s similarity %f\n",f+1,cl[x],max);
-      cout<<"Classification "<<f+1<<" : "<<cl[x]<<" Cohesion "<<max<<endl;
+      cout<<"Classification "<<f+1<<" : "<<cl[x]<<" Similarity "<<max<<endl;
       //string_level[f]=new char[strlen(cl[x])+3];
       //strcpy(string_level[f],cl[x]);
       string_level[f]=cl[x];

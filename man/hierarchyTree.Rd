@@ -4,10 +4,12 @@
 \alias{hierarchyTree}
 \title{Computes and Displays the Hierarchy Tree.}
 \usage{
-hierarchyTree(list.variables, supplementary.variables, matrix.values,
+hierarchyTree(fileName, list.variables, supplementary.variables, matrix.values,
   contribution.supp, typicality.supp, computing.mode = 1, verbose = FALSE)
 }
 \arguments{
+\item{fileName}{name of the file containing data}
+
 \item{list.variables}{list of variables to compute the similarity tree from.}
 
 \item{supplementary.variables}{list of supplementary variables.}
