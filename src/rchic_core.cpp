@@ -83,9 +83,28 @@ struct ordering {
 };
 
 
+
+
+void ItemInConstitution(vector<int>& level,int& index,int v, vector<int>& LevelX, vector<int>& LevelY)
+{
+  level[index++]=v;
+  if(LevelX[v]>=0)
+  {
+    ItemInConstitution(level,index,LevelX[v],LevelX,LevelY);
+  }
+  
+  if(LevelY[v]>=0)
+  {
+    ItemInConstitution(level,index,LevelY[v],LevelX,LevelY);
+  }
+  
+}
+
+/*
 void LevelInConstitution(vector<int>& level,int& index,int v, vector<int>& LevelX, vector<int>& LevelY)
 {
   level[index++]=v;
+  cout<<"level "<<level[index]<<endl;
   if(LevelX[v]>=0)
   {
     LevelInConstitution(level,index,LevelX[v], LevelX, LevelY);
@@ -95,6 +114,8 @@ void LevelInConstitution(vector<int>& level,int& index,int v, vector<int>& Level
     LevelInConstitution(level,index,LevelY[v], LevelX, LevelY);
   }
 }
+*/
+
 
 //defined in istree.c
 long double Cnp(int n,int p) ;
@@ -164,7 +185,7 @@ void write_transactions(NumericMatrix data) {
 // [[Rcpp::export]]
 IntegerVector dynamic_cloud(NumericVector data, IntegerVector number_partition) {
   
-  if(length(number_partition)>1)
+  if(number_partition.size()>1)
   throw std::range_error("number of partition must be a scalar");
   
   int nb_elt=data.size();
@@ -615,9 +636,19 @@ int Typi, int nb_col, int nb_row, List individuals, vector<string>& string_level
     
     int nb_sub_level=0;
     //compute the sub-levels involved
-    LevelInConstitution(level,nb_sub_level,nb, LevelX, LevelY);
+    //LevelInConstitution
     
-    sort(level.begin(),level.end());
+    ItemInConstitution(level,nb_sub_level,nb, LevelX, LevelY);
+    sort(level.begin(),level.begin()+nb_sub_level);   
+    
+    
+    
+    
+    i=0;
+    
+    
+    
+    
     
     if(Typi)
     cout<<"Typicality to the sublevels: ";
@@ -633,8 +664,7 @@ int Typi, int nb_col, int nb_row, List individuals, vector<string>& string_level
       ImpliVector[level[i]]=index_simi[GenPairX[i]][GenPairY[i]];
     }
     
-    
-    
+
     if(Typi)
     {
       for(i=0;i<nb_row;i++)
@@ -657,6 +687,7 @@ int Typi, int nb_col, int nb_row, List individuals, vector<string>& string_level
         }
         cont=pow(1./(double)nb_sub_level*cont,0.5);
         Contrib[i]=cont;
+      
       }
       double max=0;
       for(i=0;i<nb_row;i++) {
@@ -687,6 +718,7 @@ int Typi, int nb_col, int nb_row, List individuals, vector<string>& string_level
           Cont+=pow(1-phi,2);
           l++;
         }
+        
         Contrib[i]=1-sqrt(1./(double)nb_sub_level*Cont);
       }
     }
@@ -964,10 +996,10 @@ LogicalVector contribution_supp, LogicalVector typicality_supp, LogicalVector Ve
     Index_cohesion[i][j]=cohesion_matrix(i,j);
   }
   
-  TwoDdouble mat_values(nb_row,vector<double> (nb_col));
+  TwoDdouble mat_values(matrix_values.nrow(),vector<double> (matrix_values.ncol()));
   
-  for(int i=0;i<nb_row;i++)
-  for(int j=0;j<nb_col;j++) {
+  for(int i=0;i<matrix_values.nrow();i++)
+  for(int j=0;j<matrix_values.ncol();j++) {
     mat_values[i][j]=matrix_values(i,j);
   }
   
@@ -1203,15 +1235,15 @@ LogicalVector contribution_supp, LogicalVector typicality_supp, LogicalVector Ve
   SignificantLevel(Index_cohesion, nb_col, Occurrences_variables,f,variable_left,variable_right,size_classe,classes_associated_with,significant_nodes,verbose);
   
   
-  
-  if(length(supplementary_variables)>0) {
+    
+  if(supplementary_variables.ncol()>0) {
     if(contrib_supp) {
       contributiveCategories(supplementary_variables,Index_cohesion,f,GenPairX,GenPairY,LevelX,LevelY,
-      mat_values,0, nb_col, nb_row, individuals,string_level,true,verbose);   //false means hierarchy     0 means contrib
+      mat_values,0, matrix_values.ncol(), matrix_values.nrow(), individuals,string_level,true,verbose);   //false means hierarchy     0 means contrib
     }
     if(typi_supp) {
       contributiveCategories(supplementary_variables,Index_cohesion,f,GenPairX,GenPairY,LevelX,LevelY,
-      mat_values,1, nb_col, nb_row, individuals,string_level,true,verbose);   //false means hierarchy     1 means typicality
+      mat_values,1, matrix_values.ncol(), matrix_values.nrow(), individuals,string_level,true,verbose);   //false means hierarchy     1 means typicality
     } 
   }
   
@@ -1412,10 +1444,10 @@ LogicalVector contribution_supp, LogicalVector typicality_supp, LogicalVector Ve
     Index_simi[i][j]=similarity_matrix(i,j);
   }
   
-  TwoDdouble mat_values(nb_row,vector<double> (nb_col));
+  TwoDdouble mat_values(matrix_values.nrow(),vector<double> (matrix_values.ncol()));
   
-  for(int i=0;i<nb_row;i++)
-  for(int j=0;j<nb_col;j++) {
+  for(int i=0;i<matrix_values.nrow();i++)
+  for(int j=0;j<matrix_values.ncol();j++) {
     mat_values[i][j]=matrix_values(i,j);
   }
   
@@ -1634,14 +1666,14 @@ LogicalVector contribution_supp, LogicalVector typicality_supp, LogicalVector Ve
   
   SignificantLevel(Index_simi, nb_col, Occurrences_variables,f,variable_left,variable_right,size_classe,classes_associated_with,significant_nodes,verbose);
   
-  if(length(supplementary_variables)>0) {
+  if(supplementary_variables.ncol()>0) {
     if(contrib_supp) {
       contributiveCategories(supplementary_variables,Index_simi,f,GenPairX,GenPairY,LevelX,LevelY,
-      mat_values,0, nb_col, nb_row, individuals,string_level,false,verbose);   //false means similarity     0 means contrib
+      mat_values,0, matrix_values.ncol(), matrix_values.nrow(), individuals,string_level,false,verbose);   //false means similarity     0 means contrib
     }
     if(typi_supp) {
       contributiveCategories(supplementary_variables,Index_simi,f,GenPairX,GenPairY,LevelX,LevelY,
-      mat_values,1, nb_col, nb_row, individuals,string_level,false,verbose);   //false means similarity     1 means typicality
+      mat_values,1, matrix_values.ncol(), matrix_values.nrow(), individuals,string_level,false,verbose);   //false means similarity     1 means typicality
     }
   }
   
