@@ -639,7 +639,8 @@ int Typi, int nb_col, int nb_row, List individuals, vector<string>& string_level
     //LevelInConstitution
     
     ItemInConstitution(level,nb_sub_level,nb, LevelX, LevelY);
-    sort(level.begin(),level.begin()+nb_sub_level);   
+    //to see later
+    //sort(level.begin(),level.begin()+nb_sub_level);   
     
     
     
