@@ -30,9 +30,10 @@
 #' @param   fileName      name of the file containing the data
 #' @param list.variables   list containing all the variables used in the computation
 #' @param computing.mode   controls the computing mode: 1=classic implication, 2=classic implication+ confidence, 3=implifiance
+#' @param complete.graph   displays a complete graph (with a=>b and b=>a rules)
 #' @author Raphael Couturier 
 #' @export
-implicativeGraph <-function(fileName,list.variables,computing.mode=1) {
+implicativeGraph <-function(fileName,list.variables,computing.mode=1,complete.graph=0) {
   confidence<<-0
   visibleWidth<<-1200
   visibleHeight<<-800
@@ -77,6 +78,7 @@ implicativeGraph <-function(fileName,list.variables,computing.mode=1) {
   myaffiche<<-tclVar(0)
   list.variables<<-list.variables
   computing.mode<<-computing.mode
+  complete.graph<<-complete.graph
   #currently we consider that all items are selected
   list.selected.item=rep_len(T,length(list.variables))
   list.tcl<<-lapply(list.selected.item,function(i) tclVar(i))
@@ -150,17 +152,11 @@ computeImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.i
   for(i in 1:n) {
     from=listNodes[[i]][1]
     to=listNodes[[i]][2]
-    if(computing.mode==2) {
-      if(rules[i,index.imp]>thres & rules[i,1]<rules[i,2] & as.numeric(list.selected.item[[which(list.variables==from)]]) 
-         & as.numeric(list.selected.item[[which(list.variables==to)]])& computing.mode==2 & rules[i,4]>confidence) {
-        lNodes=c(lNodes,from,to)
-      }
-    }
-    else {
-      if(rules[i,index.imp]>thres & rules[i,1]<rules[i,2] & as.numeric(list.selected.item[[which(list.variables==from)]]) 
-         & as.numeric(list.selected.item[[which(list.variables==to)]])) {
-        lNodes=c(lNodes,from,to)
-      }
+    if( rules[i,index.imp]>thres  & as.numeric(list.selected.item[[which(list.variables==from)]]) 
+         & as.numeric(list.selected.item[[which(list.variables==to)]]) & 
+        ((computing.mode==2 & rules[i,4]>=confidence) | computing.mode!=2) & 
+        ((complete.graph==0 & rules[i,1]<=rules[i,2]) | complete.graph!=0)) {
+                lNodes=c(lNodes,from,to)
     }
   }
   lNodes=unique(lNodes)
@@ -169,55 +165,41 @@ computeImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.i
   for(i in 1:length(lNodes)) {
     listNode[i]<<-lNodes[i]
   }
+  
+  print("complete graph")
+  print(complete.graph==0)
+  
   #create the graph with the nodes
-  g1 <- new("graphNEL", nodes = lNodes,edgemode = "directed")
-  #g1 <- graphNEL( nodes = lNodes,edgemode = "directed")
+  #g1 <- new("graphNEL", nodes = lNodes,edgemode = "directed")
+  g1 <- graphNEL( nodes = lNodes,edgemode = "directed")
   #add the edge of the graph
   compte<-1
   for(i in 1:n) {
     rule=strsplit(row.names(rules)[i],split=' -> ')
     from=rule[[1]][1]
     to=rule[[1]][2]
-    
-    
-    if(computing.mode==2) {
-      if(rules[i,index.imp]>thres & rules[i,1]<rules[i,2] &
-         as.numeric(list.selected.item[[which(list.variables==from)]]) & 
-         as.numeric(list.selected.item[[which(list.variables==to)]]) & (computing.mode==2 & rules[i,4]>confidence)) {
-        g1 <- addEdge(from,to,g1)
-        # retrieve the confidence value
-        conf1=rules[i,4]
-        # rounding confidence to two digits after the decimal point
-        conf2=round(conf1,2)
-        #we keep the from and to value and confidence in tables (global variable) to display later confidence values without recalculating all the graph
-        fromconf[compte]<<-from
-        toconf[compte]<<-to
-        confconf1[compte]<<-conf2
-        
-        compte=compte+1
-      }
+    if( rules[i,index.imp]>thres&
+        as.numeric(list.selected.item[[which(list.variables==from)]]) &
+        as.numeric(list.selected.item[[which(list.variables==to)]]) &
+        ((computing.mode==2 & rules[i,4]>=confidence) | computing.mode!=2) &
+        ((complete.graph==0 & rules[i,1]<=rules[i,2]) | complete.graph!=0) )  {
+          g1 <- addEdge(from,to,g1)
+          # retrieve the confidence value
+          conf1=rules[i,4]
+          # rounding confidence to two digits after the decimal point
+          conf2=round(conf1,2)
+          #we keep the from and to value and confidence in tables (global variable) to display later confidence values without recalculating all the graph
+          fromconf[compte]<<-from
+          toconf[compte]<<-to
+          confconf1[compte]<<-conf2
+          compte=compte+1
     }
-    else {
-      if(rules[i,index.imp]>thres & rules[i,1]<rules[i,2] &
-         as.numeric(list.selected.item[[which(list.variables==from)]]) & 
-         as.numeric(list.selected.item[[which(list.variables==to)]])) {
-        g1 <- addEdge(from,to,g1)
-        # retrieve the confidence value
-        conf1=rules[i,4]
-        # rounding confidence to two digits after the decimal point
-        conf2=round(conf1,2)
-        #we keep the from and to value and confidence in tables (global variable) to display later confidence values without recalculating all the graph
-        fromconf[compte]<<-from
-        toconf[compte]<<-to
-        confconf1[compte]<<-conf2
-        compte=compte+1
-      }
-    }
+    
   }
   #no need to plot thegraph
-  #plot(g1)
+  #plot(g1,recipEdges="distinct")
   #call rgraphviz to draw a nice graph
-  graph1 <- agopen(g1,"foo")
+  graph1 <- agopen(g1,"foo",recipEdges="distinct")
   offsetX<<-40
   scalingFactorX<<-1.9
   scalingFactorY<<-0.5
@@ -326,8 +308,6 @@ computeImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.i
 plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item,edit=FALSE,first=TRUE) {
   tkdelete(canvas, "text")
   tkdelete(canvas, "text1")
-  
-  
   
   if(first) {
     tkdelete(canvas, "control")

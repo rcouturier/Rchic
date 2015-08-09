@@ -38,7 +38,7 @@ rchic <-function() {
   
   
   
-  modalDialog <- function(title, question, entryInit, implicationType,entryWidth = 20,
+  modalDialog <- function(title, question, entryInit, implicationType,completeGraph,entryWidth = 20,
                           returnValOnCancel = "ID_CANCEL") {
     dlg <- tktoplevel()
     tkwm.deiconify(dlg)
@@ -46,21 +46,30 @@ rchic <-function() {
     tkfocus(dlg)
     tkwm.title(dlg, title)
     textEntryVarTcl <- tclVar(paste(entryInit))
-    #textEntryWidget <- tkentry(dlg, width = paste(entryWidth),
-    #                           textvariable = textEntryVarTcl)
-    #tkgrid(tklabel(dlg, text = "       "))
-    #tkgrid(tklabel(dlg, text = question), textEntryWidget)
-    #tkgrid(tklabel(dlg, text = "       "))
     
     
     rb1 <- tkradiobutton(dlg)
     rb2 <- tkradiobutton(dlg)
     rb3 <- tkradiobutton(dlg)
     
+    cb1 <- tkcheckbutton(dlg)
+    
+    
+    
+    rc1 <- tkradiobutton(dlg)
+    
+    
     rbValueTcl <- tclVar(paste(implicationType))
+    cbValueTcl <- tclVar(paste(completeGraph))
+    
+    
     tkconfigure(rb1,variable=rbValueTcl,value="Classic")
     tkconfigure(rb2,variable=rbValueTcl,value="Classic+Confidence")
     tkconfigure(rb3,variable=rbValueTcl,value="Implifiance")
+    
+    tkconfigure(cb1,variable=cbValueTcl)
+    tkgrid(tklabel(dlg,text="Complete graph"),cb1)
+    
     
     tkgrid(tklabel(dlg,text="Classic "),rb1)
     tkgrid(tklabel(dlg,text="Classic + confidence "),rb2)
@@ -70,16 +79,16 @@ rchic <-function() {
     ReturnVal <- returnValOnCancel
     
     onOK <- function() {
-      ReturnVal <<- paste(tclvalue(rbValueTcl))
+      ReturnVal <<- paste(tclvalue(rbValueTcl),tclvalue(cbValueTcl))
       tkgrab.release(dlg)
       tkdestroy(dlg)
-      tkfocus(ttMain)
+      tkfocus(tt)
     }
     onCancel <- function() {
       ReturnVal <<- returnValOnCancel
       tkgrab.release(dlg)
       tkdestroy(dlg)
-      tkfocus(ttMain)
+      tkfocus(tt)
     }
     OK.but <- tkbutton(dlg, text = "   OK   ", command = onOK)
     Cancel.but <- tkbutton(dlg, text = " Cancel ", command = onCancel)
@@ -87,8 +96,8 @@ rchic <-function() {
     tkgrid(tklabel(dlg, text = "    "))
     
     tkfocus(dlg)
-    tkbind(dlg, "<Destroy>", function() {tkgrab.release(dlg); tkfocus(ttMain)})
-    #tkbind(textEntryWidget, "<Return>", onOK)
+    tkbind(dlg, "<Destroy>", function() {tkgrab.release(dlg); tkfocus(tt)})
+    
     tkwait.window(dlg)
     
     return(ReturnVal)
@@ -178,11 +187,15 @@ rchic <-function() {
         computing.mode=2
       if(my.option[1,2]=="Implifiance")
         computing.mode=3
+      complete.graph=as.numeric(my.option[2,2])
+      
       print("computing mode")
       print(computing.mode)
+      print("complete graph")
+      print(complete.graph)
       
       #list of variables is needed to keep the same order in the variable when the cohesion matrix is built
-      implicativeGraph(fileName,list.variables,computing.mode=computing.mode)
+      implicativeGraph(fileName,list.variables,computing.mode=computing.mode,complete.graph=complete.graph)
       
       
     }
@@ -197,15 +210,20 @@ rchic <-function() {
     
     my.option=getMyOption()
     
-    ReturnVal <- modalDialog("First Name Entry", "Enter Your First Name", "toto", my.option[1,2])
+    ReturnVal <- modalDialog("First Name Entry", "Enter Your First Name", "toto", my.option[1,2],my.option[2,2])
     if (ReturnVal == "ID_CANCEL") return()
     #tkmessageBox(title = "Greeting",
     #             message = paste("Hello, ", ReturnVal, sep = ""))
     print(my.option)
     val=strsplit(ReturnVal, " ")[[1]]
     print(val[1])
-    
     my.option[1,2]=val[1]
+    
+ 
+    print(val[2])
+    my.option[2,2]=val[2]
+    
+    
     write.table(my.option,"option.csv",col.names = FALSE,row.names = FALSE,sep=",")
   })
   

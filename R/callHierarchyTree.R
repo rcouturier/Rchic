@@ -39,7 +39,7 @@ callHierarchyTree <- function(fileName,contribution.supp=FALSE,typicality.supp=F
   list.variables=names(dataCSV)
   list.variables=list.variables[-1]
     
-  #matrix to compute the contributions and similarities
+  #matrix to compute the contributions and hierarchies
   matrix.values=as.matrix(dataCSV[-1])
   storage.mode(matrix.values)<-"numeric"
   row.names(matrix.values)=row.names(dataCSV)
