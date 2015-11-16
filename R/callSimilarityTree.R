@@ -30,6 +30,9 @@ callSimilarityTree <- function(fileName,contribution.supp=FALSE,typicality.supp=
   dataCSV=result[[1]]
   supplementary.variables=result[[2]]
   
+  #remove variables with only 0
+  dataCSV=dataCSV[, !apply(dataCSV==0,2,all)]
+  
   #prepare data for apriori
   data2transac(dataCSV)
   #call apriori
