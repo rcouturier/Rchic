@@ -6,8 +6,8 @@ Author: Raphael Couturier
 Maintainer: Raphael Couturier <raphael.couturier@univ-fcomte.fr>
 Description: This package is intented to implement all the features of
     Statistical Implicative Analysis. This theory aims at building association
-    rules of the form : if an object has the property A it also tends to have
-    the property B. The SIA builds confidence of rules by computing the number
+    rules of the form "if an object has the property A it also tends to have
+    the property B". The SIA builds confidence of rules by computing the number
     of counter examples of such an rule and then by measuring the surprise
     (or the probability) to have so few counter examples compared to the number
     of counter examples we would have with two random variables have the same
@@ -24,6 +24,5 @@ License: GPL
 LinkingTo: Rcpp
 URL: https://github.com/rchic/Rchic/
 VignetteBuilder: knitr
-Suggests:
-    knitr
+Suggests: knitr
 
