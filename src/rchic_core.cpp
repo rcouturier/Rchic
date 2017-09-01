@@ -1,8 +1,10 @@
+#include <Rcpp.h>
 #include <iostream>
 #include <ostream>
 #include <math.h>
 
 
+#include <sstream>
 #include <fstream>
 #include <string>
 
@@ -20,7 +22,7 @@
 
 #include <array> 
 
-#include <Rcpp.h>
+
 
 using namespace std;
 using namespace Rcpp;

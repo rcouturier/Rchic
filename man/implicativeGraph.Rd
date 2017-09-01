@@ -4,7 +4,8 @@
 \alias{implicativeGraph}
 \title{Displays the Implicative Graph.}
 \usage{
-implicativeGraph(fileName, list.variables, computing.mode = 1)
+implicativeGraph(fileName, list.variables, computing.mode = 1,
+  complete.graph = 0)
 }
 \arguments{
 \item{fileName}{name of the file containing the data}
@@ -12,6 +13,8 @@ implicativeGraph(fileName, list.variables, computing.mode = 1)
 \item{list.variables}{list containing all the variables used in the computation}
 
 \item{computing.mode}{controls the computing mode: 1=classic implication, 2=classic implication+ confidence, 3=implifiance}
+
+\item{complete.graph}{displays a complete graph (with a=>b and b=>a rules)}
 }
 \description{
 Reads the ASI rules, selects the rules according to the toolbar and calls rgraphviz before displaying the rules.
