@@ -5,6 +5,17 @@
 
 using namespace Rcpp;
 
+// call_apriori
+void call_apriori(int nb, StringVector s);
+RcppExport SEXP _rchic_call_apriori(SEXP nbSEXP, SEXP sSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type nb(nbSEXP);
+    Rcpp::traits::input_parameter< StringVector >::type s(sSEXP);
+    call_apriori(nb, s);
+    return R_NilValue;
+END_RCPP
+}
 // write_transactions
 void write_transactions(NumericMatrix data);
 RcppExport SEXP _rchic_write_transactions(SEXP dataSEXP) {
@@ -63,6 +74,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_rchic_call_apriori", (DL_FUNC) &_rchic_call_apriori, 2},
     {"_rchic_write_transactions", (DL_FUNC) &_rchic_write_transactions, 1},
     {"_rchic_dynamic_cloud", (DL_FUNC) &_rchic_dynamic_cloud, 2},
     {"_rchic_hierarchy", (DL_FUNC) &_rchic_hierarchy, 7},

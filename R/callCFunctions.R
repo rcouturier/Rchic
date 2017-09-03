@@ -8,12 +8,13 @@
 #' @importFrom Rcpp evalCpp
 #'
 #' @useDynLib rchic
-
-callAsirules <- function(){
-  b<-c("rchic","-l","-s0","-m1","-n2","-c0",'transaction.tab',"transaction.out")
-  a<-length(b)
-  .C("asirules",as.integer(a),as.character(b))
-}
+# 
+# callAsirules <- function(){
+#   b<-c("rchic","-l","-s0","-m1","-n2","-c0",'transaction.tab',"transaction.out")
+#   a<-length(b)
+#   r<-.C("_asirules",as.integer(a),as.character(b),PACKAGE = 'rchic')
+#   
+# }
 
 
 #' @title Calls the C++ similarity computation.
@@ -37,7 +38,7 @@ callSimilarityComputation <- function(similarity_matrix,list.occurrences.variabl
                                       supplementary.variables,matrix.values,
                                       contribution.supp, typicality.supp,verbose)  {
     
-    .Call("rchic_similarity", similarity_matrix,list.occurrences.variables,supplementary.variables,matrix.values,
+    .Call("_rchic_similarity", similarity_matrix,list.occurrences.variables,supplementary.variables,matrix.values,
           contribution.supp, typicality.supp, verbose)  
 }
 
@@ -61,7 +62,7 @@ callSimilarityComputation <- function(similarity_matrix,list.occurrences.variabl
 callHierarchyComputation <- function(cohesion_matrix,list.occurrences.variables,
                                      supplementary.variables,matrix.values,contribution.supp, typicality.supp,verbose)  {
   
-  .Call("rchic_hierarchy", cohesion_matrix,list.occurrences.variables,supplementary.variables,matrix.values,
+  .Call("_rchic_hierarchy", cohesion_matrix,list.occurrences.variables,supplementary.variables,matrix.values,
         contribution.supp, typicality.supp,verbose)  
 }
 
@@ -80,7 +81,7 @@ callHierarchyComputation <- function(cohesion_matrix,list.occurrences.variables,
 
 callDynamicCloud <- function(vector, nb.partitions)  {
   
-  .Call("rchic_dynamic_cloud", vector, nb.partitions)  
+  .Call("_rchic_dynamic_cloud", vector, nb.partitions)  
 }
 
 
@@ -100,6 +101,24 @@ callWriteTransactions <- function(data)  {
   M=as.matrix(data[,-1])
   #be sure that we have numeric
   storage.mode(M)<-"numeric"
-  .Call('rchic_write_transactions', M)  
+  .Call('_rchic_write_transactions', M)  
 }
 
+
+#' @title Calls the C++ write_transactions.
+#'
+#' @description Interface to call the the C++ write_transactions.
+#'
+#' @param  x  			          dataframe representing all the data
+#' 
+#' @author Raphael Couturier 
+#' @export
+#' @useDynLib rchic
+#' 
+
+callAsirules <- function(){ 
+  b<-c("rchic","-l","-s0","-m1","-n2","-c0",'transaction.tab',"transaction.out")
+  a<-length(b)
+  
+  call_apriori(as.integer(a),as.character(b))
+}

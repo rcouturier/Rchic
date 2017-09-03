@@ -68,6 +68,7 @@ float changed to double
 #include "apriori.h"
 
 #include <R.h>
+//#include <Rcpp.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -506,7 +507,7 @@ exit(code);                   /* abort the program */
 /*--------------------------------------------------------------------*/
 
 
-extern "C"{
+//extern "C"{
   
   int asirules (int *argc2, char *argv[])
   {                               /* --- main function */
@@ -1086,4 +1087,4 @@ extern "C"{
   return 0;                     /* return 'ok' */
   }  /* main() */
   
-}
+//}
