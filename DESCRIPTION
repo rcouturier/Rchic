@@ -1,7 +1,7 @@
 Package: rchic
 Title: Statistical Implicative Analysis
-Version: 0.24
-Date: 2015
+Version: 0.25
+Date: 2017
 Author: Raphael Couturier
 Maintainer: Raphael Couturier <raphael.couturier@univ-fcomte.fr>
 Description: This package is intented to implement all the features of
@@ -15,7 +15,7 @@ Description: This package is intented to implement all the features of
     (using similarity analysis), an implicative graph and a hierarchical tree.
     See for instance <http://www.springer.com/us/book/9783540789826>.
 Depends:
-    R (>= 3.2.1)
+    R (>= 3.3.1)
 Imports:
     tcltk2,
     Rgraphviz,
