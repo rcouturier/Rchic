@@ -763,6 +763,17 @@ int ist_rule (ISTREE *ist, int *rule,
 			}
 		}
 
+		
+	/*	
+		//for MGK test only  uncomment that for MGK
+	  //MUST BE COMMENTED
+		//MGK
+		//p(b|a) = p(a and b)/p(a)
+		double pb_knowing_a=occ_ab/occ_a;
+		double mgk=(pb_knowing_a-occ_b/occ_n)/(1.-occ_b/occ_n);
+		*phi=mgk;
+	*/	
+		
 
 		alpha=(double)occ_a/occ_n;
 		beta=(double)occ_b/occ_n;
