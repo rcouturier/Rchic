@@ -1386,14 +1386,16 @@ LogicalVector contribution_supp, LogicalVector typicality_supp, LogicalVector Ve
   //char **cc=new char*[nb_col];
   //char **cl=new char*[nb_col];
   vector<int> significant_nodes(nb_col);
+  vector<double> similarity_level(nb_col);
   vector<string> string_level(nb_col);
+  
   //char **string_level = new char*[nb_col];
   for(i=0;i<nb_col;i++) 
   {
 //    cc[i]=0;
 //    cl[i]=0;
 //    significant_nodes[i]=0;
-//    string_level[i]=0;
+    //string_level[i]='\0;
   }
   
   
@@ -1621,6 +1623,7 @@ LogicalVector contribution_supp, LogicalVector typicality_supp, LogicalVector Ve
       //string_level[f]=new char[strlen(cl[x])+3];
       //strcpy(string_level[f],cl[x]);
       string_level[f]=cl[x];
+      similarity_level[f]=max;
       f++;
       
       
@@ -1682,7 +1685,7 @@ LogicalVector contribution_supp, LogicalVector typicality_supp, LogicalVector Ve
   
   
   
-  List results(5);
+  List results(7);
   List listClasses(2);
   listClasses[0]=string(chc);
   listClasses[1]=string(chl);
@@ -1708,10 +1711,13 @@ LogicalVector contribution_supp, LogicalVector typicality_supp, LogicalVector Ve
   Rsignificant_nodes[i]=significant_nodes[i];
   results[4]=Rsignificant_nodes;
   
+  NumericVector Rvariable_similarity_level(f);
+  for(i=0;i<f;i++) {
+    Rvariable_similarity_level[i]=similarity_level[i];  
+  }
+  results[5]=Rvariable_similarity_level; //similarity indices list
   
-  
-  
-  
+  results[6]=string_level; //list of classes
   
   
   

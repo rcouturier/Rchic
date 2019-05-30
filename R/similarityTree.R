@@ -129,7 +129,7 @@ callPlotSimilarityTree <- function() {
   sub.list.occ=list.occurrences.variables[list.selected.item]
  
   
-  
+
   #call the similarity computation written in C
   res=callSimilarityComputation(sub_matrix,sub.list.occ,supplementary.variables,matrix.values,
                                 contribution.supp,typicality.supp,verbose)
@@ -145,6 +145,10 @@ callPlotSimilarityTree <- function() {
   
   list.significant.nodes=res[[5]]
   
+  
+  
+  print("ici")
+  print(res[[6]])
    
   #remove the () in the classes and convert the indexes from char to integer
   list.simi.indexes.variable=str_replace_all(list.simi.indexes.variable,"([())])","")
