@@ -147,9 +147,6 @@ callPlotSimilarityTree <- function() {
   
   
   
-  print("ici")
-  print(res[[6]])
-   
   #remove the () in the classes and convert the indexes from char to integer
   list.simi.indexes.variable=str_replace_all(list.simi.indexes.variable,"([())])","")
   list.simi.indexes.variable=strsplit(list.simi.indexes.variable,' ')
