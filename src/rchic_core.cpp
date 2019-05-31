@@ -942,6 +942,8 @@ LogicalVector contribution_supp, LogicalVector typicality_supp, LogicalVector Ve
   //char **cl=new char*[nb_col];
   //char **string_level=new char*[nb_col];
   vector<string> string_level(nb_col);
+  vector<double> cohesion_level(nb_col);
+  
   
   vector<int> significant_nodes(nb_col);
   for(i=0;i<nb_col;i++) 
@@ -1185,6 +1187,7 @@ LogicalVector contribution_supp, LogicalVector typicality_supp, LogicalVector Ve
       //string_level[f]=new char[strlen(cl[x])+3];
       //strcpy(string_level[f],cl[x]);
       string_level[f]=cl[x];
+      cohesion_level[f]=a;
       //tab_cohe[f]=a;
       if (max) f++;
       
@@ -1251,7 +1254,7 @@ LogicalVector contribution_supp, LogicalVector typicality_supp, LogicalVector Ve
   }
   
   
-  List results(6);
+  List results(8);
   List listClasses(2);
   listClasses[0]=string(chc);
   listClasses[1]=string(chl);
@@ -1284,7 +1287,13 @@ LogicalVector contribution_supp, LogicalVector typicality_supp, LogicalVector Ve
   results[5]=Rfinal_nodes;
   
   
+  NumericVector Rvariable_cohesion_level(f);
+  for(i=0;i<f;i++) {
+    Rvariable_cohesion_level[i]=cohesion_level[i];  
+  }
+  results[6]=Rvariable_cohesion_level; //cohesion indices list
   
+  results[7]=string_level; //list of classes  
   
   
   
