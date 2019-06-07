@@ -454,7 +454,7 @@ bool verbose)
   for(i=0;i<nb_levels;i++)
   {
     if(verbose)
-    cout<<endl<<" Level "<<i+1<<" : ";
+      cout<<endl<<" Level "<<i+1<<" : ";
     
     for(j=0;j<=i;j++)
     {
@@ -571,7 +571,7 @@ bool verbose)
     }
   }
   //Debug
-  cout<<"Most significant level "<<index+1<<endl;
+  if(verbose) cout<<"Most significant level "<<index+1<<endl;
   
   for(i=0;i<nb_levels;i++)
   {
@@ -581,7 +581,7 @@ bool verbose)
     if(i==nb_levels-1 && i>0 && localmax[i]>localmax[i-1]) node=1;
     if(node) 
     {
-      cout<<"Significant level "<<i+1<<endl; 
+      if(verbose) cout<<"Significant level "<<i+1<<endl; 
       significant_nodes[i]+=1;
     }
   }
@@ -877,11 +877,11 @@ LogicalVector contribution_supp, LogicalVector typicality_supp, LogicalVector Ve
   bool contrib_supp=contribution_supp[0];
   bool typi_supp=typicality_supp[0];
   
-  cout<<verbose<<endl;
+  if(verbose) cout<<verbose<<endl;
   
   int nb_col=cohesion_matrix.ncol();
   int nb_row=cohesion_matrix.nrow();
-  cout<<nb_col<<endl;
+  if(verbose) cout<<nb_col<<endl;
   
   List list_names=cohesion_matrix.attr("dimnames");
   List list_names2=matrix_values.attr("dimnames");
@@ -1183,7 +1183,7 @@ LogicalVector contribution_supp, LogicalVector typicality_supp, LogicalVector Ve
       
       double a=Cohesion_classX(x,size_class[x],Index_cohesion,classes_associated_with);
       //Rprintf("Classification %d : %s  Cohesion %f\n",(f+1),cl[x],a);
-      cout<<"Classification "<<f+1<<" : "<<cl[x]<<" Cohesion "<<a<<endl;
+      if(verbose) cout<<"Classification "<<f+1<<" : "<<cl[x]<<" Cohesion "<<a<<endl;
       //string_level[f]=new char[strlen(cl[x])+3];
       //strcpy(string_level[f],cl[x]);
       string_level[f]=cl[x];
@@ -1331,28 +1331,28 @@ LogicalVector contribution_supp, LogicalVector typicality_supp, LogicalVector Ve
   bool typi_supp=typicality_supp[0];
   
   
-  cout<<verbose<<endl;
+  //cout<<verbose<<endl;
   
   int nb_col=similarity_matrix.ncol();
   int nb_row=similarity_matrix.nrow();
-  cout<<nb_col<<endl;
+  //cout<<nb_col<<endl;
   
   List list_names=similarity_matrix.attr("dimnames");
   List list_names2=matrix_values.attr("dimnames");
   List variables=list_names[0];
   
-  cout<<" list "<<list_names2.size()<<endl;
+  //cout<<" list "<<list_names2.size()<<endl;
   List individuals=list_names2[0];
-  cout<<" list2 "<<individuals.size()<<endl;
+  //cout<<" list2 "<<individuals.size()<<endl;
   
   for(int i=0;i<variables.size();i++) {
     string v=variables[i];
-    cout<<v<<endl;
+    if(verbose) cout<<v<<endl;
   }
   
   for(int i=0;i<individuals.size();i++) {
     string v=individuals[i];
-    cout<<v<<endl;
+    if(verbose) cout<<v<<endl;
   }
   
   
@@ -1602,7 +1602,7 @@ LogicalVector contribution_supp, LogicalVector typicality_supp, LogicalVector Ve
       variable_left[f]=classes_associated_with[x][1];
       variable_right[f]=classes_associated_with[x][size_class[x]];
       if(verbose)
-      Rprintf("Level %d variable_left %d variable_right %d\n",f,variable_left[f],variable_right[f]);
+        Rprintf("Level %d variable_left %d variable_right %d\n",f,variable_left[f],variable_right[f]);
       size_classe[f]=size_class[x];			
       
 //      char *new_s=new char[strlen(cc[x])+3];  //3 a cause des ()
@@ -1628,7 +1628,7 @@ LogicalVector contribution_supp, LogicalVector typicality_supp, LogicalVector Ve
       cl[x] = stringStream2.str();
 
       //Rprintf("Classification %d : %s similarity %f\n",f+1,cl[x],max);
-      cout<<"Classification "<<f+1<<" : "<<cl[x]<<" Similarity "<<max<<endl;
+      if(verbose) cout<<"Classification "<<f+1<<" : "<<cl[x]<<" Similarity "<<max<<endl;
       //string_level[f]=new char[strlen(cl[x])+3];
       //strcpy(string_level[f],cl[x]);
       string_level[f]=cl[x];
