@@ -38,7 +38,7 @@ rchic <-function() {
   
   
   
-  modalDialog <- function(title, question, entryInit, implicationType,completeGraph,entryWidth = 20,
+  modalDialog <- function(title, question, entryInit, implicationType,completeGraph,verbose,entryWidth = 20,
                           returnValOnCancel = "ID_CANCEL") {
     dlg <- tktoplevel()
     tkwm.deiconify(dlg)
@@ -54,6 +54,8 @@ rchic <-function() {
     
     cb1 <- tkcheckbutton(dlg)
     
+    cb2 <- tkcheckbutton(dlg)
+    
     
     
     rc1 <- tkradiobutton(dlg)
@@ -61,6 +63,7 @@ rchic <-function() {
     
     rbValueTcl <- tclVar(paste(implicationType))
     cbValueTcl <- tclVar(paste(completeGraph))
+    cb2ValueTcl <- tclVar(paste(verbose))
     
     
     tkconfigure(rb1,variable=rbValueTcl,value="Classic")
@@ -71,6 +74,11 @@ rchic <-function() {
     tkgrid(tklabel(dlg,text="Complete graph"),cb1)
     
     
+    tkconfigure(cb2,variable=cb2ValueTcl)
+    tkgrid(tklabel(dlg,text="Verbose"),cb2)
+    
+    
+    
     tkgrid(tklabel(dlg,text="Classic "),rb1)
     tkgrid(tklabel(dlg,text="Classic + confidence "),rb2)
     tkgrid(tklabel(dlg,text="Implifiance "),rb3)
@@ -79,7 +87,7 @@ rchic <-function() {
     ReturnVal <- returnValOnCancel
     
     onOK <- function() {
-      ReturnVal <<- paste(tclvalue(rbValueTcl),tclvalue(cbValueTcl))
+      ReturnVal <<- paste(tclvalue(rbValueTcl),tclvalue(cbValueTcl),tclvalue(cb2ValueTcl))
       tkgrab.release(dlg)
       tkdestroy(dlg)
       tkfocus(tt)
@@ -123,7 +131,23 @@ rchic <-function() {
     } else {
       
       
-      callSimilarityTree(fileName=fileName,contribution.supp=TRUE,typicality.supp=FALSE,verbose=FALSE)
+      
+      #retrieve option
+      my.option=getMyOption()
+      #compute the computing mode
+      computing.mode=1
+      if(my.option[1,2]=="Classic+Confidence")
+        computing.mode=2
+      if(my.option[1,2]=="Implifiance")
+        computing.mode=3
+      verbose=as.numeric(my.option[3,2])
+      if(verbose==1)
+        verbose=TRUE
+      else
+        verbose=FALSE
+      
+      
+      callSimilarityTree(fileName=fileName,contribution.supp=TRUE,typicality.supp=FALSE,verbose=verbose)
       
     }
   })
@@ -148,7 +172,14 @@ rchic <-function() {
       print("computing mode")
       print(computing.mode)
       
-      callHierarchyTree(fileName=fileName,contribution.supp=TRUE,typicality.supp=FALSE,computing.mode=computing.mode,verbose=FALSE)
+      verbose=as.numeric(my.option[3,2])
+      if(verbose==1)
+        verbose=TRUE
+      else
+        verbose=FALSE
+      
+      
+      callHierarchyTree(fileName=fileName,contribution.supp=TRUE,typicality.supp=FALSE,computing.mode=computing.mode,verbose=verbose)
     }
   })
   tkadd(fileMenu, "command", label = "Implicative graph", command = function(){
@@ -210,18 +241,23 @@ rchic <-function() {
     
     my.option=getMyOption()
     
-    ReturnVal <- modalDialog("First Name Entry", "Enter Your First Name", "toto", my.option[1,2],my.option[2,2])
+    ReturnVal <- modalDialog("First Name Entry", "Enter Your First Name", "toto", my.option[1,2],my.option[2,2],my.option[3,2])
     if (ReturnVal == "ID_CANCEL") return()
     #tkmessageBox(title = "Greeting",
     #             message = paste("Hello, ", ReturnVal, sep = ""))
     print(my.option)
     val=strsplit(ReturnVal, " ")[[1]]
+    print("ici")
+    print(val)
+    
     print(val[1])
     my.option[1,2]=val[1]
     
- 
     print(val[2])
     my.option[2,2]=val[2]
+    
+    print(val[3])
+    my.option[3,2]=val[3]
     
     
     write.table(my.option,"option.csv",col.names = FALSE,row.names = FALSE,sep=",")

@@ -33,7 +33,7 @@ readAndAnalyzeData <- function (fileName, ask.value.partitionning=FALSE) {
       else {
         nb.partitions=3
       }
-      print(name)
+      #print(name)
       #call kmeans to partition the variable
       #cl=kmeans(variable,nb.partitions)
       cl=callDynamicCloud(as.numeric(c(t(variable))),as.integer(nb.partitions))
@@ -60,7 +60,7 @@ readAndAnalyzeData <- function (fileName, ask.value.partitionning=FALSE) {
     }
     else
     {
-      print(name)
+      #print(name)
       res=grepl("\\.s$", name)
       #exclude supplementary variables
       if(res==FALSE) {

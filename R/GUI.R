@@ -14,8 +14,8 @@ getMyOption <- function() {
     print(my.option)
   }
   else {
-    fields=c("computation","complete.graph")
-    values=c("Classic","0")
+    fields=c("computation","complete.graph","verbose")
+    values=c("Classic","0","0")
     my.option=data.frame(fields,values,stringsAsFactors=FALSE)
   }
 }
