@@ -286,7 +286,7 @@ callPlotSimilarityTree <- function() {
     
   }
   
-  
+  tkpostscript(canvas, file="similarity.ps",height=workingHeight,width=workingWidth)
   
 }
 

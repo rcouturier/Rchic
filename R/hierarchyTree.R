@@ -308,6 +308,6 @@ callPlotHierarchyTree <- function() {
     }
   }
   
-  
+  tkpostscript(canvas, file="hierarchy.ps",height=workingHeight,width=workingWidth)
   
 }
