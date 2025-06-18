@@ -4,8 +4,12 @@
 \alias{implicativeGraph}
 \title{Displays the Implicative Graph.}
 \usage{
-implicativeGraph(fileName, list.variables, computing.mode = 1,
-  complete.graph = 0)
+implicativeGraph(
+  fileName,
+  list.variables,
+  computing.mode = 1,
+  complete.graph = 0
+)
 }
 \arguments{
 \item{fileName}{name of the file containing the data}

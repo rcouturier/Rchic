@@ -188,20 +188,20 @@ callPlotHierarchyTree <- function() {
   offsetX=10
   offsetY=30
   
-  dx=20
-  dy=10
+  dx=20*2
+  dy=10*2
   
   visibleWidth=1200
   visibleHeight=800
   
   workingWidth=length(list.hier.variables)*dx+50
-  workingHeight=offsetY+12*(max.length.variables)+nb.levels*dy+50
+  workingHeight=offsetY+12*2*(max.length.variables)+nb.levels*dy+50
   
   offset.variable.x=0
   offset.variable.y=0
   for(i in 1:length(list.hier.indexes.variable)){
     offset.variable.x[list.hier.indexes.variable[i]]=offsetX+dx*i
-    offset.variable.y[i]=offsetY+12*max.length.variables+10
+    offset.variable.y[i]=offsetY+12*2*max.length.variables+10
   }
   
   
@@ -222,11 +222,11 @@ callPlotHierarchyTree <- function() {
     #offset compared to the lenghtest variable
     offset.length.variable=max.length.variables-length.variable
     for (j in 1:str_length(list.hier.variables[i])) {
-      tkcreate(canvas, "text", offsetX+i*dx, offsetY+12*(offset.length.variable+j), text=substr(list.hier.variables[i],j,j),font=plotFont, fill="brown",tags="draw")
+      tkcreate(canvas, "text", offsetX+i*dx, offsetY+12*2*(offset.length.variable+j), text=substr(list.hier.variables[i],j,j),font=plotFont, fill="brown",tags="draw")
     }
   }
   
-  offsetY=offsetY+12*max.length.variables+10
+  offsetY=offsetY+12*2*max.length.variables+10
   
   line.coord=numeric(4)
   for (j in 1:nb.levels) {

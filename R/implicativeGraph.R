@@ -200,9 +200,11 @@ computeImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.i
   #plot(g1,recipEdges="distinct")
   #call rgraphviz to draw a nice graph
   graph1 <- agopen(g1,"foo",recipEdges="distinct")
+  toFile(graph1, layoutType="dot", filename="g1_dot.svg", fileType="svg")
+  
   offsetX<<-40
-  scalingFactorX<<-1.9
-  scalingFactorY<<-0.5
+  scalingFactorX<<-1.9*2
+  scalingFactorY<<-0.5*2
   size.x=slot(slot(boundBox(graph1),'upRight'),'x')
   size.y=slot(slot(boundBox(graph1),'upRight'),'y')
   workingHeight<<-size.y*scalingFactorY+10

@@ -4,9 +4,15 @@
 \alias{callHierarchyComputation}
 \title{Calls the C++ hierarchy computation.}
 \usage{
-callHierarchyComputation(cohesion_matrix, list.occurrences.variables,
-  supplementary.variables, matrix.values, contribution.supp, typicality.supp,
-  verbose)
+callHierarchyComputation(
+  cohesion_matrix,
+  list.occurrences.variables,
+  supplementary.variables,
+  matrix.values,
+  contribution.supp,
+  typicality.supp,
+  verbose
+)
 }
 \arguments{
 \item{cohesion_matrix}{cohesion matrix of the variables}

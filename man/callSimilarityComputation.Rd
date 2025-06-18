@@ -4,9 +4,15 @@
 \alias{callSimilarityComputation}
 \title{Calls the C++ ASI rules processor.}
 \usage{
-callSimilarityComputation(similarity_matrix, list.occurrences.variables,
-  supplementary.variables, matrix.values, contribution.supp, typicality.supp,
-  verbose)
+callSimilarityComputation(
+  similarity_matrix,
+  list.occurrences.variables,
+  supplementary.variables,
+  matrix.values,
+  contribution.supp,
+  typicality.supp,
+  verbose
+)
 }
 \arguments{
 \item{similarity_matrix}{matrix of similarities of the variables.}
@@ -29,7 +35,5 @@ Interface to call the ASI rules processor.
 Interface to call the the C++ similarity computation.
 }
 \author{
-Raphael Couturier
-
 Raphael Couturier
 }

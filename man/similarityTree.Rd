@@ -4,8 +4,15 @@
 \alias{similarityTree}
 \title{Computes and Displays the Similarity Tree.}
 \usage{
-similarityTree(fileName, list.variables, supplementary.variables, matrix.values,
-  contribution.supp, typicality.supp, verbose = FALSE)
+similarityTree(
+  fileName,
+  list.variables,
+  supplementary.variables,
+  matrix.values,
+  contribution.supp,
+  typicality.supp,
+  verbose = FALSE
+)
 }
 \arguments{
 \item{fileName}{name of the file containing data}

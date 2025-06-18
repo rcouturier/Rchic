@@ -4,8 +4,16 @@
 \alias{hierarchyTree}
 \title{Computes and Displays the Hierarchy Tree.}
 \usage{
-hierarchyTree(fileName, list.variables, supplementary.variables, matrix.values,
-  contribution.supp, typicality.supp, computing.mode = 1, verbose = FALSE)
+hierarchyTree(
+  fileName,
+  list.variables,
+  supplementary.variables,
+  matrix.values,
+  contribution.supp,
+  typicality.supp,
+  computing.mode = 1,
+  verbose = FALSE
+)
 }
 \arguments{
 \item{fileName}{name of the file containing data}
