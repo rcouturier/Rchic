@@ -51,6 +51,7 @@ rchic <-function() {
     rb1 <- tkradiobutton(dlg)
     rb2 <- tkradiobutton(dlg)
     rb3 <- tkradiobutton(dlg)
+    rb4 <- tkradiobutton(dlg)
     
     cb1 <- tkcheckbutton(dlg)
     
@@ -69,6 +70,7 @@ rchic <-function() {
     tkconfigure(rb1,variable=rbValueTcl,value="Classic")
     tkconfigure(rb2,variable=rbValueTcl,value="Classic+Confidence")
     tkconfigure(rb3,variable=rbValueTcl,value="Implifiance")
+    tkconfigure(rb4,variable=rbValueTcl,value="Entropic")
     
     tkconfigure(cb1,variable=cbValueTcl)
     tkgrid(tklabel(dlg,text="Complete graph"),cb1)
@@ -82,6 +84,7 @@ rchic <-function() {
     tkgrid(tklabel(dlg,text="Classic "),rb1)
     tkgrid(tklabel(dlg,text="Classic + confidence "),rb2)
     tkgrid(tklabel(dlg,text="Implifiance "),rb3)
+    tkgrid(tklabel(dlg,text="Entropic "),rb4)
     
     
     ReturnVal <- returnValOnCancel
@@ -218,6 +221,9 @@ rchic <-function() {
         computing.mode=2
       if(my.option[1,2]=="Implifiance")
         computing.mode=3
+      if(my.option[1,2]=="Entropic")
+        computing.mode=4
+      
       complete.graph=as.numeric(my.option[2,2])
       
       print("computing mode")

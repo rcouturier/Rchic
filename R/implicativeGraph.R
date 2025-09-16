@@ -139,12 +139,15 @@ computeImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.i
   n=dim(rules)[1]
   listNodes=strsplit(row.names(rules),split=' -> ')
   
+  write.csv(rules, "raph.csv", row.names = FALSE)
   
   #according to computing.mode, the location of the index is not the same
   if(computing.mode==1 | computing.mode==2)
     index.imp=5    #it corresponds to the classical index
+  if(computing.mode==4)
+    index.imp=6    #it corresponds to the entropic
   if(computing.mode==3)
-    index.imp=6    #it corresponds to the implifiance
+    index.imp=7    #it corresponds to the implifiance
   
   
   #determine the list of visible nodes

@@ -629,7 +629,7 @@ double Poisson(double para,int cumul)
 
 int ist_rule (ISTREE *ist, int *rule,
               double* occhyp, double* occcon, double *supp, double *conf, double *aval, double *phi,
-              double *impli, double* normal_simi,double *entro_simi, int maxlen, int simple_impli, int Binomial_law)
+              double *entro, double *impli, double* normal_simi,double *entro_simi, int maxlen, int simple_impli, int Binomial_law)
 {                               /* --- extract next rule */
 	int      i;                   /* loop variable */
 	int      item;                /* buffer for an item identifier */
@@ -793,21 +793,21 @@ int ist_rule (ISTREE *ist, int *rule,
 
 
 		//  entropic version
-		/*		if (t <= alpha/2.0)
+		if (t <= alpha/2.0) 
 					h1 =0.5*(1+xl2xb(0.5-t/alpha) + xl2xb(0.5+t/alpha));
-					else if( t<=alpha)
+		else if( t<=alpha)
 					h1 =0.5*(1-xl2xb(t/alpha-0.5) - xl2xb(1.5-t/alpha));
-					else
-					h1=1.;
-					unmb = 1.0 - beta;
-					if (t <= unmb/2.0)
-					h2 = 0.5*(1+xl2xb(0.5-t/unmb) + xl2xb(0.5+t/unmb));
-					else if(t<=unmb)
-					h2 = 0.5*(1-xl2xb(t/unmb-0.5) - xl2xb(1.5-t/unmb));
-					else h2=1.;
-					ii = sqrt((1.-h1)*(1.-h2));
-					*impli=(1.-1./(2.*sqrt(occ_n)))*ii;
-					*/
+		else
+			h1=1.;
+		unmb = 1.0 - beta;
+		if (t <= unmb/2.0)
+				h2 = 0.5*(1+xl2xb(0.5-t/unmb) + xl2xb(0.5+t/unmb));
+		else if(t<=unmb)
+			h2 = 0.5*(1-xl2xb(t/unmb-0.5) - xl2xb(1.5-t/unmb));
+		else h2=1.;
+		ii = sqrt((1.-h1)*(1.-h2));
+		*entro=(1.-1./(2.*sqrt(occ_n)))*ii;
+					
 
 
 
