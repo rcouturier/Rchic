@@ -1,7 +1,7 @@
 Package: rchic
 Title: Statistical Implicative Analysis
-Version: 0.27
-Date: 2019
+Version: 0.28
+Date: 2025
 Author: Raphael Couturier
 Maintainer: Raphael Couturier <raphael.couturier@univ-fcomte.fr>
 Description: This package is intented to implement all the features of
