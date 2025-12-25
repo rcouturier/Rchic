@@ -205,13 +205,13 @@ computeImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.i
   graph1 <- agopen(g1,"foo",recipEdges="distinct")
   toFile(graph1, layoutType="dot", filename="g1_dot.svg", fileType="svg")
   
-  offsetX<<-40
-  scalingFactorX<<-1.9*2
-  scalingFactorY<<-0.5*2
+  offsetX<<-100 #-40
+  scalingFactorX<<-1.9/1.6#*10
+  scalingFactorY<<-0.5/2.#*10
   size.x=slot(slot(boundBox(graph1),'upRight'),'x')
   size.y=slot(slot(boundBox(graph1),'upRight'),'y')
   workingHeight<<-size.y*scalingFactorY+10
-  workingWidth<<-size.x*scalingFactorX+offsetX
+  workingWidth<<-size.x*scalingFactorX+offsetX*2.
   tkconfigure(canvas, scrollregion=c(0,0,workingWidth,workingHeight))
   ### WARNING: all tk objects MUST have the draw tag !!!
   tkdelete(canvas, "draw")
