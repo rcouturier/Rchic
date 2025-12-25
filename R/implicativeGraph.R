@@ -90,7 +90,7 @@ implicativeGraph <-function(fileName,list.variables,computing.mode=1,complete.gr
   tkpack(xscr, side = "bottom", fill = "x")
   tkpack(yscr, side = "right", fill = "y")
   tkpack(canvas, side = "left", fill="both", expand=1)
-  plotFont <<- "Helvetica 12"
+  plotFont <<- "Helvetica 10"
   toolbarItem(list.variables,list.tcl,callPlotImplicativeGraph)
   callPlotImplicativeGraph()
 }
@@ -602,7 +602,7 @@ plotImplicativeGraph <- function(thres=99,value,cbvalue,color,list.selected.item
         #get the name of the node
         name=node[[1]]
         #create the text
-        p<-tkcreate(canvas, "text", coord$x, coord$y, text=name,font=plotFont, fill="brown",tags="text")
+        p<-tkcreate(canvas, "text", coord$x, coord$y, text=name,font=plotFont, fill="black",tags="text")
         #function to track the mouse
         tkitembind(canvas, p, "<1>", text_pressed(i))
         tkitembind(canvas, p,"<B1-Motion>", text_move(i))
