@@ -28,7 +28,10 @@ toolbarItem <- function(list.variables,list.tcl,mycallPlot) {
   
   list.buttons = lapply(list.variables,function(i) ttkbutton(frame,text=i,width=max.length))     #,state="disabled"
   
-  lapply(seq_along(list.buttons),function(i) {tkgrid(list.buttons[[i]],row=floor((i-1)/10),column=(i-1)%%10) })
+  #lapply(seq_along(list.buttons),function(i) {tkgrid(list.buttons[[i]],row=floor((i-1)/10),column=(i-1)%%10) })
+  lapply(seq_along(list.buttons),function(i) {tkgrid(list.buttons[[i]],column=floor((i-1)/30),row=(i-1)%%30) })
+  
+  
   
   actionOK <- function() {
     print("OK")  
